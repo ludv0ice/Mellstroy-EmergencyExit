@@ -1,0 +1,1 @@
+[{"type":0,"number":"0","other":null,"code":"image_speed=0\nalarm[0]=1+random(1500)"},{"type":2,"number":"0","other":null,"code":"image_speed=0.1\nalarm[0]=900+random(500)\n"},{"type":7,"number":"7","other":null,"code":"image_speed=0"}]

@@ -1,0 +1,1 @@
+[{"type":0,"number":"0","other":null,"code":"image_speed=0\nsprite_index=choose(sprPlant1,sprPlant2)\nimage_angle=random(360)"}]

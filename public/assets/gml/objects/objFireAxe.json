@@ -1,0 +1,1 @@
+[{"type":0,"number":"0","other":null,"code":"image_speed=0"},{"type":3,"number":"0","other":null,"code":"if image_index=0 {\nif place_meeting(x-4,y,objPlayer) {\nimage_index=1\naudio_play_sound(sndDoorOpen,0,false)\nmy_id=instance_create(x-4,y,objWeapon)\nmy_id.image_index=15\n}\n}\n"}]

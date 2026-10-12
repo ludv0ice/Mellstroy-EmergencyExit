@@ -1,0 +1,1 @@
+[{"type":0,"number":"0","other":null,"code":"amount=10\namount2=8\nif room=rmLevelSelect {amount=5 amount2=4}\nimage_speed=0\nimage_index=random(1000)"},{"type":3,"number":"0","other":null,"code":"amount*=1.01\namount2*=1.0125\nif amount>240 instance_destroy()"}]

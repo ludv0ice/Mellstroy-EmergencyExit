@@ -1,0 +1,1 @@
+[{"type":0,"number":"0","other":null,"code":"x=room_width/2\ni=0\nrepeat (6) {\nindex[i]=floor(random(4))\ni+=1\n}\ndir=0"},{"type":8,"number":"0","other":null,"code":""}]

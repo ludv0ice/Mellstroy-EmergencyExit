@@ -1,0 +1,1 @@
+[{"type":0,"number":"0","other":null,"code":"swats=4\n"},{"type":2,"number":"0","other":null,"code":"if swats>0 {\nswats-=1\nmy_id=instance_create(x,y,objSwat)\nwith my_id {move_contact_solid(180,200) x+=8 direction=270 diradd=1}\nmy_id=instance_create(x,y,objSwat)\nwith my_id {move_contact_solid(0,200) x-=8 direction=270 diradd=-1}\nalarm[0]=180\n}"}]

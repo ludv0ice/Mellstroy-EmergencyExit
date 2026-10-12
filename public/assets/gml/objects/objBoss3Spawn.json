@@ -1,0 +1,1 @@
+[{"type":3,"number":"0","other":null,"code":"if global.done=1 {\nif objPlayer.y<288 {\ninstance_destroy()\ninstance_create(352,-160,objVan)\n}\n}"}]

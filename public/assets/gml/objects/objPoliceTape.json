@@ -1,0 +1,1 @@
+[{"type":3,"number":"0","other":null,"code":"if place_meeting(x,y-2,objPlayer) {\nif objPlayer.x>x+13 and objPlayer.x<x+19 {\nwith objPlayer instance_destroy()\ninstance_create(x,y,objPlayerRipTape)\ninstance_destroy()\n}\n}"}]

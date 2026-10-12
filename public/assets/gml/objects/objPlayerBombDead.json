@@ -1,0 +1,1 @@
+[{"type":0,"number":"0","other":null,"code":"friction=0.1\nbled=0"},{"type":3,"number":"0","other":null,"code":"if speed=0 {if bled=0 {bled=1 instance_create(x,y,objBloodPool)}}"}]

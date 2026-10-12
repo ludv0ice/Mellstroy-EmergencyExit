@@ -1,0 +1,1 @@
+[{"type":0,"number":"0","other":null,"code":"image_speed=0.5+random(0.1)\nimage_index=random(3)\nif (room==rmArcadeUpstairs) sprite_index=choose(sprArcadeCabinet1,sprArcadeCabinet2,sprArcadeCabinet3,sprArcadeCabinet4,sprArcadeCabinet5,sprArcadeCabinet6,sprArcadeCabinet7,sprArcadeCabinet8,sprArcadeCabinet9,sprArcadeCabinet10,sprArcadeCabinet11)\n"}]

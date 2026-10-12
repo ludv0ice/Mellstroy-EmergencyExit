@@ -1,0 +1,1 @@
+[{"type":0,"number":"0","other":null,"code":"image_speed=0"},{"type":3,"number":"0","other":null,"code":"if instance_exists(objPlayer) {\nif point_distance(x,y+32,objPlayer.x,objPlayer.y)<80 {\nif place_meeting(x,y,objPlayer) exit\nif image_index<9 image_index+=0.5\nif place_meeting(x,y,objPlayer) image_index-=0.5\n} else {\nif image_index>0 image_index-=0.5\n}\n}"}]

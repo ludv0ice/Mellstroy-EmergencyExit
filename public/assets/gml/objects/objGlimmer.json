@@ -1,0 +1,1 @@
+[{"type":0,"number":"0","other":null,"code":"image_speed=0\nangle=random(360)\nindex=random(1000)"},{"type":3,"number":"0","other":null,"code":"image_index=(view_xview[0]+view_yview[0])*0.1+index\nimage_angle=angle+(view_xview[0]+view_yview[0])*0.02\nindex+=0.05"}]

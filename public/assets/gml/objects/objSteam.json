@@ -1,0 +1,1 @@
+[{"type":0,"number":"0","other":null,"code":"image_speed=0.15+random(0.05)\nimage_alpha=0.25\nimage_angle=random(360)\nfriction=0.1"},{"type":3,"number":"0","other":null,"code":"if image_index>8.3 instance_destroy()"},{"type":8,"number":"0","other":null,"code":"draw_sprite_ext(sprite_index,image_index,x,y,image_xscale,image_yscale,image_angle,image_blend,image_alpha)"}]

@@ -1,0 +1,1 @@
+[{"type":3,"number":"0","other":null,"code":"edge = 200;//distance outside the view to make extra rain\n\nrepeat(10)//number of drops to make each step\n{\n    //make rain drops appear randomly\n    instance_create(view_xview[0]-edge+random(view_wview[0]+edge*2), view_yview[0]-edge+random(view_hview[0]+edge*2), objRain);\n}\n"}]

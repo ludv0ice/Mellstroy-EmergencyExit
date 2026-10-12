@@ -1,0 +1,1 @@
+[{"type":0,"number":"0","other":null,"code":"image_speed=0\nframes=sprite_get_number(sprite_index)"},{"type":3,"number":"0","other":null,"code":"if image_index<frames-1 image_index+=0.2"}]

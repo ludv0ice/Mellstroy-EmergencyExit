@@ -1,0 +1,1 @@
+[{"type":0,"number":"0","other":null,"code":"speed=0.05\ndirection=random(360)\nimage_angle=random(360)\n"},{"type":3,"number":"0","other":null,"code":"image_angle-=abs(hspeed)\nif !place_free(x+hspeed*20,y) hspeed=-hspeed\nif !place_free(x,y+vspeed*20) vspeed=-vspeed"}]

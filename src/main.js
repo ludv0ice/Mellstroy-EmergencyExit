@@ -1,0 +1,172 @@
+import Phaser from 'phaser';
+import './style.css';
+import {GameView} from './renderer.js';
+import {Simulation} from './simulation.js';
+import {CHAPTERS,PROFILES} from './campaign.js';
+import {AudioEngine} from './audio.js';
+
+const $=id=>document.getElementById(id);
+const overlays=['menu','briefing','chapter-panel','archive-panel','pause','death','result','settings'];
+function stored(key,fallback){try{return JSON.parse(localStorage.getItem(key))??fallback;}catch{return fallback;}}
+function save(key,value){try{localStorage.setItem(key,JSON.stringify(value));}catch{}}
+const app={
+  mode:'loading',manifest:null,skins:null,view:null,chapter:CHAPTERS[0],floorIndex:0,profile:PROFILES[0],isArchive:false,runScore:0,runTime:0,deaths:0,
+  progress:stored('emergency-exit-progress',{unlocked:0,best:{},last:0}),
+  settings:stored('emergency-exit-settings',{sound:65,music:35,effects:true,crt:true}),
+  cache:new Map(),floorStates:new Map(),checkpoints:new Map(),
+  async room(id){if(!this.cache.has(id)){const r=await fetch('/assets/rooms/'+id+'.json');if(!r.ok)throw Error('Не удалось загрузить комнату '+id);this.cache.set(id,await r.json());}return this.cache.get(id);},
+  overlay(id){for(const name of overlays)$(name).classList.toggle('hidden',name!==id);
+    if(this.view?.input.keyboard)this.view.input.keyboard.enabled=['playing','paused','dead'].includes(this.mode);
+    const playing=['playing','paused','dead','result','escaping'].includes(this.mode);$('hud').classList.toggle('hidden',!playing);$('weapon-hud').classList.toggle('hidden',!playing);$('touch-controls').classList.toggle('hidden',this.mode!=='playing'||!window.matchMedia('(pointer:coarse)').matches);
+  },
+  async onReady(view){this.view=view;
+    try{const raw=await this.room('rmSequence1');const sim=new Simulation(this.manifest,raw,PROFILES[0]);await view.setWorld(sim,true);
+      $('loading').classList.add('hidden');this.mode='menu';this.overlay('menu');
+    }catch(error){this.fail(error);}
+  },
+  fail(error){$('loading').classList.remove('hidden');$('load-label').textContent=error.message;console.error(error);},
+  async load(id,carry=null,reuse=false){
+    this.mode='loading';this.overlay(null);$('loading').classList.remove('hidden');$('load-label').textContent='Загрузка '+id+'…';$('load-progress').style.width='70%';
+    try{const raw=await this.room(id);const sim=reuse&&this.floorStates.has(id)?this.floorStates.get(id):new Simulation(this.manifest,raw,this.profile);
+      if(carry){sim.player.weapon=carry.weapon;sim.player.ammo=carry.ammo;sim.player.armor=carry.armor;
+        const entry=carry.from&&sim.exits.find(e=>e.init.nextroom===carry.from||e.code.includes(carry.from));
+        if(entry){const pos=sim.safeSpawn(entry);sim.player.x=pos.x;sim.player.y=pos.y;}
+      }
+      sim.status='playing';sim.player.alive=true;sim.grace=.6;
+      if(!reuse)this.checkpoints.set(id,{weapon:sim.player.weapon,ammo:sim.player.ammo,armor:sim.player.armor});
+      if(!this.isArchive)this.floorStates.set(id,sim);
+      this.configureExit(sim);await this.view.setWorld(sim);
+      this.sim=sim;this.mode='playing';this.overlay(null);$('loading').classList.add('hidden');this.audio.start();this.updateHUD();
+      this.toast(sim.total?`ПЕРИМЕТР: ${sim.total} ПРОТИВНИКОВ`:'НАЙДИ ВЫХОД');
+    }catch(error){this.fail(error);}
+  },
+  briefing(index){this.chapter=CHAPTERS[index];this.isArchive=false;this.mode='briefing';this.overlay('briefing');
+    $('brief-number').textContent='ГЛАВА '+this.chapter.number+' / ПОБЕГ ИЗ ГОРОДА';$('brief-title').textContent=this.chapter.title;$('brief-text').textContent=this.chapter.brief;
+  },
+  start(){this.profile=PROFILES.find(p=>p.id===$('profile').value)??PROFILES[0];this.floorIndex=0;this.runScore=0;this.runTime=0;this.deaths=0;
+    this.floorStates.clear();this.checkpoints.clear();
+    this.progress.last=this.chapter.index;save('emergency-exit-progress',this.progress);this.load(this.chapter.rooms[0]);
+  },
+  restart(){if(!this.sim)return;this.deaths++;this.load(this.sim.room.id,this.checkpoints.get(this.sim.room.id));},
+  togglePause(){if(this.mode==='playing'){this.mode='paused';this.overlay('pause');this.audio.active=false;}
+    else if(this.mode==='paused'){this.mode='playing';this.overlay(null);this.audio.active=true;}},
+  menu(){this.mode='menu';this.overlay('menu');$('continue').textContent=this.progress.unlocked?'ПРОДОЛЖИТЬ ПОБЕГ ↗':'НАЧАТЬ ПОБЕГ ↗';$('combo').classList.add('hidden');if(this.view)this.view.preview=true;this.audio.active=true;this.renderChapters();},
+  onEvent(event){if(event.type==='death'){this.mode='dead';this.overlay('death');this.audio.active=false;$('combo').classList.add('hidden');}
+    if(event.type==='clear')this.toast('ПЕРИМЕТР ЧИСТ · К ВЫХОДУ');
+    if(event.type==='complete')this.beginExit();
+  },
+  beginExit(){
+    if(/PlayerCarEnter/.test(this.sim.exit.name??'')){
+      this.mode='escaping';this.escape={elapsed:0,start:{x:this.sim.player.x,y:this.sim.player.y},target:this.sim.exit};this.overlay(null);this.audio.play('sndCarOpen');
+    }else this.complete();
+  },
+  advanceExit(dt){
+    const e=this.escape;e.elapsed+=dt;const t=Math.min(1,e.elapsed/.45);
+    this.sim.player.x=e.start.x+(e.target.x-e.start.x)*t;this.sim.player.y=e.start.y+(e.target.y-e.start.y)*t;
+    this.sim.player.visible=e.elapsed<.42;
+    if(e.elapsed>.85){this.audio.play('sndCarEngine');this.escape=null;this.complete();}
+  },
+  configureExit(sim){
+    if(this.isArchive)return;
+    const forward=this.chapter.rooms.slice(this.floorIndex+1).some(id=>!this.floorStates.get(id)?.cleared);
+    this.returning=!forward&&this.floorIndex>0;
+    const target=forward?this.chapter.rooms[this.floorIndex+1]:this.returning?this.chapter.rooms[this.floorIndex-1]:null;
+    if(target){const candidates=sim.exits.filter(e=>!/PlayerCarEnter/.test(e.name));
+      sim.exit=candidates.find(e=>e.init.nextroom===target||e.code.includes(target))??candidates.find(e=>e.code.includes(forward?'room_next':'room_previous'))??candidates.sort((a,b)=>Math.hypot(b.x-sim.player.x,b.y-sim.player.y)-Math.hypot(a.x-sim.player.x,a.y-sim.player.y))[0]??sim.exit;
+    }else sim.exit=sim.exits.find(e=>/PlayerCarEnter/.test(e.name))??sim.exit;
+  },
+  complete(){
+    if(!this.isArchive){
+      this.floorStates.set(this.sim.room.id,this.sim);
+      const unfinished=this.chapter.rooms.slice(this.floorIndex+1).some(id=>!this.floorStates.get(id)?.cleared);
+      if(unfinished||this.floorIndex>0){
+        const carry={weapon:this.sim.player.weapon,ammo:this.sim.player.ammo,armor:this.sim.player.armor,from:this.sim.room.id};
+        this.floorIndex+=unfinished?1:-1;
+        this.runScore=[...this.floorStates.entries()].filter(([id])=>id!==this.chapter.rooms[this.floorIndex]).reduce((n,[,s])=>n+s.score,0);
+        this.load(this.chapter.rooms[this.floorIndex],carry,true);return;
+      }
+      this.runScore=[...this.floorStates.values()].reduce((n,s)=>n+s.score,0);this.runTime=[...this.floorStates.values()].reduce((n,s)=>n+s.elapsed,0);
+    }else{this.runScore=this.sim.score;this.runTime=this.sim.elapsed;}
+    this.mode='result';this.overlay('result');$('combo').classList.add('hidden');
+    const base=(this.isArchive?this.sim.total:[...this.floorStates.values()].reduce((n,s)=>n+s.total,0))*400,grade=this.runScore>base*2.5?'A+':this.runScore>base*1.6?'A':this.runScore>base?'B':'C';
+    $('result-score').textContent=this.runScore.toLocaleString('ru-RU');$('result-time').textContent=this.runTime.toFixed(1)+'s';$('result-grade').textContent=grade;
+    $('result-title').textContent=!this.isArchive&&this.chapter.index===15?'ГОРОД ПОЗАДИ.':'ЧИСТО.';
+    if(!this.isArchive){this.progress.unlocked=Math.max(this.progress.unlocked,Math.min(CHAPTERS.length-1,this.chapter.index+1));
+      const best=this.progress.best[this.chapter.index];if(!best||best.score<this.runScore)this.progress.best[this.chapter.index]={score:this.runScore,grade,time:this.runTime};
+      save('emergency-exit-progress',this.progress);
+      this.progress.last=Math.min(CHAPTERS.length-1,this.chapter.index+1);save('emergency-exit-progress',this.progress);
+    }
+    $('next').textContent=this.isArchive?'В АРХИВ КОМНАТ':this.chapter.index===CHAPTERS.length-1?'ЗАВЕРШИТЬ ПОБЕГ':'СЛЕДУЮЩАЯ ГЛАВА ↗';
+  },
+  updateHUD(){const s=this.sim;if(!s)return;$('hud-number').textContent=this.isArchive?'GMX /':this.chapter.number+' /';$('hud-title').textContent=this.isArchive?s.room.id:this.chapter.title;
+    $('hud-floor').textContent=this.isArchive?'АРХИВНЫЙ МАРШРУТ':`ЛОКАЦИЯ ${this.floorIndex+1} / ${this.chapter.rooms.length} · ${this.returning?'ОБРАТНО К МАШИНЕ':this.profile.name}`;
+    $('hud-enemies').textContent=s.cleared?'ПЕРИМЕТР ЧИСТ':`${s.total-s.kills} / ${s.total} НА ПЕРИМЕТРЕ`;
+    $('hud-score').textContent=(this.runScore+s.score).toLocaleString('ru-RU');$('weapon-name').textContent=s.player.weapon.name.toUpperCase();$('ammo').textContent=s.player.weapon.gun?String(s.player.ammo).padStart(2,'0'):'';$('context').textContent=s.context;
+    $('combo').classList.toggle('hidden',s.combo<2||this.mode!=='playing');$('combo').textContent=s.combo+'× COMBO';
+  },
+  toast(text){$('toast').textContent=text;$('toast').style.opacity='1';clearTimeout(this.toastTimer);this.toastTimer=setTimeout(()=>$('toast').style.opacity='0',2800);},
+  renderChapters(){const list=$('chapter-list');list.replaceChildren();
+    for(const chapter of CHAPTERS){const b=document.createElement('button'),best=this.progress.best[chapter.index];
+      const num=document.createElement('span');num.className='number';num.textContent=chapter.number;
+      const text=document.createElement('span'),strong=document.createElement('strong'),small=document.createElement('small');strong.textContent=chapter.title;small.textContent=chapter.rooms.length+' ЛОКАЦИИ'+(chapter.index>this.progress.unlocked?' · ЕЩЁ НЕ ПРОЙДЕНА':'');text.append(strong,small);b.append(num,text);
+      if(best){const grade=document.createElement('span');grade.className='grade';grade.textContent=best.grade;b.append(grade);}
+      b.addEventListener('click',()=>this.briefing(chapter.index));list.append(b);
+    }
+  },
+  renderRooms(){const q=$('room-search').value.toLowerCase(),combat=$('combat-only').checked,list=$('room-list');list.replaceChildren();
+    for(const room of this.manifest.rooms.filter(r=>r.id.toLowerCase().includes(q)&&(!combat||r.enemies>0))){
+      const b=document.createElement('button'),strong=document.createElement('strong'),small=document.createElement('small');strong.textContent=room.id;small.textContent=`${room.width}×${room.height} · ${room.enemies} ПРОТИВНИКОВ`;b.append(strong,small);
+      b.addEventListener('click',()=>{this.isArchive=true;this.floorStates.clear();this.checkpoints.clear();this.profile=PROFILES.find(p=>p.id===$('profile').value)??PROFILES[0];this.runScore=0;this.runTime=0;this.load(room.id);});list.append(b);
+    }
+  },
+  settingsFrom:null,
+  showSettings(){this.settingsFrom=this.mode;this.mode='settings';this.overlay('settings');this.audio.active=false;},
+  applySettings(){document.body.classList.toggle('no-crt',!this.settings.crt);this.audio?.updateVolumes();save('emergency-exit-settings',this.settings);}
+};
+
+async function boot(){
+  try{
+    [app.manifest,app.skins]=await Promise.all([fetch('/assets/manifest.json').then(r=>r.json()),fetch('/assets/custom/skins.json').then(r=>r.json())]);
+    app.audio=new AudioEngine(app.manifest,app.settings);app.applySettings();$('room-count').textContent=app.manifest.stats.rooms;
+    for(const profile of PROFILES){const o=document.createElement('option');o.value=profile.id;o.textContent=profile.name+' — '+profile.tag;$('profile').append(o);}
+    app.renderChapters();app.renderRooms();$('load-progress').style.width='35%';
+    const scene=new GameView();scene.app=app;
+    app.game=new Phaser.Game({type:Phaser.CANVAS,parent:'game',backgroundColor:'#130d21',antialias:false,pixelArt:true,roundPixels:true,
+      scale:{mode:Phaser.Scale.RESIZE,width:window.innerWidth,height:window.innerHeight},scene:[scene],audio:{noAudio:true},input:{activePointers:3},fps:{target:60,forceSetTimeOut:false}});
+    bindUI();
+    // Read-only, serializable bridge for reproducible gameplay verification.
+    window.__GAME__={getState:()=>app.sim?.snapshot()??{status:app.mode},get mode(){return app.mode;},get stats(){return app.manifest.stats;},get camera(){return {x:app.view.cameraPoint.x,y:app.view.cameraPoint.y,zoom:app.view.zoom};}};
+  }catch(error){app.fail(error);}
+}
+function bindUI(){
+  $('continue').textContent=app.progress.unlocked?'ПРОДОЛЖИТЬ ПОБЕГ ↗':'НАЧАТЬ ПОБЕГ ↗';
+  $('continue').onclick=()=>{app.audio.start();app.briefing(app.progress.last??0);};$('deploy').onclick=()=>app.start();
+  $('chapters-button').onclick=()=>{app.mode='chapters';app.renderChapters();app.overlay('chapter-panel');};
+  $('archive-button').onclick=()=>{app.mode='archive';app.renderRooms();app.overlay('archive-panel');};
+  $('room-search').oninput=()=>app.renderRooms();$('combat-only').onchange=()=>app.renderRooms();
+  for(const b of document.querySelectorAll('.back'))b.onclick=()=>app.menu();
+  $('pause-button').onclick=()=>app.togglePause();$('resume').onclick=()=>app.togglePause();$('restart').onclick=()=>app.restart();
+  for(const id of ['to-menu','death-menu','result-menu'])$(id).onclick=()=>app.menu();
+  $('retry').onclick=()=>app.restart();$('result-retry').onclick=()=>{app.runScore=0;app.runTime=0;app.floorIndex=0;app.floorStates.clear();app.checkpoints.clear();app.load(app.isArchive?app.sim.room.id:app.chapter.rooms[0]);};
+  $('next').onclick=()=>{if(app.isArchive){app.mode='archive';app.overlay('archive-panel');return;}if(app.chapter.index===CHAPTERS.length-1)app.menu();else app.briefing(app.chapter.index+1);};
+  $('settings-button').onclick=()=>app.showSettings();$('pause-settings').onclick=()=>app.showSettings();
+  $('settings-back').onclick=()=>{app.mode=app.settingsFrom;if(app.mode==='paused')app.overlay('pause');else app.menu();};
+  for(const [id,key] of [['sound-volume','sound'],['music-volume','music']]){$(id).value=app.settings[key];$(id).oninput=()=>{app.settings[key]=Number($(id).value);app.audio.start();app.applySettings();};}
+  for(const key of ['effects','crt']){$(key).checked=app.settings[key];$(key).onchange=()=>{app.settings[key]=$(key).checked;app.applySettings();};}
+  $('fullscreen').onclick=()=>{if(!document.fullscreenElement)document.documentElement.requestFullscreen?.();else document.exitFullscreen?.();};
+  window.addEventListener('blur',()=>{if(app.mode==='playing')app.togglePause();});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden&&app.mode==='playing')app.togglePause();});
+  touchInput();
+}
+function touchInput(){
+  const pad=$('move-pad'),stick=pad.querySelector('i');let touch=null;
+  pad.onpointerdown=e=>{touch=e.pointerId;pad.setPointerCapture(touch);app.audio.start();update(e);};
+  pad.onpointermove=e=>{if(e.pointerId===touch)update(e);};
+  function update(e){const r=pad.getBoundingClientRect(),dx=(e.clientX-r.left-60)/45,dy=(e.clientY-r.top-60)/45,length=Math.max(1,Math.hypot(dx,dy));app.view.controls.moveX=dx/length;app.view.controls.moveY=dy/length;stick.style.transform=`translate(${dx/length*35}px,${dy/length*35}px)`;}
+  const end=()=>{touch=null;app.view.controls.moveX=0;app.view.controls.moveY=0;stick.style.transform='';};pad.onpointerup=end;pad.onpointercancel=end;
+  for(const b of document.querySelectorAll('[data-action]')){
+    b.onpointerdown=e=>{e.preventDefault();b.setPointerCapture(e.pointerId);const a=b.dataset.action;if(a==='attack')app.view.controls.attack=true;else app.view.pending[a]=true;if(a==='pickup')app.view.pending.pickup=true;};
+    b.onpointerup=()=>app.view.controls.attack=false;b.onpointercancel=()=>app.view.controls.attack=false;
+  }
+}
+boot();
