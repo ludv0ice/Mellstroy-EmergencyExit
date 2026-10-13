@@ -19,6 +19,9 @@ export function buildRoom(manifest, raw) {
     ...defaults,
     id,
     ...entity,
+    // The yellow wall sprites were imported as decoration, but are barriers.
+    solid: entity.solid || /^objWallSoft[HV]$/.test(entity.name),
+    isWall: entity.isWall || /^objWallSoft[HV]$/.test(entity.name),
     init: { ...entity.init },
     meta: manifest.sprites[entity.sprite],
     mask: manifest.sprites[entity.mask],

@@ -81,6 +81,27 @@ const definitions = [
   ['Звезда', 'Throw'],
   ['Молотов', 'Throw'],
 ];
+// Reach in world pixels, before the target's collision radius is added.
+const meleeReach = {
+  Club: 48,
+  Pipe: 38,
+  Bat: 42,
+  Knife: 28,
+  Sword: 52,
+  Pool: 58,
+  PoolBroke: 36,
+  Axe: 40,
+  NightStick: 34,
+  Crowbar: 37,
+  Machete: 44,
+  SledgeHammer: 50,
+  Trophy: 30,
+  Drill: 27,
+  Pan: 33,
+  BoilingPot: 31,
+  Pot: 29,
+  Bag: 26,
+};
 export const WEAPONS = definitions.map((d, id) => ({
   id,
   name: d[0],
@@ -92,7 +113,7 @@ export const WEAPONS = definitions.map((d, id) => ({
   spread: d[5] ?? 0,
   speed: d[6] ?? 0,
   sound: d[7] ?? 'sndSwing1',
-  range: id === 5 ? 25 : id === 8 ? 39 : 32,
+  range: meleeReach[d[1]] ?? 0,
   sharp: [5, 8, 15, 18, 21].includes(id),
   throwOnly: id >= 27,
   silent: [7, 25].includes(id),

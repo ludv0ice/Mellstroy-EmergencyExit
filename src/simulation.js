@@ -11,6 +11,8 @@ import {
   Navigation,
 } from './physics.js';
 
+export const STUN_DURATION = 3.1;
+
 export class Simulation {
   constructor(manifest, raw, profile, seed = 1) {
     this.manifest = manifest;
@@ -289,6 +291,7 @@ export class Simulation {
     if (p.moving > 4) p.frame = (p.frame + dt * p.moving * 0.05) % 8;
     else p.frame = 0;
     if (input.pickup) this.pickup();
+    if (input.drop) this.dropWeapon();
     if (input.throw) this.throwWeapon();
     if (input.execute) this.execute();
     if (input.attack && p.fireTimer <= 0 && p.execution <= 0) this.attack();
@@ -339,9 +342,12 @@ export class Simulation {
         weapon: p.weapon,
         ammo: p.ammo,
         frame: p.weapon.id,
+        ammoBonusApplied: true,
       });
     p.weapon = item.weapon;
-    p.ammo = Math.round(item.ammo * (this.profile.ammoBonus ?? 1));
+    p.ammo = Math.round(
+      item.ammo * (item.ammoBonusApplied ? 1 : (this.profile.ammoBonus ?? 1)),
+    );
     item.taken = true;
     this.sound('sndPickupWeapon');
   }
@@ -385,7 +391,7 @@ export class Simulation {
             this.profile.disarm && enemy.weapon !== UNARMED
               ? { weapon: enemy.weapon, ammo: enemy.ammo }
               : null;
-          this.stun(enemy, 3.1);
+          this.stun(enemy, STUN_DURATION);
           if (stolen) {
             p.weapon = stolen.weapon;
             p.ammo = stolen.ammo;
@@ -406,12 +412,14 @@ export class Simulation {
         if (
           box.entity.glass &&
           !box.entity.broken &&
-          circleRect(
-            p.x + Math.cos(p.angle) * 24,
-            p.y + Math.sin(p.angle) * 24,
-            12,
+          rayRect(
+            p.x,
+            p.y,
+            p.x + Math.cos(p.angle) * w.range,
+            p.y + Math.sin(p.angle) * w.range,
             box,
-          )
+            6,
+          ) !== null
         )
           this.breakGlass(box.entity);
     }
@@ -442,6 +450,29 @@ export class Simulation {
     }
     if (!w.silent && !(team === 'player' && this.profile.silentShots))
       this.noise(actor, 320);
+  }
+  dropWeapon() {
+    const p = this.player;
+    if (p.weapon === UNARMED) return;
+    const ahead = {
+      x: p.x + Math.cos(p.angle) * 12,
+      y: p.y + Math.sin(p.angle) * 12,
+    };
+    const at =
+      !this.blocked(ahead.x, ahead.y, 7) && !this.lineBlocked(p, ahead, true)
+        ? ahead
+        : p;
+    this.items.push({
+      x: at.x,
+      y: at.y,
+      angle: p.angle,
+      weapon: p.weapon,
+      ammo: p.ammo,
+      frame: p.weapon.id,
+      ammoBonusApplied: true,
+    });
+    p.weapon = UNARMED;
+    p.ammo = 0;
   }
   throwWeapon() {
     const p = this.player;
@@ -500,6 +531,7 @@ export class Simulation {
       weapon: e.weapon,
       ammo: e.ammo,
       frame: e.weapon.id,
+      ammoBonusApplied: !!e.ammoBonusApplied,
     });
     e.weapon = UNARMED;
     e.ammo = 0;
@@ -592,6 +624,7 @@ export class Simulation {
     }
     e.fireTimer = Math.max(0, e.fireTimer - dt);
     e.routeTimer -= dt;
+    e.patrolTurn = Math.max(0, e.patrolTurn - dt);
     if (e.stun > 0) {
       e.stun = Math.max(0, e.stun - dt);
       if (e.stun === 0) {
@@ -646,7 +679,14 @@ export class Simulation {
               this.moveEnemy(e, e.route[0], (e.dog ? 175 : 115) * dt, dt);
           }
         }
-        if (d < 20 && sees && e.reaction <= 0 && e.fireTimer <= 0) {
+        const melee = e.weapon.gun ? UNARMED : e.weapon;
+        if (
+          d < melee.range + p.radius &&
+          sees &&
+          !this.lineBlocked(e, p) &&
+          e.reaction <= 0 &&
+          e.fireTimer <= 0
+        ) {
           this.die();
           e.fireTimer = 0.4;
         }
@@ -656,14 +696,31 @@ export class Simulation {
       e.lastSeen = null;
       e.moving = 0;
       if (!e.stationary) {
-        const dx = Math.cos(e.angle) * 60 * dt,
-          dy = Math.sin(e.angle) * 60 * dt;
-        if (this.blocked(e.x + dx * 6, e.y + dy * 6, 8)) {
-          e.angle += Math.PI / 2;
-          e.patrolTurn = 0;
-        } else {
-          this.move(e, dx, dy, dt);
-          e.moving = 60;
+        const clear = (angle) =>
+          !this.blocked(
+            e.x + Math.cos(angle) * 12,
+            e.y + Math.sin(angle) * 12,
+            8,
+          );
+        if (!clear(e.angle) && e.patrolTurn === 0) {
+          const next = [
+            e.angle + Math.PI / 2,
+            e.angle - Math.PI / 2,
+            e.angle + Math.PI,
+          ].find(clear);
+          if (next !== undefined)
+            e.angle = Math.atan2(Math.sin(next), Math.cos(next));
+          e.patrolTurn = 0.35;
+        }
+        if (clear(e.angle)) {
+          const before = { x: e.x, y: e.y };
+          this.move(
+            e,
+            Math.cos(e.angle) * 60 * dt,
+            Math.sin(e.angle) * 60 * dt,
+            dt,
+          );
+          e.moving = dt > 0 ? distance(before, e) / dt : 0;
         }
       }
     }
@@ -673,6 +730,7 @@ export class Simulation {
       if (item) {
         e.weapon = item.weapon;
         e.ammo = item.ammo;
+        e.ammoBonusApplied = !!item.ammoBonusApplied;
         item.taken = true;
       }
     }
@@ -708,10 +766,10 @@ export class Simulation {
           hit = { box };
         }
       }
-      const targets = [
-        ...this.enemies.filter((e) => e.alive),
-        ...(b.team === 'enemy' ? [this.player] : []),
-      ];
+      const targets =
+        b.team === 'enemy'
+          ? [this.player]
+          : this.enemies.filter((e) => e.alive);
       for (const actor of targets) {
         if (actor === b.owner || actor.alive === false) continue;
         const t = segmentCircle(
@@ -742,13 +800,8 @@ export class Simulation {
           } else this.sound('sndHitWall');
         } else if (hit.actor === this.player) this.takeBullet();
         else if (b.thrown) {
-          if (
-            b.weapon.sharp ||
-            b.weapon.throwOnly ||
-            this.profile.killingThrows
-          )
-            this.kill(hit.actor, 'cut');
-          else this.stun(hit.actor, 3.2);
+          if (this.profile.killingThrows) this.kill(hit.actor, 'cut');
+          else this.stun(hit.actor, STUN_DURATION);
         } else {
           hit.actor.hp--;
           if (hit.actor.hp <= 0) this.kill(hit.actor, 'shot');
@@ -768,13 +821,21 @@ export class Simulation {
       )
         b.dead = true;
       if (b.dead && b.thrown) {
+        // Keep a recovered weapon on the near side of a wall and inside the map.
+        const speed = Math.hypot(b.vx, b.vy);
+        const offset = hit?.box ? 9 : 0;
+        const at = this.safeSpawn({
+          x: clamp(b.x - (b.vx / speed) * offset, 8, this.room.width - 8),
+          y: clamp(b.y - (b.vy / speed) * offset, 8, this.room.height - 8),
+        });
         this.items.push({
-          x: b.x,
-          y: b.y,
+          x: at.x,
+          y: at.y,
           angle: b.angle,
           weapon: b.weapon,
           ammo: b.ammo,
           frame: b.weapon.id,
+          ammoBonusApplied: true,
         });
       }
     }

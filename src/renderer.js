@@ -24,7 +24,7 @@ export class GameView extends Phaser.Scene {
       this.texture.setSize(size.width, size.height);
     });
     this.keys = this.input.keyboard.addKeys(
-      'W,A,S,D,UP,DOWN,LEFT,RIGHT,SHIFT,SPACE,E,F,R,ESC',
+      'W,A,S,D,UP,DOWN,LEFT,RIGHT,SHIFT,SPACE,E,F,Q,R,ESC',
     );
     this.input.mouse.disableContextMenu();
     this.pending = {};
@@ -48,6 +48,7 @@ export class GameView extends Phaser.Scene {
       if (this.app?.mode === 'playing' && !event.repeat) {
         if (event.code === 'KeyE') this.pending.pickup = true;
         if (event.code === 'KeyF') this.pending.throw = true;
+        if (event.code === 'KeyQ') this.pending.drop = true;
         if (event.code === 'Space') this.pending.execute = true;
       }
     });
@@ -281,6 +282,7 @@ export class GameView extends Phaser.Scene {
       moveY:
         (down('S') || down('DOWN') ? 1 : 0) - (down('W') || down('UP') ? 1 : 0),
       attack: pointer.isDown && pointer.leftButtonDown(),
+      drop: Phaser.Input.Keyboard.JustDown(keys.Q) || this.pending.drop,
       pickup: Phaser.Input.Keyboard.JustDown(keys.E) || this.pending.pickup,
       execute:
         Phaser.Input.Keyboard.JustDown(keys.SPACE) || this.pending.execute,
@@ -500,13 +502,6 @@ export class GameView extends Phaser.Scene {
           p.angle,
           0.65,
         );
-      if (p.attack > 0 && !p.weapon.gun) {
-        ctx.strokeStyle = '#ffe9c7';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.weapon.range ?? 25, p.angle - 0.8, p.angle + 0.8);
-        ctx.stroke();
-      }
     } else if (!p.alive)
       this.drawCustom(ctx, 'hero', 0, p.x, p.y, p.angle + Math.PI, 0.75);
     ctx.drawImage(this.front, 0, 0);
