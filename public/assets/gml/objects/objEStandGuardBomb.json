@@ -1,1 +1,0 @@
-[{"type":3,"number":"0","other":null,"code":"if !place_free(x,y) {if speed>0 {instance_create(x,y,objBloodPool)} speed=0}"}]

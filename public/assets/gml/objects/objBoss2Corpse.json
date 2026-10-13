@@ -1,1 +1,0 @@
-[{"type":0,"number":"0","other":null,"code":"image_speed=0\nstate=0\ntalked=0"},{"type":3,"number":"0","other":null,"code":"if state=1 {\nimage_speed=0.25\n}"},{"type":7,"number":"7","other":null,"code":"if state=1 nothing=1 else image_speed=0"}]

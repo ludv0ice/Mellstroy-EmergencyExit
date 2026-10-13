@@ -1,1 +1,0 @@
-[{"type":0,"number":"0","other":null,"code":"done = 0;\n"},{"type":7,"number":"7","other":null,"code":"switch(object_index) {\n    case objBloodPool:\n        done = 1;\n        break;\n}\n"}]

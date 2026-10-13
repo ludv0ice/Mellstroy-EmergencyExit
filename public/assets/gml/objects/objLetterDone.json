@@ -1,1 +1,0 @@
-[{"type":0,"number":"0","other":null,"code":"image_speed=0"},{"type":3,"number":"0","other":null,"code":"image_index=-round(current_time*0.015)+x*0.025\n\n"},{"type":8,"number":"0","other":null,"code":"draw_sprite_ext(sprite_index,image_index,x,y,image_xscale,image_yscale,image_angle,image_blend,image_alpha)\n\n"}]

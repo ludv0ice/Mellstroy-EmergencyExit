@@ -1,1 +1,0 @@
-[{"type":0,"number":"0","other":null,"code":"mp_grid_add_instances(global.grid,id,1)\ni=0\nrepeat (16) {\nmy_id=instance_create(x+i*2,y+1,objShard)\nmy_id.direction=90-10+random(20)\nmy_id.speed=random(3)\ni+=1\n}"}]

@@ -8,12 +8,8 @@
 *.py text eol=lf
 *.png binary
 *.jpg binary
-*.ogg binary
 *.wav binary
-*.mp3 binary
-*.dll binary
-*.gmk binary
-*.gm81 binary
 *.ttf binary
-*.otf binary
-*.fon binary
+public/assets/** linguist-generated=true
+tests/fixtures/** linguist-generated=true
+index.html linguist-generated=true

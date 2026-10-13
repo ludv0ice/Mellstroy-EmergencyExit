@@ -1,1 +1,0 @@
-[{"type":3,"number":"0","other":null,"code":"\nif !instance_exists(objPlayer) exit\nif xlimit<0 {\nif objPlayer.x<x and !place_meeting(x,y,objPlayer) solid=1 else solid=0\n}\nif xlimit>0 {\nif objPlayer.x>x and !place_meeting(x,y,objPlayer) solid=1 else solid=0\n}\n\nif global.done=1 solid=0"}]

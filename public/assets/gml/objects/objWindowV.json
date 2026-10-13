@@ -1,1 +1,0 @@
-[{"type":0,"number":"0","other":null,"code":"if x<room_width/2 and sprite_index=sprWindowRight sprite_index=sprWindowLeft\nimage_speed=0\nimage_index=0\n"}]

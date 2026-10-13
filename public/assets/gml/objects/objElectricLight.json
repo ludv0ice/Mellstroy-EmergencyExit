@@ -1,1 +1,0 @@
-[{"type":0,"number":"0","other":null,"code":"r=20"},{"type":8,"number":"0","other":null,"code":"draw_set_blend_mode(bm_add)\ndraw_circle_color(x,y,r,merge_color(c_aqua,c_white,random(1)),c_black,0)\ndraw_set_blend_mode(bm_normal)\nif r>0 r-=2 else instance_destroy()"}]

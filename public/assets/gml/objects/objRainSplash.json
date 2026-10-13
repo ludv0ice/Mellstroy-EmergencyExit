@@ -1,1 +1,0 @@
-[{"type":0,"number":"0","other":null,"code":"/// @description set drawing info\nimage_angle = random(360);\nimage_blend = c_gray;\nimage_speed = .3;\n"},{"type":7,"number":"7","other":null,"code":"/// @description destroy self\ninstance_destroy();\n"}]

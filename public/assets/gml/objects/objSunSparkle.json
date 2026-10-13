@@ -1,1 +1,0 @@
-[{"type":0,"number":"0","other":null,"code":"image_speed=0.1+random(0.1)\nimage_index=random(1000)\ndir=(200-x)*2"}]

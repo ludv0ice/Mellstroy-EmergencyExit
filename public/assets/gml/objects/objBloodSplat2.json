@@ -1,1 +1,0 @@
-[{"type":0,"number":"0","other":null,"code":"addspeed=0.2+random(0.1)\nimage_blend=c_red\nimage_speed=0\nimage_angle=random(360)\nimage_xscale=0.75+random(0.5)\nimage_yscale=image_xscale\n\nscrPatchDepth_Create();\n"},{"type":3,"number":"0","other":null,"code":"if image_index<2 image_index+=addspeed else {if global.blood=0 or global.surfaces=1 addToSurface(global.surf3,0)}"}]

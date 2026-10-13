@@ -1,1 +1,0 @@
-[{"type":0,"number":"0","other":null,"code":"vcapture_init()\ni=0\nfile=\"c:\\program1\\trailer\"\nwhile file_exists(file+string(i)+\".avi\") i+=1\nfile+=string(i)+\".avi\"\nvcapture_begin(window_handle(),file,50)\nsleep(2000)"},{"type":3,"number":"0","other":null,"code":"vcapture_frame()"},{"type":7,"number":"3","other":null,"code":"vcapture_save()"}]

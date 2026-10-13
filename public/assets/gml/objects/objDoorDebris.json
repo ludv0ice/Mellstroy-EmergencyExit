@@ -1,1 +1,0 @@
-[{"type":0,"number":"0","other":null,"code":"image_index=random(8)\nimage_speed=0\ndir_add=-1+round(random(2))\nimage_angle=random(360)\nfriction=0.1"},{"type":3,"number":"0","other":null,"code":"image_angle+=dir_add*speed*2\nif speed=0 {\naddToSurface(global.surf2,1)\n}\n"}]

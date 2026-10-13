@@ -1,1 +1,0 @@
-[{"type":0,"number":"0","other":null,"code":"image_blend=make_color_hsv(25,100,150)\nimage_angle=random(360)\nimage_speed=0.25"},{"type":7,"number":"7","other":null,"code":"instance_destroy()"}]

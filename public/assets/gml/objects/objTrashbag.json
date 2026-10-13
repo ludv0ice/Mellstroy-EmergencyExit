@@ -1,1 +1,0 @@
-[{"type":0,"number":"0","other":null,"code":"image_speed=0\nimage_angle=random(360)\nimage_index=floor(random(3))\nif round(random(3))=2 {\nsprite_index=sprOpenTrashbag\nimage_speed=0.25\n}"}]

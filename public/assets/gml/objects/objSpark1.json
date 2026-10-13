@@ -1,1 +1,0 @@
-[{"type":0,"number":"0","other":null,"code":"image_speed=0.3+random(0.1)\nimage_index=1\nfriction=0.1"},{"type":7,"number":"7","other":null,"code":"instance_destroy()"}]

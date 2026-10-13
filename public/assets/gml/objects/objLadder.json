@@ -1,1 +1,0 @@
-[{"type":3,"number":"0","other":null,"code":"if global.done=1 {\nif place_meeting(x-8,y,objPlayerBiker) {\nwith objPlayerBiker instance_destroy()\ninstance_create(x,y,objBikerClimbUp)\n}\nif place_meeting(x-8,y,objPlayerMouseHouse) {\nwith objPlayerMouseHouse instance_destroy()\ninstance_create(x,y,objPlayerClimbUp)\n}\n}"}]

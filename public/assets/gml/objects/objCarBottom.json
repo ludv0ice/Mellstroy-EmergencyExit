@@ -1,1 +1,0 @@
-[{"type":0,"number":"0","other":null,"code":"if instance_exists(objPlayerCarEnter) {\n    image_angle = objPlayerCarEnter.image_angle;\n}\nalarm[0] = 2;\n"},{"type":2,"number":"0","other":null,"code":"if instance_exists(objPlayerCarEnter) {\n    image_angle = objPlayerCarEnter.image_angle;\n}\n"}]
