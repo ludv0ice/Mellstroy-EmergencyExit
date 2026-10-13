@@ -1,5 +1,6 @@
 import { WEAPONS, UNARMED, weaponBySprite } from './weapons.js';
 import { buildRoom, rectFor } from './rooms.js';
+import { directionForVector } from './player-animation.js';
 import {
   distance,
   clamp,
@@ -123,6 +124,7 @@ export class Simulation {
       x: position.x,
       y: position.y,
       angle: 0,
+      facing: 'down',
       vx: 0,
       vy: 0,
       radius: 7,
@@ -288,8 +290,10 @@ export class Simulation {
     }
     p.moving = Math.hypot(p.vx, p.vy);
     if (p.execution <= 0) this.move(p, p.vx * dt, p.vy * dt, dt);
-    if (p.moving > 4) p.frame = (p.frame + dt * p.moving * 0.05) % 8;
-    else p.frame = 0;
+    if (p.moving > 4) {
+      p.facing = directionForVector(p.vx, p.vy, p.facing);
+      p.frame = (p.frame + dt * p.moving * 0.05) % 8;
+    } else p.frame = 0;
     if (input.pickup) this.pickup();
     if (input.drop) this.dropWeapon();
     if (input.throw) this.throwWeapon();

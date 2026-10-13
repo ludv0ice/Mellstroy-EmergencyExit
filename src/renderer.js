@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { clamp } from './physics.js';
 import { assetUrl } from './assets.js';
+import { playerPose } from './player-animation.js';
 
 export class GameView extends Phaser.Scene {
   constructor() {
@@ -206,7 +207,7 @@ export class GameView extends Phaser.Scene {
     );
     ctx.restore();
   }
-  drawCustom(ctx, key, frame, x, y, angle = 0, alpha = 1) {
+  drawCustom(ctx, key, frame, x, y, angle = 0, alpha = 1, row = 0) {
     const m = this.app.skins[key],
       img = this.images.get('custom-' + key);
     if (!img) return;
@@ -217,7 +218,7 @@ export class GameView extends Phaser.Scene {
     ctx.drawImage(
       img,
       (Math.floor(frame) % m.frames) * m.width,
-      0,
+      clamp(row, 0, (m.rows ?? 1) - 1) * m.height,
       m.width,
       m.height,
       -(m.originX ?? m.width / 2),
@@ -474,6 +475,7 @@ export class GameView extends Phaser.Scene {
         }
       }
     const p = sim.player;
+    const pose = playerPose(p);
     if (p.alive && p.visible !== false) {
       ctx.strokeStyle = '#70f5df';
       ctx.globalAlpha = 0.55;
@@ -482,16 +484,16 @@ export class GameView extends Phaser.Scene {
       ctx.arc(p.x, p.y, 10, 0, Math.PI * 2);
       ctx.stroke();
       ctx.globalAlpha = 1;
-      if (p.attack > 0 && p.weapon.id === -1)
-        this.drawCustom(
-          ctx,
-          'punch',
-          clamp(Math.floor((1 - p.attack / 0.18) * 7), 0, 6),
-          p.x,
-          p.y,
-          p.angle,
-        );
-      else this.drawCustom(ctx, 'hero', p.frame, p.x, p.y, p.angle);
+      this.drawCustom(
+        ctx,
+        pose.key,
+        pose.frame,
+        p.x,
+        p.y,
+        pose.angle,
+        1,
+        pose.row,
+      );
       if (p.weapon.id >= 0)
         this.drawSprite(
           ctx,
@@ -503,7 +505,16 @@ export class GameView extends Phaser.Scene {
           0.65,
         );
     } else if (!p.alive)
-      this.drawCustom(ctx, 'hero', 0, p.x, p.y, p.angle + Math.PI, 0.75);
+      this.drawCustom(
+        ctx,
+        pose.key,
+        pose.frame,
+        p.x,
+        p.y,
+        pose.angle,
+        0.75,
+        pose.row,
+      );
     ctx.drawImage(this.front, 0, 0);
     for (const e of sim.room.entities.filter((e) => e.glass && e.visible)) {
       const broken = e.sprite.replace(/([HV])$/, '$1Broken');

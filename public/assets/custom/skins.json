@@ -59,5 +59,35 @@
     "url": "/assets/custom/floor-atlas.png",
     "width": 816,
     "height": 368
+  },
+  "heroDirectional": {
+    "url": "/assets/custom/mellstroy-directions.png",
+    "width": 60,
+    "height": 60,
+    "frames": 8,
+    "rows": 4,
+    "directions": [
+      "down",
+      "up",
+      "left",
+      "right"
+    ],
+    "originX": 30,
+    "originY": 30
+  },
+  "punchDirectional": {
+    "url": "/assets/custom/mellstroy-attacks.png",
+    "width": 60,
+    "height": 60,
+    "frames": 7,
+    "rows": 4,
+    "directions": [
+      "down",
+      "up",
+      "left",
+      "right"
+    ],
+    "originX": 30,
+    "originY": 30
   }
 }
