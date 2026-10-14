@@ -280,9 +280,9 @@ export const PROFILES = [
   {
     id: 'thrower',
     name: 'ДАЛЬНИЙ БРОСОК',
-    tag: 'Все броски смертельны',
+    tag: 'Оружие летит дальше и оглушает',
     speed: 180,
-    killingThrows: true,
+    longThrows: true,
   },
   {
     id: 'uzi',

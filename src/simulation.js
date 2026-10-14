@@ -294,11 +294,15 @@ export class Simulation {
       p.facing = directionForVector(p.vx, p.vy, p.facing);
       p.frame = (p.frame + dt * p.moving * 0.05) % 8;
     } else p.frame = 0;
+    if (input.weaponAction) {
+      if (p.weapon === UNARMED) this.pickup();
+      else this.throwWeapon();
+    }
     if (input.pickup) this.pickup();
     if (input.drop) this.dropWeapon();
     if (input.throw) this.throwWeapon();
     if (input.execute) this.execute();
-    if (input.attack && p.fireTimer <= 0 && p.execution <= 0) this.attack();
+    if (input.attack && !input.weaponAction && !input.pickup && !input.drop && !input.throw && p.fireTimer <= 0 && p.execution <= 0) this.attack();
     for (const door of this.doors) {
       if (door.swing) {
         door.open = clamp(door.open + door.swing * dt, 0, Math.PI * 0.7);
@@ -353,6 +357,7 @@ export class Simulation {
       item.ammo * (item.ammoBonusApplied ? 1 : (this.profile.ammoBonus ?? 1)),
     );
     item.taken = true;
+    p.attack = 0;
     this.sound('sndPickupWeapon');
   }
   attack() {
@@ -377,7 +382,9 @@ export class Simulation {
       this.emit('shake', { amount: 1.8 });
     } else {
       p.fireTimer = w.cooldown;
-      p.attack = 0.18;
+      p.attackDuration = w.id < 0 ? 0.18 : Math.min(0.42, w.cooldown);
+      p.attack = p.attackDuration;
+      p.attackAngle = p.angle;
       this.sound(w.sound);
       for (const enemy of this.enemies) {
         if (
@@ -477,6 +484,7 @@ export class Simulation {
     });
     p.weapon = UNARMED;
     p.ammo = 0;
+    p.attack = 0;
   }
   throwWeapon() {
     const p = this.player;
@@ -487,7 +495,7 @@ export class Simulation {
       vx: Math.cos(p.angle) * 390,
       vy: Math.sin(p.angle) * 390,
       angle: p.angle,
-      life: 0.65,
+      life: this.profile.longThrows ? 0.95 : 0.65,
       team: 'player',
       owner: p,
       weapon: p.weapon,
@@ -496,6 +504,7 @@ export class Simulation {
     });
     p.weapon = UNARMED;
     p.ammo = 0;
+    p.attack = 0;
     p.fireTimer = 0.15;
     this.sound('sndThrow');
   }
@@ -685,7 +694,7 @@ export class Simulation {
         }
         const melee = e.weapon.gun ? UNARMED : e.weapon;
         if (
-          d < melee.range + p.radius &&
+          d < (melee.enemyRange ?? melee.range) + p.radius &&
           sees &&
           !this.lineBlocked(e, p) &&
           e.reaction <= 0 &&
@@ -730,7 +739,7 @@ export class Simulation {
     }
     if (e.moving > 0) e.frame = (e.frame + dt * e.moving * 0.06) % 8;
     if (e.weapon === UNARMED && !e.dog && !e.fat) {
-      const item = this.items.find((i) => !i.taken && distance(i, e) < 18);
+      const item = this.items.find((i) => !i.taken && distance(i, e) < 18 && !this.lineBlocked(i, e));
       if (item) {
         e.weapon = item.weapon;
         e.ammo = item.ammo;
@@ -804,8 +813,7 @@ export class Simulation {
           } else this.sound('sndHitWall');
         } else if (hit.actor === this.player) this.takeBullet();
         else if (b.thrown) {
-          if (this.profile.killingThrows) this.kill(hit.actor, 'cut');
-          else this.stun(hit.actor, STUN_DURATION);
+          this.stun(hit.actor, STUN_DURATION);
         } else {
           hit.actor.hp--;
           if (hit.actor.hp <= 0) this.kill(hit.actor, 'shot');

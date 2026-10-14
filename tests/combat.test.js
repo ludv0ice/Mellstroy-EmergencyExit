@@ -56,20 +56,15 @@ test('Every melee weapon hits within its own reach and misses outside it', () =>
   assert.equal(club.kills, 1);
 });
 
-test('Enemy melee reach follows its weapon instead of using one distance for all attacks', () => {
-  for (const [weapon, killed] of [
-    [UNARMED, false],
-    [WEAPONS[2], true],
-  ]) {
-    const sim = duel(45),
-      enemy = sim.enemies[0];
-    enemy.weapon = weapon;
-    enemy.angle = Math.PI;
-    enemy.reaction = 0;
-    enemy.fireTimer = 0;
-    sim.grace = 0;
-    sim.updateEnemy(enemy, 1 / 60);
-    assert.equal(sim.player.alive, !killed, weapon.name);
+test('Every enemy melee weapon has less reach than the same weapon held by the hero', () => {
+  for (const weapon of WEAPONS.filter(w => !w.gun && !w.throwOnly)) {
+    assert.ok(weapon.enemyRange < weapon.range, weapon.name);
+    for (const [distance, killed] of [[weapon.enemyRange + 6, true], [weapon.enemyRange + 8, false]]) {
+      const sim = duel(distance), enemy = sim.enemies[0];
+      enemy.weapon = weapon; enemy.angle = Math.PI; enemy.reaction = 0; enemy.fireTimer = 0; sim.grace = 0;
+      sim.updateEnemy(enemy, 1 / 60);
+      assert.equal(sim.player.alive, !killed, weapon.name + ' ' + distance);
+    }
   }
 });
 
@@ -220,7 +215,7 @@ test('Long melee weapons cannot hit through a solid wall', () => {
   assert.equal(sim.enemies[0].alive, true);
 });
 
-test('The explicitly selected lethal-throw modifier still works', () => {
+test('The long-throw profile also stuns instead of killing', () => {
   const sim = fixture(
     [actor('player', 40, 40), actor('enemy', 63, 40)],
     PROFILES.find((p) => p.id === 'thrower'),
@@ -228,7 +223,8 @@ test('The explicitly selected lethal-throw modifier still works', () => {
   sim.player.weapon = WEAPONS[4];
   sim.throwWeapon();
   sim.updateBullets(0.05);
-  assert.equal(sim.kills, 1);
+  assert.equal(sim.kills, 0);
+  assert.equal(sim.enemies[0].stun, STUN_DURATION);
 });
 
 test('Thrown weapons hitting a wall land on a reachable side with their remaining ammo', () => {
@@ -289,4 +285,20 @@ test('The yellow walls on chapter 03 block the player, enemies and navigation', 
     false,
     'doorway between wall segments remains open',
   );
+});
+
+test('Mouse inventory action throws immediately during cooldown and picks up with empty hands', () => {
+  const sim = duel(23); sim.player.weapon = WEAPONS[0]; sim.player.ammo = 6; sim.player.fireTimer = 10;
+  sim.update(1 / 60, {moveX: 0, moveY: 0, weaponAction: true, attack: true, aim: {x:100,y:40}});
+  assert.equal(sim.player.weapon, UNARMED);
+  sim.updateBullets(0.05);
+  assert.equal(sim.enemies[0].stun, STUN_DURATION);
+  sim.update(1 / 60, {moveX:0,moveY:0,weaponAction:true});
+  assert.equal(sim.player.weapon.id, 0); assert.equal(sim.player.ammo, 6);
+});
+test('Enemy cannot steal a ground weapon through a wall', () => {
+  const sim = fixture([actor('player',40,40),actor('enemy',70,40),wall(60,16,0,1,3)]);
+  sim.items.push({x:55,y:40,weapon:WEAPONS[0],ammo:5});
+  sim.updateEnemy(sim.enemies[0],1/60);
+  assert.equal(sim.enemies[0].weapon,UNARMED);
 });

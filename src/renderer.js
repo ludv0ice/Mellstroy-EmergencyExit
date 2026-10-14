@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { clamp } from './physics.js';
 import { assetUrl } from './assets.js';
-import { playerPose } from './player-animation.js';
+import { playerPose, heldWeaponPose } from './player-animation.js';
 
 export class GameView extends Phaser.Scene {
   constructor() {
@@ -32,7 +32,7 @@ export class GameView extends Phaser.Scene {
     this.input.on('pointerdown', (pointer) => {
       if (this.app?.mode !== 'playing') return;
       this.app.audio.start();
-      if (pointer.rightButtonDown()) this.pending.pickup = true;
+      if (pointer.rightButtonDown()) this.pending.weaponAction = true;
       if (pointer.middleButtonDown()) this.pending.throw = true;
     });
     this.input.keyboard.on('keydown', (event) => {
@@ -184,7 +184,7 @@ export class GameView extends Phaser.Scene {
       e.name,
     );
   }
-  drawSprite(ctx, key, frame, x, y, angle = 0, sx = 1, sy = sx, alpha = 1) {
+  drawSprite(ctx, key, frame, x, y, angle = 0, sx = 1, sy = sx, alpha = 1, origin = null) {
     const m = this.sim.manifest.sprites[key],
       img = this.images.get(key);
     if (!m || !img) return;
@@ -200,8 +200,8 @@ export class GameView extends Phaser.Scene {
       0,
       m.width,
       m.height,
-      -m.originX,
-      -m.originY,
+      -(origin?.[0] ?? m.originX),
+      -(origin?.[1] ?? m.originY),
       m.width,
       m.height,
     );
@@ -283,6 +283,7 @@ export class GameView extends Phaser.Scene {
       moveY:
         (down('S') || down('DOWN') ? 1 : 0) - (down('W') || down('UP') ? 1 : 0),
       attack: pointer.isDown && pointer.leftButtonDown(),
+      weaponAction: !!this.pending.weaponAction,
       drop: Phaser.Input.Keyboard.JustDown(keys.Q) || this.pending.drop,
       pickup: Phaser.Input.Keyboard.JustDown(keys.E) || this.pending.pickup,
       execute:
@@ -477,13 +478,6 @@ export class GameView extends Phaser.Scene {
     const p = sim.player;
     const pose = playerPose(p);
     if (p.alive && p.visible !== false) {
-      ctx.strokeStyle = '#70f5df';
-      ctx.globalAlpha = 0.55;
-      ctx.lineWidth = 0.6;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, 10, 0, Math.PI * 2);
-      ctx.stroke();
-      ctx.globalAlpha = 1;
       this.drawCustom(
         ctx,
         pose.key,
@@ -494,15 +488,19 @@ export class GameView extends Phaser.Scene {
         1,
         pose.row,
       );
-      if (p.weapon.id >= 0)
+      const held = heldWeaponPose(p);
+      if (held)
         this.drawSprite(
           ctx,
           'sprWeapons',
           p.weapon.id,
-          p.x + Math.cos(p.angle) * 9,
-          p.y + Math.sin(p.angle) * 9,
-          p.angle,
-          0.65,
+          p.x + held.x,
+          p.y + held.y,
+          held.angle,
+          held.scale,
+          held.scale,
+          1,
+          held.origin,
         );
     } else if (!p.alive)
       this.drawCustom(

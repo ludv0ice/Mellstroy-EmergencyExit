@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import {
   playerPose,
+  heldWeaponPose,
+  MELEE_ANIMATIONS,
   directionForVector,
   PLAYER_DIRECTIONS,
 } from '../src/player-animation.js';
@@ -141,4 +143,22 @@ test('Zero motion keeps the last facing and directional atlases retain fixed anc
     assert.equal(skin.originX, 30);
     assert.equal(skin.originY, 30);
   }
+});
+
+test('All melee weapons have distinct fixed grips and animated attacks in four directions', () => {
+  const signatures = new Set();
+  for (const weapon of WEAPONS.filter(w => !w.gun && !w.throwOnly)) {
+    assert.ok(MELEE_ANIMATIONS[weapon.sprite]);
+    const trajectory = [];
+    for (const facing of PLAYER_DIRECTIONS) {
+      const p = {weapon, facing, angle:0, attack:0, attackDuration:0.3, attackAngle:0};
+      const idle = heldWeaponPose(p);
+      for(let i=0;i<16;i++) {p.angle=i*Math.PI/8;assert.deepEqual(heldWeaponPose(p),idle);}
+      for(let i=0;i<7;i++) {p.attack=0.3*(1-(i+0.1)/7);trajectory.push(heldWeaponPose(p));}
+      assert.notDeepEqual(trajectory.at(-4),idle);
+      const frozen = heldWeaponPose(p);p.angle+=1;assert.deepEqual(heldWeaponPose(p),frozen);
+    }
+    signatures.add(JSON.stringify(trajectory));
+  }
+  assert.equal(signatures.size,18);
 });
