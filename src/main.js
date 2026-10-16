@@ -3,6 +3,7 @@ import './style.css';
 import { GameView } from './renderer.js';
 import { Simulation } from './simulation.js';
 import { Tutorial } from './tutorial.js';
+import { MenuNavigation } from './menu-navigation.js';
 import { CHAPTERS, PROFILES } from './campaign.js';
 import { AudioEngine } from './audio.js';
 import { connectsTo } from './rooms.js';
@@ -64,10 +65,12 @@ const app = {
   overlay(id) {
     for (const name of overlays)
       $(name).classList.toggle('hidden', name !== id);
+    this.menuNavigation?.show(id);
     if (this.view?.input.keyboard)
       this.view.input.keyboard.enabled = ['playing', 'paused', 'dead'].includes(
         this.mode,
       );
+    this.view?.input.keyboard?.resetKeys();
     const playing = [
       'playing',
       'paused',
@@ -86,7 +89,7 @@ const app = {
   async onReady(view) {
     this.view = view;
     try {
-      const raw = await this.room('rmSequence1');
+      const raw = await this.room('eeHideout');
       const sim = new Simulation(this.manifest, raw, PROFILES[0]);
       await view.setWorld(sim, true);
       $('loading').classList.add('hidden');
@@ -125,7 +128,7 @@ const app = {
           sim.player.y = pos.y;
         }
       }
-      if (id === 'rmTutorial') sim.tutorial = new Tutorial(sim);
+      if (id === 'eeTraining') sim.tutorial = new Tutorial(sim);
       sim.status = 'playing';
       sim.player.alive = true;
       sim.grace = 0.6;
@@ -201,6 +204,9 @@ const app = {
       ? 'ПРОДОЛЖИТЬ ПОБЕГ'
       : 'НАЧАТЬ ПОБЕГ';
     $('combo').classList.add('hidden');
+    clearTimeout(this.toastTimer);
+    $('toast').style.opacity = '0';
+    $('toast').textContent = '';
     if (this.view) this.view.preview = true;
     this.audio.active = true;
     this.renderChapters();
@@ -354,7 +360,7 @@ const app = {
     $('hud-number').textContent = this.chapter.number + ' /';
     $('hud-title').textContent = this.chapter.title;
     $('hud-floor').textContent =
-      `ЛОКАЦИЯ ${this.floorIndex + 1} / ${this.chapter.rooms.length} · ${this.returning ? 'ОБРАТНО К МАШИНЕ' : this.profile.name}`;
+      `ЛОКАЦИЯ ${this.floorIndex + 1} / ${this.chapter.rooms.length} · ${this.returning ? 'ОБРАТНО К МАШИНЕ' : (s.room.design?.title ?? this.profile.name)}`;
     $('hud-enemies').textContent = s.cleared
       ? 'ПЕРИМЕТР ЧИСТ'
       : `${s.total - s.kills} / ${s.total} НА ПЕРИМЕТРЕ`;
@@ -478,6 +484,7 @@ async function boot() {
   }
 }
 function bindUI() {
+  app.menuNavigation = new MenuNavigation();
   $('continue').textContent = app.progress.unlocked
     ? 'ПРОДОЛЖИТЬ ПОБЕГ'
     : 'НАЧАТЬ ПОБЕГ';

@@ -6,10 +6,10 @@ import { AudioEngine } from '../src/audio.js';
 
 test('Local resources use the game folder and preloaded room data without fetch', async (t) => {
   const room = JSON.parse(
-    readFileSync(new URL('../assets/rooms/rmTutorial.json', import.meta.url)),
+    readFileSync(new URL('../assets/rooms/eeTraining.json', import.meta.url)),
   );
   globalThis.__EMERGENCY_EXIT_ASSETS__ = {
-    json: { '/assets/rooms/rmTutorial.json': room },
+    json: { '/assets/rooms/eeTraining.json': room },
   };
   globalThis.__EMERGENCY_EXIT_ROOT__ = 'file:///Games/My%20Game/';
   t.after(() => {
@@ -19,7 +19,7 @@ test('Local resources use the game folder and preloaded room data without fetch'
   t.mock.method(globalThis, 'fetch', () => {
     throw new Error('No fetch allowed');
   });
-  assert.deepEqual(await readJson('/assets/rooms/rmTutorial.json'), room);
+  assert.deepEqual(await readJson('/assets/rooms/eeTraining.json'), room);
   assert.equal(
     assetUrl('/assets/audio/sndCarOpen.wav'),
     'file:///Games/My%20Game/assets/audio/sndCarOpen.wav',
@@ -31,10 +31,10 @@ test('Development requests preserve HTTP errors', async (t) => {
   t.mock.method(globalThis, 'fetch', async (url) =>
     url === '/missing'
       ? new Response('', { status: 404 })
-      : Response.json({ id: 'rmTutorial' }),
+      : Response.json({ id: 'eeTraining' }),
   );
   assert.equal(assetUrl('/assets/image.png'), '/assets/image.png');
-  assert.deepEqual(await readJson('/room'), { id: 'rmTutorial' });
+  assert.deepEqual(await readJson('/room'), { id: 'eeTraining' });
   await assert.rejects(readJson('/missing'), /Не удалось загрузить/);
 });
 

@@ -3,11 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { Simulation } from '../src/simulation.js';
-import { buildRoom } from '../src/rooms.js';
 import { PROFILES } from '../src/campaign.js';
-const baseline = JSON.parse(
-  readFileSync(new URL('./fixtures/campaign-baseline.json', import.meta.url)),
-);
 const manifest = JSON.parse(
   readFileSync(new URL('../assets/manifest.json', import.meta.url)),
 );
@@ -17,61 +13,6 @@ const raw = (id) =>
   );
 const hash = (value) =>
   createHash('sha256').update(JSON.stringify(value)).digest('hex');
-
-function geometry(room, raw) {
-  const entityFields = [
-    'name',
-    'kind',
-    'sprite',
-    'x',
-    'y',
-    'scaleX',
-    'scaleY',
-    'angle',
-    'frame',
-    'depth',
-    'visible',
-    'solid',
-    'isWall',
-    'furniture',
-    'glass',
-    'broken',
-  ];
-  const tileFields = [
-    'bgName',
-    'x',
-    'y',
-    'w',
-    'h',
-    'xo',
-    'yo',
-    'depth',
-    'scaleX',
-    'scaleY',
-  ];
-  const select = (value, fields) =>
-    Object.fromEntries(fields.map((key) => [key, value[key]]));
-  return {
-    id: room.id,
-    width: room.width,
-    height: room.height,
-    entities: room.entities
-      .filter((e) => e.kind !== 'enemy')
-      .map((e) =>
-        select(
-          /^objWallSoft[HV]$/.test(e.name)
-            ? {
-                ...e,
-                solid: raw.entities[e.id].solid ?? false,
-                isWall: raw.entities[e.id].isWall ?? false,
-              }
-            : e,
-          entityFields,
-        ),
-      ),
-    tiles: room.tiles.map((t) => select(t, tileFields)),
-  };
-}
 
 function trace(sim) {
   const states = [sim.snapshot()];
@@ -97,16 +38,6 @@ function trace(sim) {
   return hash(states);
 }
 
-test('All scenery, collisions and draw order remain intact after reducing enemy counts', () => {
-  for (const [id, expected] of Object.entries(
-    JSON.parse(
-      readFileSync(new URL('./fixtures/static-geometry.json', import.meta.url)),
-    ),
-  )) {
-    const data = raw(id);
-    assert.equal(hash(geometry(buildRoom(manifest, data), data)), expected, id);
-  }
-});
 test('Every retained room remains deterministic and finite with the corrected mechanics', () => {
   for (const { id } of manifest.rooms) {
     assert.equal(
@@ -119,13 +50,13 @@ test('Every retained room remains deterministic and finite with the corrected me
 
 test('All 24 gameplay modifiers construct valid simulations with consistent weapon and armor setup', () => {
   for (const profile of PROFILES) {
-    const sim = new Simulation(manifest, raw('rmTutorial'), profile);
+    const sim = new Simulation(manifest, raw('eeTraining'), profile);
     assert.equal(sim.player.weapon.id, profile.startWeapon ?? -1, profile.id);
     assert.equal(sim.player.ammo, sim.player.weapon.ammo, profile.id);
     assert.equal(sim.player.armor, profile.armor ?? 0, profile.id);
     assert.equal(
       trace(sim),
-      trace(new Simulation(manifest, raw('rmTutorial'), profile)),
+      trace(new Simulation(manifest, raw('eeTraining'), profile)),
       profile.id,
     );
   }

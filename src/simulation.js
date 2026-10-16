@@ -88,7 +88,7 @@ export class Simulation {
           routeTimer: 0,
           patrolTurn: 0,
           stationary:
-            raw.id === 'rmTutorial' || /Stationary|Guard|Idle/.test(e.name),
+            raw.id === 'eeTraining' || /Stationary|Guard|Idle/.test(e.name),
           dog,
           fat,
           swat,
@@ -713,7 +713,7 @@ export class Simulation {
       d < (this.profile.stealth ? 140 : 260) &&
       cone &&
       !this.lineBlocked(e, p, false, false) &&
-      !(this.room.id === 'rmTutorial' && d > 45);
+      !(this.room.id === 'eeTraining' && d > 45);
     if (sees) {
       e.lastSeen = { x: p.x, y: p.y };
       e.alert = 5;

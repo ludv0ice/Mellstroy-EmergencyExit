@@ -67,10 +67,10 @@ test('Loading rooms keeps mutable entity state separate from cached JSON', () =>
   assert.equal(restarted.entities[0].init.ammo, 6);
 });
 test('Room data preserves weapon IDs, ammunition and sprite anchors', () => {
-  const room = buildRoom(manifest, raw('rmTutorial'));
+  const room = buildRoom(manifest, raw('eeTraining'));
   const weapons = room.entities.filter((e) => e.kind === 'weapon');
   assert.equal(weapons.length, 2);
-  const sim = new Simulation(manifest, raw('rmTutorial'), PROFILES[0]);
+  const sim = new Simulation(manifest, raw('eeTraining'), PROFILES[0]);
   assert.equal(sim.items[0].weapon.id, 1);
   assert.equal(sim.items[0].ammo, 6);
   assert.equal(manifest.sprites.sprPWalkUnarmed.width, 60);
@@ -179,7 +179,7 @@ test('Navigation finds a route around walls', () => {
   assert.ok(path.some((p) => p.y >= 85));
 });
 test('Every campaign room and declared asset exists', () => {
-  const ids = ['rmSequence1', ...CHAPTERS.flatMap((c) => c.rooms)];
+  const ids = ['eeHideout', ...CHAPTERS.flatMap((c) => c.rooms)];
   assert.deepEqual(new Set(manifest.rooms.map((r) => r.id)), new Set(ids));
   for (const r of manifest.rooms) {
     const data = raw(r.id);

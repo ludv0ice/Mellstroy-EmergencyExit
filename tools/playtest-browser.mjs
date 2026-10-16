@@ -246,18 +246,15 @@ try {
   await press('KeyE');
   assert.equal((await evaluate('window.__GAME__.getState()')).player.weapon, 5);
   await evaluate(
-    "(async()=>{const a=window.__QA_APP__;a.briefing(3);a.floorIndex=1;a.floorStates.clear();await a.load('rmApartment2Upstairs');a.sim.grace=10;a.sim.player.x=116;a.sim.player.y=400;a.view.cameraPoint={x:240,y:360};})()",
+    "(async()=>{const a=window.__QA_APP__;a.briefing(3);a.floorIndex=1;a.floorStates.clear();await a.load('eeRelayRoom');a.sim.grace=10;})()",
   );
-  await screenshot('chapter03-yellow-wall');
-  await key('KeyD', 'keyDown');
-  await tick(60);
-  await key('KeyD', 'keyUp');
-  await tick(5);
-  assert.ok((await evaluate('window.__GAME__.getState()')).player.x <= 121);
-  const enemyWall = await evaluate(
-    '(()=>{const a=window.__QA_APP__,e=a.sim.enemies[0];e.x=116;e.y=400;a.sim.move(e,40,0,1/60);return e.x;})()',
-  );
-  assert.ok(enemyWall <= 121);
+  const wallBlocked = await evaluate(`(()=>{
+    const s=window.__QA_APP__.sim,b=s.room.entities.find(e=>e.isWall&&e.bounds.w>e.bounds.h).bounds;
+    s.player.x=b.x+b.w/2;s.player.y=b.y+b.h+10;s.move(s.player,0,-30,1/60);
+    return s.player.y>=b.y+b.h+7;
+  })()`);
+  assert.equal(wallBlocked, true);
+  await screenshot('original-chapter03-walls');
   const ids = await evaluate('window.__QA_APP__.manifest.rooms.map(r=>r.id)');
   for (const id of ids) {
     await evaluate(
@@ -301,7 +298,7 @@ try {
     noWhiteRangeArc: true,
     knifeThrowStun: true,
     throwRecovery: true,
-    yellowWallPlayerAndEnemy: true,
+    originalWallCollision: true,
     touchDrop: true,
     externalRequests: 0,
     solidEnemyContact: true,

@@ -32,6 +32,7 @@ export function connectsTo(exit, room) {
 }
 
 export function rectFor(entity) {
+  if (entity.bounds) return { ...entity.bounds, entity };
   const m = entity.mask ?? entity.meta;
   if (!m) return null;
   const b = m.bbox,

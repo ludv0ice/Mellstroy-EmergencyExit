@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { clamp } from './physics.js';
+import { drawLevel } from './level-art.js';
 import { assetUrl } from './assets.js';
 import { playerPose, heldWeaponPose } from './player-animation.js';
 
@@ -140,6 +141,7 @@ export class GameView extends Phaser.Scene {
     ctx.imageSmoothingEnabled = false;
     ctx.fillStyle = '#241a35';
     ctx.fillRect(0, 0, this.floor.width, this.floor.height);
+    drawLevel(ctx, sim.room);
     const entries = [
       ...sim.room.tiles.map((tile) => ({ tile, depth: tile.depth })),
       ...sim.room.entities

@@ -10,7 +10,7 @@ const assets = path.join(root, 'assets');
 const manifest = JSON.parse(readFileSync(path.join(assets, 'manifest.json')));
 const skins = JSON.parse(readFileSync(path.join(assets, 'custom/skins.json')));
 const rooms = new Set([
-  'rmSequence1',
+  'eeHideout',
   ...CHAPTERS.flatMap((chapter) => chapter.rooms),
 ]);
 assert.deepEqual(new Set(manifest.rooms.map((room) => room.id)), rooms);

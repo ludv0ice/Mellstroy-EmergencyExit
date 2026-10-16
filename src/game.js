@@ -133,6 +133,66 @@
       return [];
     }
   };
+  function drawLevel(ctx, room) {
+    if (!room.floor) return;
+    const { cell, grid, palette, zoneCount } = room.floor;
+    const [base, light, accent, pattern] = palette;
+    ctx.fillStyle = "#080d15";
+    ctx.fillRect(0, 0, room.width, room.height);
+    for (let y = 0; y < grid.length; y++) {
+      for (let x = 0; x < grid[y].length; x++) {
+        if (grid[y][x] === " ") continue;
+        const zone = parseInt(grid[y][x], 36);
+        const px = x * cell, py = y * cell;
+        ctx.fillStyle = zone === zoneCount ? "#192c37" : base;
+        ctx.fillRect(px, py, cell, cell);
+        ctx.fillStyle = light;
+        ctx.globalAlpha = 0.25;
+        if (pattern === "wood") {
+          for (let i = 0; i < cell; i += 8) ctx.fillRect(px, py + i, cell, 1);
+          ctx.fillRect(px + y % 2 * 16, py, 1, cell);
+        } else if (pattern === "dance" || pattern === "checker") {
+          if ((x + y + zone) % 2)
+            ctx.fillRect(px + 1, py + 1, cell - 2, cell - 2);
+          ctx.fillRect(px, py, cell, 1);
+        } else if (pattern === "stripe") {
+          ctx.fillRect(px, py, cell, 1);
+          if (x % 3 === 0) ctx.fillRect(px + 2, py + 3, 2, cell - 6);
+        } else {
+          ctx.strokeStyle = light;
+          ctx.lineWidth = 1;
+          ctx.strokeRect(px + 0.5, py + 0.5, cell - 1, cell - 1);
+          ctx.fillRect(px + 7, py + 7, 2, 2);
+        }
+        ctx.globalAlpha = 1;
+      }
+    }
+    for (const zone of room.zones) {
+      ctx.strokeStyle = accent + "35";
+      ctx.lineWidth = 1;
+      ctx.strokeRect(zone.x + 9, zone.y + 9, zone.w - 18, zone.h - 18);
+      ctx.fillStyle = accent + "70";
+      ctx.font = "7px Exo2, sans-serif";
+      ctx.textAlign = "left";
+      ctx.fillText(zone.name, zone.x + 12, zone.y + 20, zone.w - 24);
+      if (pattern === "carpet" || pattern === "stone") {
+        ctx.strokeStyle = accent + "20";
+        ctx.strokeRect(zone.x + 16, zone.y + 32, zone.w - 32, zone.h - 48);
+      }
+    }
+    for (const entity of room.entities.filter((e) => e.isWall && e.bounds)) {
+      const r = entity.bounds;
+      ctx.fillStyle = "#0008";
+      ctx.fillRect(r.x + 3, r.y + 4, r.w + 2, r.h + 2);
+      ctx.fillStyle = "#52616e";
+      ctx.fillRect(r.x, r.y, r.w, r.h);
+      ctx.fillStyle = accent;
+      ctx.globalAlpha = 0.65;
+      if (r.w > r.h) ctx.fillRect(r.x, r.y, r.w, 1);
+      else ctx.fillRect(r.x, r.y, 1, r.h);
+      ctx.globalAlpha = 1;
+    }
+  }
   function assetUrl(url) {
     const root = globalThis.__EMERGENCY_EXIT_ROOT__;
     if (root && url.startsWith("/")) return new URL(url.slice(1), root).href;
@@ -383,6 +443,7 @@
       ctx.imageSmoothingEnabled = false;
       ctx.fillStyle = "#241a35";
       ctx.fillRect(0, 0, this.floor.width, this.floor.height);
+      drawLevel(ctx, sim.room);
       const entries = [
         ...sim.room.tiles.map((tile) => ({ tile, depth: tile.depth })),
         ...sim.room.entities.filter(
@@ -1023,6 +1084,7 @@
     return exit.init.nextroom === room || !!((_a = exit.targets) == null ? void 0 : _a.includes(room));
   }
   function rectFor(entity) {
+    if (entity.bounds) return { ...entity.bounds, entity };
     const m = entity.mask ?? entity.meta;
     if (!m) return null;
     const b = m.bbox, ox = m.originX, oy = m.originY;
@@ -1110,7 +1172,7 @@
           route: [],
           routeTimer: 0,
           patrolTurn: 0,
-          stationary: raw.id === "rmTutorial" || /Stationary|Guard|Idle/.test(e.name),
+          stationary: raw.id === "eeTraining" || /Stationary|Guard|Idle/.test(e.name),
           dog,
           fat,
           swat,
@@ -1621,7 +1683,7 @@
       }
       const p = this.player, d = distance(e, p), angle = Math.atan2(p.y - e.y, p.x - e.x);
       const cone = Math.abs(angleDelta(angle, e.angle)) < (e.alert > 0 ? Math.PI : 1.45);
-      const sees = this.grace <= 0 && d < (this.profile.stealth ? 140 : 260) && cone && !this.lineBlocked(e, p, false, false) && !(this.room.id === "rmTutorial" && d > 45);
+      const sees = this.grace <= 0 && d < (this.profile.stealth ? 140 : 260) && cone && !this.lineBlocked(e, p, false, false) && !(this.room.id === "eeTraining" && d > 45);
       if (sees) {
         e.lastSeen = { x: p.x, y: p.y };
         e.alert = 5;
@@ -2012,129 +2074,187 @@
       return this.step === "exit";
     }
   };
+  var panels = ["menu", "pause", "briefing", "chapter-panel"];
+  var MenuNavigation = class {
+    constructor() {
+      this.panel = null;
+      this.index = 0;
+      document.addEventListener("keydown", (event) => this.keydown(event), true);
+      for (const panel of panels) {
+        const track = (event) => {
+          const button = event.target.closest("button");
+          if (button && this.buttons.includes(button))
+            this.select(this.buttons.indexOf(button), false);
+        };
+        const element = document.getElementById(panel);
+        element.addEventListener("pointerover", track);
+        element.addEventListener("focusin", track);
+      }
+    }
+    get buttons() {
+      if (!this.panel) return [];
+      const buttons = this.panel.id === "chapter-panel" ? [
+        ...this.panel.querySelectorAll("#chapter-list button"),
+        this.panel.querySelector(".back")
+      ] : [...this.panel.querySelectorAll("button")];
+      return buttons.filter(
+        (button) => button && !button.disabled && button.getClientRects().length
+      );
+    }
+    show(id) {
+      document.querySelectorAll(".menu-selected").forEach((button) => button.classList.remove("menu-selected"));
+      this.panel = panels.includes(id) ? document.getElementById(id) : null;
+      this.index = 0;
+      if (this.panel) this.select(0, true);
+    }
+    select(index, focus) {
+      const buttons = this.buttons;
+      if (!buttons.length) return;
+      this.index = (index + buttons.length) % buttons.length;
+      buttons.forEach(
+        (button, i) => button.classList.toggle("menu-selected", i === this.index)
+      );
+      if (focus) buttons[this.index].focus({ preventScroll: true });
+      if (focus && this.panel.id === "chapter-panel")
+        buttons[this.index].scrollIntoView({ block: "nearest" });
+    }
+    keydown(event) {
+      var _a;
+      if (!this.panel || this.panel.classList.contains("hidden")) return;
+      if (event.target.matches("select, input")) return;
+      const direction = { KeyW: -1, ArrowUp: -1, KeyS: 1, ArrowDown: 1 }[event.code];
+      if (!direction && event.code !== "Enter" && event.code !== "NumpadEnter")
+        return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      if (event.repeat) return;
+      if (direction) this.select(this.index + direction, true);
+      else (_a = this.buttons[this.index]) == null ? void 0 : _a.click();
+    }
+  };
   var CHAPTERS = [
     [
       "00",
       "\u042D\u0424\u0418\u0420 \u041E\u041A\u041E\u041D\u0427\u0415\u041D",
       "\u041E\u0441\u0432\u043E\u0439 \u0434\u0432\u0438\u0436\u0435\u043D\u0438\u0435, \u043E\u0433\u043B\u0443\u0448\u0435\u043D\u0438\u0435, \u0434\u043E\u0431\u0438\u0432\u0430\u043D\u0438\u0435, \u043F\u043E\u0434\u0431\u043E\u0440, \u0441\u0431\u0440\u043E\u0441, \u0431\u0440\u043E\u0441\u043E\u043A \u0438 \u0441\u0442\u0440\u0435\u043B\u044C\u0431\u0443. \u041A\u0430\u0436\u0434\u043E\u0435 \u0437\u0430\u0434\u0430\u043D\u0438\u0435 \u043E\u0442\u043A\u0440\u044B\u0432\u0430\u0435\u0442\u0441\u044F \u043F\u043E\u0441\u043B\u0435 \u043F\u0440\u0435\u0434\u044B\u0434\u0443\u0449\u0435\u0433\u043E. \u0412\u0440\u0430\u0433\u0438 \u0437\u0434\u0435\u0441\u044C \u0436\u0434\u0443\u0442 \u0442\u0432\u043E\u0438\u0445 \u0434\u0435\u0439\u0441\u0442\u0432\u0438\u0439.",
-      ["rmTutorial"]
+      ["eeTraining"]
     ],
     [
       "01",
       "\u041F\u041E\u0421\u041B\u0415\u0414\u041D\u0418\u0419 \u041F\u041E\u0415\u0417\u0414",
       "\u0414\u043E \u0432\u043E\u043A\u0437\u0430\u043B\u0430 \u0434\u043E\u0431\u0440\u0430\u043B\u0430\u0441\u044C \u043F\u0435\u0440\u0432\u0430\u044F \u0433\u0440\u0443\u043F\u043F\u0430. \u041F\u0440\u043E\u0440\u0432\u0438\u0441\u044C \u043A \u043F\u043B\u0430\u0442\u0444\u043E\u0440\u043C\u0435.",
-      ["rmTrainstationEntrance", "rmTrainstationDownstairs"]
+      ["eeStationHall", "eeStationService"]
     ],
     [
       "02",
       "\u0411\u0415\u0417 \u0421\u0412\u0418\u0414\u0415\u0422\u0415\u041B\u0415\u0419",
       "\u0410\u0434\u0440\u0435\u0441 \u043A\u0432\u0430\u0440\u0442\u0438\u0440\u044B \u0441\u043B\u0438\u043B\u0438 \u0432 \u0447\u0430\u0442. \u041F\u043E\u043B\u0438\u0446\u0438\u044F \u043F\u0435\u0440\u0435\u043A\u0440\u044B\u043B\u0430 \u043F\u043E\u0434\u044A\u0435\u0437\u0434.",
-      ["rmApartment1Entrance", "rmApartment1Upstairs"]
+      ["eeCourtyard", "eeLoft"]
     ],
     [
       "03",
       "\u0427\u0423\u0416\u041E\u0419 \u0410\u0414\u0420\u0415\u0421",
       "\u0412\u0442\u043E\u0440\u043E\u0435 \u0443\u0431\u0435\u0436\u0438\u0449\u0435 \u0442\u043E\u0436\u0435 \u0440\u0430\u0441\u043A\u0440\u044B\u0442\u043E. \u0418\u043C \u043D\u0443\u0436\u0435\u043D \u0442\u043E\u0442, \u043A\u0442\u043E \u0432\u043A\u043B\u044E\u0447\u0430\u043B \u043A\u0430\u043C\u0435\u0440\u0443.",
-      ["rmApartment2Entrance", "rmApartment2Upstairs"]
+      ["eeCanalEntry", "eeRelayRoom"]
     ],
     [
       "04",
       "OFFLINE",
       "\u0422\u0435\u043B\u0435\u0444\u043E\u043D \u043C\u043E\u043B\u0447\u0438\u0442. \u0412 \u0433\u043E\u0441\u0442\u0438\u043D\u043E\u0439 \u2014 \u043B\u044E\u0434\u0438 \u0432 \u0444\u043E\u0440\u043C\u0435.",
-      ["rmHouse1Downstairs", "rmHouse1Upstairs"]
+      ["eeQuietReception", "eeRoofFlat"]
     ],
     [
       "05",
       "\u0411\u0415\u0417 \u0414\u041E\u041D\u0410\u0422\u041E\u0412",
       "\u0417\u0434\u0435\u0441\u044C \u043E\u0431\u0435\u0449\u0430\u043B\u0438 \u043F\u0435\u0440\u0435\u0436\u0434\u0430\u0442\u044C \u043D\u043E\u0447\u044C. \u0417\u0434\u0435\u0441\u044C \u0442\u0435\u0431\u044F \u0436\u0434\u0430\u043B\u0438.",
-      ["rmHouse5Downstairs", "rmHouse5Upstairs"]
+      ["eeWorkshop", "eeMezzanine"]
     ],
     [
       "06",
       "\u0421\u041B\u0418\u0422\u042B\u0419 \u0410\u0414\u0420\u0415\u0421",
       "\u041A\u0442\u043E-\u0442\u043E \u043E\u0441\u0442\u0430\u0432\u0438\u043B \u0441\u0432\u0435\u0442 \u0432\u043A\u043B\u044E\u0447\u0451\u043D\u043D\u044B\u043C. \u041F\u0440\u043E\u0432\u0435\u0440\u044C \u043E\u0431\u0430 \u044D\u0442\u0430\u0436\u0430.",
-      ["rmHouse2Downstairs", "rmHouse2Upstairs"]
+      ["eeDuplexEntry", "eeDuplexBridge"]
     ],
     [
       "07",
       "\u041D\u0415 \u0411\u0415\u0421\u041F\u041E\u041A\u041E\u0418\u0422\u042C",
       "\u041D\u043E\u043C\u0435\u0440 \u043E\u043F\u043B\u0430\u0447\u0435\u043D \u0434\u043E \u0443\u0442\u0440\u0430. \u041D\u043E \u0434\u043E \u0443\u0442\u0440\u0430 \u0435\u0449\u0451 \u043D\u0443\u0436\u043D\u043E \u0434\u043E\u0436\u0438\u0442\u044C.",
-      ["rmHotelEntrance", "rmHotelSuite"]
+      ["eeHotelLobby", "eeHotelGarden"]
     ],
     [
       "08",
       "\u0427\u0415\u0422\u042B\u0420\u0415 \u042D\u0422\u0410\u0416\u0410",
       "\u041B\u0438\u0444\u0442\u044B \u043E\u0442\u043A\u043B\u044E\u0447\u0435\u043D\u044B. \u0415\u0434\u0438\u043D\u0441\u0442\u0432\u0435\u043D\u043D\u044B\u0439 \u043F\u0443\u0442\u044C \u2014 \u0447\u0435\u0440\u0435\u0437 \u0437\u0434\u0430\u043D\u0438\u0435.",
       [
-        "rmBuildingFloor1",
-        "rmBuildingFloor2",
-        "rmBuildingFloor3",
-        "rmBuildingFloor4"
+        "eeTowerLoading",
+        "eeTowerArchive",
+        "eeTowerServers",
+        "eeTowerRoof"
       ]
     ],
     [
       "09",
       "\u041F\u041E\u0414\u0412\u0410\u041B",
       "\u0417\u0430\u043F\u0430\u0441\u043D\u043E\u0439 \u0432\u044B\u0445\u043E\u0434 \u043D\u0430\u0445\u043E\u0434\u0438\u0442\u0441\u044F \u0432\u043D\u0438\u0437\u0443. \u0415\u0441\u043B\u0438 \u043E\u043D \u0432\u043E\u043E\u0431\u0449\u0435 \u0441\u0443\u0449\u0435\u0441\u0442\u0432\u0443\u0435\u0442.",
-      ["rmHouse3Downstairs", "rmHouse3Upstairs", "rmHouse3Basement"]
+      ["eeLaundry", "eeUtilityFlat", "eePumpBasement"]
     ],
     [
       "10",
       "\u0428\u0422\u0423\u0420\u041C",
       "\u0422\u0435\u043F\u0435\u0440\u044C \u044D\u0442\u043E \u043D\u0435 \u043F\u0430\u0442\u0440\u0443\u043B\u044C. \u041D\u0435 \u043E\u0441\u0442\u0430\u043D\u0430\u0432\u043B\u0438\u0432\u0430\u0439\u0441\u044F.",
-      ["rmSwatDownstairs", "rmSwatUpstairs"]
+      ["eeCheckpoint", "eeResponseDeck"]
     ],
     [
       "11",
       "\u041F\u0415\u0420\u0418\u041C\u0415\u0422\u0420",
       "\u041E\u043D\u0438 \u043E\u0446\u0435\u043F\u0438\u043B\u0438 \u0432\u0435\u0441\u044C \u043A\u0432\u0430\u0440\u0442\u0430\u043B. \u041D\u0430\u0439\u0434\u0438 \u0440\u0430\u0437\u0440\u044B\u0432 \u0432 \u043A\u043E\u043B\u044C\u0446\u0435.",
-      ["rmHouse4Middle", "rmHouse4Left", "rmHouse4Right", "rmHouse4Upstairs"]
+      ["eeMarketHub", "eeMarketLeft", "eeMarketRight", "eeMarketOffice"]
     ],
     [
       "12",
       "\u041D\u041E\u0427\u041D\u0410\u042F \u0421\u041C\u0415\u041D\u0410",
       "\u0412\u0441\u0435 \u0437\u0430\u043F\u0438\u0441\u0438 \u0442\u0432\u043E\u0438\u0445 \u044D\u0444\u0438\u0440\u043E\u0432 \u0445\u0440\u0430\u043D\u044F\u0442\u0441\u044F \u0432 \u044D\u0442\u043E\u043C \u043E\u0444\u0438\u0441\u0435.",
-      ["rmOfficeEntrance", "rmOfficeFloor2", "rmOfficeFloor3"]
+      ["eeBroadcastLobby", "eeEditing", "eeUplink"]
     ],
     [
       "13",
       "\u041E\u0422\u0414\u0415\u041B",
       "\u041A\u043B\u044E\u0447 \u043E\u0442 \u0432\u044B\u0435\u0437\u0434\u0430 \u0438\u0437 \u0433\u043E\u0440\u043E\u0434\u0430 \u2014 \u043D\u0430 \u0432\u0435\u0440\u0445\u043D\u0435\u043C \u044D\u0442\u0430\u0436\u0435 \u0443\u0447\u0430\u0441\u0442\u043A\u0430.",
-      ["rmPoliceHQFloor1", "rmPoliceHQFloor2", "rmPoliceHQFloor3"]
+      ["eePrecinctGate", "eeEvidence", "eeControlRoom"]
     ],
     [
       "14",
       "\u041F\u041E\u0421\u041B\u0415\u041F\u0410\u0422\u0418",
       "\u041A\u043B\u0443\u0431 \u0437\u0430\u043A\u0440\u044B\u043B\u0441\u044F. \u041F\u043E\u0441\u043B\u0435\u0434\u043D\u0438\u0435 \u0433\u043E\u0441\u0442\u0438 \u0432\u0441\u0451 \u0435\u0449\u0451 \u0432\u043D\u0443\u0442\u0440\u0438.",
-      ["rmBossClubFloor1", "rmBossClubFloor2", "rmBossClubFloor3", "rmBoss2"]
+      ["eeClubQueue", "eeClubBalcony", "eeClubBooth", "eeClubVault"]
     ],
     [
       "15",
       "EMERGENCY EXIT",
       "\u0417\u0430 \u043E\u0441\u043E\u0431\u043D\u044F\u043A\u043E\u043C \u0436\u0434\u0451\u0442 \u043C\u0430\u0448\u0438\u043D\u0430. \u042D\u0442\u0430 \u043D\u043E\u0447\u044C \u0434\u043E\u043B\u0436\u043D\u0430 \u0437\u0430\u043A\u043E\u043D\u0447\u0438\u0442\u044C\u0441\u044F.",
-      ["rmMansionEntrance", "rmMansionMainHall", "rmMansionBalcony"]
+      ["eeEstateGate", "eeEstateGallery", "eeEstateLanding"]
     ],
     [
       "16",
       "\u0412\u0422\u041E\u0420\u041E\u0419 \u0410\u041A\u041A\u0410\u0423\u041D\u0422",
       "\u0414\u043E\u043F\u043E\u043B\u043D\u0438\u0442\u0435\u043B\u044C\u043D\u044B\u0439 \u043C\u0430\u0440\u0448\u0440\u0443\u0442 \u0447\u0435\u0440\u0435\u0437 \u0440\u0435\u0441\u0442\u043E\u0440\u0430\u043D.",
-      ["rmNoodleShop"]
+      ["eeNightKitchen"]
     ],
     [
       "17",
       "GAME OVER",
       "\u0410\u0440\u043A\u0430\u0434\u043D\u044B\u0435 \u0430\u0432\u0442\u043E\u043C\u0430\u0442\u044B \u0448\u0443\u043C\u044F\u0442 \u0433\u0440\u043E\u043C\u0447\u0435 \u0440\u0430\u0446\u0438\u0438.",
-      ["rmArcadeDownstairs", "rmArcadeUpstairs"]
+      ["eeArcadeLobby", "eeArcadeLab"]
     ],
-    ["18", "\u0412\u042B\u0421\u041E\u041A\u0410\u042F \u0421\u0422\u0410\u0412\u041A\u0410", "\u0414\u0440\u0443\u0433\u0430\u044F \u043D\u043E\u0447\u044C. \u0422\u043E\u0442 \u0436\u0435 \u0432\u044B\u0445\u043E\u0434.", ["rmHighballer"]],
+    ["18", "\u0412\u042B\u0421\u041E\u041A\u0410\u042F \u0421\u0422\u0410\u0412\u041A\u0410", "\u0414\u0440\u0443\u0433\u0430\u044F \u043D\u043E\u0447\u044C. \u0422\u043E\u0442 \u0436\u0435 \u0432\u044B\u0445\u043E\u0434.", ["eeSkyLounge"]],
     [
       "19",
       "\u041F\u041E\u0421\u041B\u0415 \u041F\u041E\u041B\u0423\u041D\u041E\u0427\u0418",
       "\u041D\u0430 \u044D\u0442\u043E\u0442 \u0440\u0430\u0437 \u044D\u0444\u0438\u0440 \u043D\u0430\u0447\u0430\u043B\u0441\u044F \u0441\u043B\u0438\u0448\u043A\u043E\u043C \u043F\u043E\u0437\u0434\u043D\u043E.",
-      ["rmEurogamer"]
+      ["eeAfterHours"]
     ],
-    ["20", "\u0414\u041E\u0420\u041E\u0413\u0410 \u0414\u041E\u041C\u041E\u0419", "\u041F\u043E\u0441\u043B\u0435\u0434\u043D\u0435\u0435 \u0443\u0431\u0435\u0436\u0438\u0449\u0435 \u0437\u0430 \u0433\u043E\u0440\u043E\u0434\u043E\u043C.", ["rmTrailer"]],
-    ["21", "\u0421\u0422\u0410\u0420\u042B\u0419 \u041E\u0422\u0415\u041B\u042C", "\u041D\u0430 \u0440\u0435\u0441\u0435\u043F\u0448\u0435\u043D\u0435 \u043D\u0438\u043A\u0442\u043E \u043D\u0435 \u043E\u0442\u0432\u0435\u0447\u0430\u0435\u0442.", ["rmOldHotel"]]
+    ["20", "\u0414\u041E\u0420\u041E\u0413\u0410 \u0414\u041E\u041C\u041E\u0419", "\u041F\u043E\u0441\u043B\u0435\u0434\u043D\u0435\u0435 \u0443\u0431\u0435\u0436\u0438\u0449\u0435 \u0437\u0430 \u0433\u043E\u0440\u043E\u0434\u043E\u043C.", ["eeRoadhouse"]],
+    ["21", "\u0421\u0422\u0410\u0420\u042B\u0419 \u041E\u0422\u0415\u041B\u042C", "\u041D\u0430 \u0440\u0435\u0441\u0435\u043F\u0448\u0435\u043D\u0435 \u043D\u0438\u043A\u0442\u043E \u043D\u0435 \u043E\u0442\u0432\u0435\u0447\u0430\u0435\u0442.", ["eeOldAtrium"]]
   ].map(([number, title, brief, rooms], index) => ({
     index,
     number,
@@ -2446,13 +2566,15 @@
       return this.cache.get(id);
     },
     overlay(id) {
-      var _a;
+      var _a, _b, _c, _d;
       for (const name of overlays)
         $(name).classList.toggle("hidden", name !== id);
-      if ((_a = this.view) == null ? void 0 : _a.input.keyboard)
+      (_a = this.menuNavigation) == null ? void 0 : _a.show(id);
+      if ((_b = this.view) == null ? void 0 : _b.input.keyboard)
         this.view.input.keyboard.enabled = ["playing", "paused", "dead"].includes(
           this.mode
         );
+      (_d = (_c = this.view) == null ? void 0 : _c.input.keyboard) == null ? void 0 : _d.resetKeys();
       const playing = [
         "playing",
         "paused",
@@ -2471,7 +2593,7 @@
     async onReady(view) {
       this.view = view;
       try {
-        const raw = await this.room("rmSequence1");
+        const raw = await this.room("eeHideout");
         const sim = new Simulation(this.manifest, raw, PROFILES[0]);
         await view.setWorld(sim, true);
         $("loading").classList.add("hidden");
@@ -2506,7 +2628,7 @@
             sim.player.y = pos.y;
           }
         }
-        if (id === "rmTutorial") sim.tutorial = new Tutorial(sim);
+        if (id === "eeTraining") sim.tutorial = new Tutorial(sim);
         sim.status = "playing";
         sim.player.alive = true;
         sim.grace = 0.6;
@@ -2578,6 +2700,9 @@
       this.overlay("menu");
       $("continue").textContent = this.progress.unlocked ? "\u041F\u0420\u041E\u0414\u041E\u041B\u0416\u0418\u0422\u042C \u041F\u041E\u0411\u0415\u0413" : "\u041D\u0410\u0427\u0410\u0422\u042C \u041F\u041E\u0411\u0415\u0413";
       $("combo").classList.add("hidden");
+      clearTimeout(this.toastTimer);
+      $("toast").style.opacity = "0";
+      $("toast").textContent = "";
       if (this.view) this.view.preview = true;
       this.audio.active = true;
       this.renderChapters();
@@ -2686,7 +2811,7 @@
       $("next").textContent = this.chapter.index === CHAPTERS.length - 1 ? "\u0417\u0410\u0412\u0415\u0420\u0428\u0418\u0422\u042C \u041F\u041E\u0411\u0415\u0413" : "\u0421\u041B\u0415\u0414\u0423\u042E\u0429\u0410\u042F \u0413\u041B\u0410\u0412\u0410";
     },
     updateHUD() {
-      var _a;
+      var _a, _b;
       const tutorial = (_a = this.sim) == null ? void 0 : _a.tutorial;
       const panel = $("tutorial");
       panel.classList.toggle("hidden", !tutorial || this.mode !== "playing");
@@ -2701,7 +2826,7 @@
       if (!s) return;
       $("hud-number").textContent = this.chapter.number + " /";
       $("hud-title").textContent = this.chapter.title;
-      $("hud-floor").textContent = `\u041B\u041E\u041A\u0410\u0426\u0418\u042F ${this.floorIndex + 1} / ${this.chapter.rooms.length} \xB7 ${this.returning ? "\u041E\u0411\u0420\u0410\u0422\u041D\u041E \u041A \u041C\u0410\u0428\u0418\u041D\u0415" : this.profile.name}`;
+      $("hud-floor").textContent = `\u041B\u041E\u041A\u0410\u0426\u0418\u042F ${this.floorIndex + 1} / ${this.chapter.rooms.length} \xB7 ${this.returning ? "\u041E\u0411\u0420\u0410\u0422\u041D\u041E \u041A \u041C\u0410\u0428\u0418\u041D\u0415" : ((_b = s.room.design) == null ? void 0 : _b.title) ?? this.profile.name}`;
       $("hud-enemies").textContent = s.cleared ? "\u041F\u0415\u0420\u0418\u041C\u0415\u0422\u0420 \u0427\u0418\u0421\u0422" : `${s.total - s.kills} / ${s.total} \u041D\u0410 \u041F\u0415\u0420\u0418\u041C\u0415\u0422\u0420\u0415`;
       $("hud-score").textContent = (this.runScore + s.score).toLocaleString(
         "ru-RU"
@@ -2818,6 +2943,7 @@
     }
   }
   function bindUI() {
+    app.menuNavigation = new MenuNavigation();
     $("continue").textContent = app.progress.unlocked ? "\u041F\u0420\u041E\u0414\u041E\u041B\u0416\u0418\u0422\u042C \u041F\u041E\u0411\u0415\u0413" : "\u041D\u0410\u0427\u0410\u0422\u042C \u041F\u041E\u0411\u0415\u0413";
     $("continue").onclick = () => {
       app.audio.start();

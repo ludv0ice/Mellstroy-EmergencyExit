@@ -209,21 +209,30 @@ try {
   await aim(hero.x + 100, hero.y);
   if ((await stage()) === 'aim') await aim(hero.x - 100, hero.y);
   await expectStage('punch');
-  await goTo(248, 116, 24);
-  await attack(248, 116);
+  const enemies = await evaluate(
+    'window.__QA_APP__.sim.enemies.map(e => ({x:e.x,y:e.y}))',
+  );
+  const weapons = await evaluate(
+    'window.__QA_APP__.sim.items.map(e => ({x:e.x,y:e.y,id:e.weapon.id}))',
+  );
+  await goTo(enemies[0].x, enemies[0].y, 24);
+  await attack(enemies[0].x, enemies[0].y);
   await expectStage('finish');
   await press('Space');
   await tick(50);
   await expectStage('pickup');
-  await goTo(378, 175);
+  await goTo(
+    weapons.find((w) => w.id === 4).x,
+    weapons.find((w) => w.id === 4).y,
+  );
   await press('KeyE');
   await expectStage('drop');
   await press('KeyQ');
   await expectStage('retrieve');
   await press('KeyE');
   await expectStage('throw');
-  await goTo(300, 116, 38);
-  await aim(300, 116);
+  await goTo(enemies[1].x, enemies[1].y, 38);
+  await aim(enemies[1].x, enemies[1].y);
   await press('KeyF');
   await tick(25);
   await expectStage('recover');
@@ -233,14 +242,17 @@ try {
   await goTo(item.x, item.y, 20);
   await press('KeyE');
   await expectStage('melee');
-  await goTo(300, 116, 35);
-  await attack(300, 116);
+  await goTo(enemies[1].x, enemies[1].y, 35);
+  await attack(enemies[1].x, enemies[1].y);
   await expectStage('gun');
-  await goTo(186, 178);
+  await goTo(
+    weapons.find((w) => w.id === 1).x,
+    weapons.find((w) => w.id === 1).y,
+  );
   await press('KeyE');
   await expectStage('shoot');
-  await goTo(273, 334, 42);
-  await attack(273, 334);
+  await goTo(enemies[2].x, enemies[2].y, 42);
+  await attack(enemies[2].x, enemies[2].y);
   await expectStage('exit');
   const exit = await evaluate('window.__QA_APP__.sim.exit');
   await goTo(exit.x, exit.y, 25);

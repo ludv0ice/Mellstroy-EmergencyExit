@@ -262,35 +262,19 @@ test('Weapons thrown out of bounds remain on the map for recovery', () => {
   assert.equal(sim.player.weapon.id, 4);
 });
 
-test('The yellow walls on chapter 03 block the player, enemies and navigation', () => {
-  const raw = JSON.parse(
-    readFileSync(
-      new URL('../assets/rooms/rmApartment2Upstairs.json', import.meta.url),
-    ),
+test('New chapter 03 walls block the hero and navigation with exact bounds', () => {
+  const room = JSON.parse(
+    readFileSync(new URL('../assets/rooms/eeRelayRoom.json', import.meta.url)),
   );
-  const sim = new Simulation(manifest, raw, PROFILES[0]);
-  const walls = sim.room.entities.filter((e) =>
-    /^objWallSoft[HV]$/.test(e.name),
-  );
-  assert.equal(walls.length, 19);
-  for (const e of walls) {
-    assert.equal(e.solid, true);
-    assert.equal(e.isWall, true);
-    assert.ok(sim.staticBoxes.some((b) => b.entity.id === e.id));
-  }
-  assert.equal(sim.blocked(452, 240, 1), true);
-  for (const actor of [sim.player, sim.enemies[0]]) {
-    actor.x = 116;
-    actor.y = 400;
-    assert.equal(sim.blocked(actor.x, actor.y, 7), false);
-    sim.move(actor, 40, 0, 1 / 60);
-    assert.ok(actor.x <= 121, 'cannot cross yellow wall');
-  }
-  assert.equal(
-    sim.blocked(240, 324, 7, false),
-    false,
-    'doorway between wall segments remains open',
-  );
+  const sim = new Simulation(manifest, room, PROFILES[0]);
+  const wall = room.entities.find((e) => e.isWall && e.bounds.w > e.bounds.h);
+  const b = wall.bounds;
+  assert.equal(sim.blocked(b.x + b.w / 2, b.y + b.h / 2, 1), true);
+  const at = { x: b.x + b.w / 2, y: b.y + b.h + 10 };
+  sim.player.x = at.x;
+  sim.player.y = at.y;
+  sim.move(sim.player, 0, -20, 1 / 60);
+  assert.ok(sim.player.y >= b.y + b.h + 7);
 });
 
 test('Mouse inventory action throws immediately during cooldown and picks up with empty hands', () => {
