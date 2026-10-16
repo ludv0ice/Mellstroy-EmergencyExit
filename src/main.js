@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import './style.css';
 import { GameView } from './renderer.js';
 import { Simulation } from './simulation.js';
+import { Tutorial } from './tutorial.js';
 import { CHAPTERS, PROFILES } from './campaign.js';
 import { AudioEngine } from './audio.js';
 import { connectsTo } from './rooms.js';
@@ -75,6 +76,7 @@ const app = {
       'escaping',
     ].includes(this.mode);
     $('hud').classList.toggle('hidden', !playing);
+    if (id || this.mode !== 'playing') $('tutorial').classList.add('hidden');
     $('weapon-hud').classList.toggle('hidden', !playing);
     $('touch-controls').classList.toggle(
       'hidden',
@@ -123,6 +125,7 @@ const app = {
           sim.player.y = pos.y;
         }
       }
+      if (id === 'rmTutorial') sim.tutorial = new Tutorial(sim);
       sim.status = 'playing';
       sim.player.alive = true;
       sim.grace = 0.6;
@@ -141,9 +144,10 @@ const app = {
       $('loading').classList.add('hidden');
       this.audio.start();
       this.updateHUD();
-      this.toast(
-        sim.total ? `ПЕРИМЕТР: ${sim.total} ПРОТИВНИКОВ` : 'НАЙДИ ВЫХОД',
-      );
+      if (!sim.tutorial)
+        this.toast(
+          sim.total ? `ПЕРИМЕТР: ${sim.total} ПРОТИВНИКОВ` : 'НАЙДИ ВЫХОД',
+        );
     } catch (error) {
       this.fail(error);
     }
@@ -156,10 +160,14 @@ const app = {
       'ГЛАВА ' + this.chapter.number + ' / ПОБЕГ ИЗ ГОРОДА';
     $('brief-title').textContent = this.chapter.title;
     $('brief-text').textContent = this.chapter.brief;
+    $('profile').disabled = index === 0;
+    if (index === 0) $('profile').value = PROFILES[0].id;
+    $('deploy').textContent = index === 0 ? 'НАЧАТЬ ОБУЧЕНИЕ' : 'НАЧАТЬ ГЛАВУ';
   },
   start() {
     this.profile =
       PROFILES.find((p) => p.id === $('profile').value) ?? PROFILES[0];
+    if (this.chapter.index === 0) this.profile = PROFILES[0];
     this.floorIndex = 0;
     this.runScore = 0;
     this.runTime = 0;
@@ -190,8 +198,8 @@ const app = {
     this.mode = 'menu';
     this.overlay('menu');
     $('continue').textContent = this.progress.unlocked
-      ? 'ПРОДОЛЖИТЬ ПОБЕГ ↗'
-      : 'НАЧАТЬ ПОБЕГ ↗';
+      ? 'ПРОДОЛЖИТЬ ПОБЕГ'
+      : 'НАЧАТЬ ПОБЕГ';
     $('combo').classList.add('hidden');
     if (this.view) this.view.preview = true;
     this.audio.active = true;
@@ -204,7 +212,8 @@ const app = {
       this.audio.active = false;
       $('combo').classList.add('hidden');
     }
-    if (event.type === 'clear') this.toast('ПЕРИМЕТР ЧИСТ · К ВЫХОДУ');
+    if (event.type === 'clear' && !this.sim.tutorial)
+      this.toast('ПЕРИМЕТР ЧИСТ · К ВЫХОДУ');
     if (event.type === 'complete') this.beginExit();
   },
   beginExit() {
@@ -321,9 +330,25 @@ const app = {
     $('next').textContent =
       this.chapter.index === CHAPTERS.length - 1
         ? 'ЗАВЕРШИТЬ ПОБЕГ'
-        : 'СЛЕДУЮЩАЯ ГЛАВА ↗';
+        : 'СЛЕДУЮЩАЯ ГЛАВА';
   },
   updateHUD() {
+    const tutorial = this.sim?.tutorial;
+    const panel = $('tutorial');
+    panel.classList.toggle('hidden', !tutorial || this.mode !== 'playing');
+    if (tutorial) {
+      const hint = tutorial.hint;
+      $('tutorial-progress').textContent =
+        `ОБУЧЕНИЕ ${hint.number} / ${hint.total}`;
+      $('tutorial-title').textContent = hint.title;
+      $('tutorial-text').textContent = hint.text;
+      $('tutorial-keys').textContent =
+        tutorial.step === 'move'
+          ? ['W', 'A', 'S', 'D']
+              .map((key) => (hint.directions.includes(key) ? key + ' +' : key))
+              .join('   ')
+          : '';
+    }
     const s = this.sim;
     if (!s) return;
     $('hud-number').textContent = this.chapter.number + ' /';
@@ -345,7 +370,7 @@ const app = {
       'hidden',
       s.combo < 2 || this.mode !== 'playing',
     );
-    $('combo').textContent = s.combo + '× COMBO';
+    $('combo').textContent = s.combo + 'x COMBO';
   },
   toast(text) {
     $('toast').textContent = text;
@@ -455,8 +480,8 @@ async function boot() {
 }
 function bindUI() {
   $('continue').textContent = app.progress.unlocked
-    ? 'ПРОДОЛЖИТЬ ПОБЕГ ↗'
-    : 'НАЧАТЬ ПОБЕГ ↗';
+    ? 'ПРОДОЛЖИТЬ ПОБЕГ'
+    : 'НАЧАТЬ ПОБЕГ';
   $('continue').onclick = () => {
     app.audio.start();
     app.briefing(app.progress.last ?? 0);

@@ -4,9 +4,9 @@ from collections import deque
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = ROOT / 'assets/source/mellstroy-directions-generated.png'
-ATTACK_SOURCE = ROOT / 'assets/source/mellstroy-attacks-generated.png'
-OUTPUT = ROOT / 'public/assets/custom'
+SOURCE = ROOT / 'tools/art-source/mellstroy-directions-generated.png'
+ATTACK_SOURCE = ROOT / 'tools/art-source/mellstroy-attacks-generated.png'
+OUTPUT = ROOT / 'assets/custom'
 FRAME = 60
 ORIGIN = (30, 30)
 FOOT_BASELINE = 44

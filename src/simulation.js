@@ -75,7 +75,7 @@ export class Simulation {
           origin: { x: e.x, y: e.y },
           alive: true,
           stun: 0,
-          reaction: 0.25,
+          reaction: 0.45,
           fireTimer: 0.35,
           frame: 0,
           moving: 0,
@@ -263,6 +263,7 @@ export class Simulation {
   update(dt, input) {
     this.events = [];
     if (this.status !== 'playing') return;
+    if (this.tutorial) input = this.tutorial.filterInput(input);
     dt = Math.min(dt, 0.05);
     this.elapsed += dt;
     this.grace = Math.max(0, this.grace - dt);
@@ -294,15 +295,12 @@ export class Simulation {
       p.facing = directionForVector(p.vx, p.vy, p.facing);
       p.frame = (p.frame + dt * p.moving * 0.05) % 8;
     } else p.frame = 0;
-    if (input.weaponAction) {
-      if (p.weapon === UNARMED) this.pickup();
-      else this.throwWeapon();
-    }
-    if (input.pickup) this.pickup();
-    if (input.drop) this.dropWeapon();
-    if (input.throw) this.throwWeapon();
+    this.updateInventory(input);
     if (input.execute) this.execute();
-    if (input.attack && !input.weaponAction && !input.pickup && !input.drop && !input.throw && p.fireTimer <= 0 && p.execution <= 0) this.attack();
+    const changingWeapon =
+      input.weaponAction || input.pickup || input.drop || input.throw;
+    if (input.attack && !changingWeapon && p.fireTimer <= 0 && p.execution <= 0)
+      this.attack();
     for (const door of this.doors) {
       if (door.swing) {
         door.open = clamp(door.open + door.swing * dt, 0, Math.PI * 0.7);
@@ -310,11 +308,12 @@ export class Simulation {
       }
     }
     for (const e of this.enemies) {
-      if (e.alive) this.updateEnemy(e, dt);
+      if (e.alive && !this.tutorial) this.updateEnemy(e, dt);
     }
     this.updateBullets(dt);
     this.updateParticles(dt);
     this.checkClear();
+    this.tutorial?.update(input);
     const nearest = this.items
       .filter((i) => !i.taken)
       .sort((a, b) => distance(a, p) - distance(b, p))[0];
@@ -324,20 +323,39 @@ export class Simulation {
     this.context = down
       ? 'SPACE · ДОБИТЬ'
       : nearest && distance(nearest, p) < 30
-        ? 'E / ПКМ · ' + nearest.weapon.name.toUpperCase()
+        ? (p.weapon === UNARMED ? 'E / ПКМ · ' : 'E · ') +
+          nearest.weapon.name.toUpperCase()
         : this.cleared
           ? 'К ВЫХОДУ → E'
           : '';
-    if (input.interact && this.cleared && distance(p, this.exit) < 48) {
+    if (
+      input.interact &&
+      this.cleared &&
+      (!this.tutorial || this.tutorial.canExit) &&
+      distance(p, this.exit) < 48
+    ) {
       this.status = 'complete';
       this.sound('sndComplete');
       this.emit('complete');
     }
   }
+  updateInventory(input) {
+    if (input.weaponAction) {
+      if (this.player.weapon === UNARMED) this.pickup();
+      else this.throwWeapon();
+    }
+    if (input.pickup) this.pickup();
+    if (input.drop) this.dropWeapon();
+    if (input.throw) this.throwWeapon();
+  }
   pickup() {
     const p = this.player,
       items = this.items.filter(
-        (i) => !i.taken && distance(i, p) < 32 && !this.lineBlocked(i, p),
+        (i) =>
+          !i.taken &&
+          distance(i, p) < 32 &&
+          !this.lineBlocked(i, p) &&
+          (!this.tutorial || this.tutorial.allowsPickup(i)),
       );
     items.sort((a, b) => distance(a, p) - distance(b, p));
     const item = items[0];
@@ -389,6 +407,7 @@ export class Simulation {
       for (const enemy of this.enemies) {
         if (
           !enemy.alive ||
+          (this.tutorial && !this.tutorial.allowsHit(enemy)) ||
           distance(enemy, p) > w.range + 6 ||
           this.lineBlocked(p, enemy)
         )
@@ -532,6 +551,7 @@ export class Simulation {
       this.dropEnemyWeapon(enemy);
     }
     enemy.stun = time;
+    enemy.meleeWindup = null;
     enemy.state = 'stunned';
     enemy.moving = 0;
   }
@@ -664,7 +684,7 @@ export class Simulation {
       e.state = 'chase';
     } else {
       e.alert = Math.max(0, e.alert - dt);
-      e.reaction = 0.25;
+      e.reaction = 0.45;
     }
     if (e.alert > 0 && e.lastSeen) {
       e.angle = angle;
@@ -672,8 +692,7 @@ export class Simulation {
         e.moving = 0;
         if (e.reaction <= 0 && e.fireTimer <= 0) {
           e.ammo--;
-          e.fireTimer =
-            e.weapon.cooldown + (e.weapon.cooldown < 0.2 ? 0.12 : 0.12);
+          e.fireTimer = e.weapon.cooldown + 0.12;
           this.fire(e, e.weapon, 'enemy');
           this.sound(e.weapon.sound);
         }
@@ -693,15 +712,22 @@ export class Simulation {
           }
         }
         const melee = e.weapon.gun ? UNARMED : e.weapon;
-        if (
-          d < (melee.enemyRange ?? melee.range) + p.radius &&
+        const inReach = d < (melee.enemyRange ?? melee.range) + p.radius;
+        const ready =
+          inReach &&
           sees &&
           !this.lineBlocked(e, p) &&
           e.reaction <= 0 &&
-          e.fireTimer <= 0
-        ) {
-          this.die();
-          e.fireTimer = 0.4;
+          e.fireTimer <= 0;
+        if (!ready) e.meleeWindup = null;
+        else {
+          // A short, committed wind-up gives a new player time to strike first.
+          e.meleeWindup = (e.meleeWindup ?? 0.22) - dt;
+          if (e.meleeWindup <= 0) {
+            this.die();
+            e.fireTimer = 0.4;
+            e.meleeWindup = null;
+          }
         }
       }
     } else {
@@ -739,7 +765,9 @@ export class Simulation {
     }
     if (e.moving > 0) e.frame = (e.frame + dt * e.moving * 0.06) % 8;
     if (e.weapon === UNARMED && !e.dog && !e.fat) {
-      const item = this.items.find((i) => !i.taken && distance(i, e) < 18 && !this.lineBlocked(i, e));
+      const item = this.items.find(
+        (i) => !i.taken && distance(i, e) < 18 && !this.lineBlocked(i, e),
+      );
       if (item) {
         e.weapon = item.weapon;
         e.ammo = item.ammo;
@@ -784,6 +812,12 @@ export class Simulation {
           ? [this.player]
           : this.enemies.filter((e) => e.alive);
       for (const actor of targets) {
+        if (
+          this.tutorial &&
+          actor !== this.player &&
+          !this.tutorial.allowsHit(actor)
+        )
+          continue;
         if (actor === b.owner || actor.alive === false) continue;
         const t = segmentCircle(
           b.x,

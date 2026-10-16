@@ -6,7 +6,7 @@ import { WEAPONS, UNARMED } from '../src/weapons.js';
 import { PROFILES } from '../src/campaign.js';
 
 const manifest = JSON.parse(
-  readFileSync(new URL('../public/assets/manifest.json', import.meta.url)),
+  readFileSync(new URL('../assets/manifest.json', import.meta.url)),
 );
 const actor = (kind, x, y) => ({
   kind,
@@ -57,12 +57,21 @@ test('Every melee weapon hits within its own reach and misses outside it', () =>
 });
 
 test('Every enemy melee weapon has less reach than the same weapon held by the hero', () => {
-  for (const weapon of WEAPONS.filter(w => !w.gun && !w.throwOnly)) {
+  for (const weapon of WEAPONS.filter((w) => !w.gun && !w.throwOnly)) {
     assert.ok(weapon.enemyRange < weapon.range, weapon.name);
-    for (const [distance, killed] of [[weapon.enemyRange + 6, true], [weapon.enemyRange + 8, false]]) {
-      const sim = duel(distance), enemy = sim.enemies[0];
-      enemy.weapon = weapon; enemy.angle = Math.PI; enemy.reaction = 0; enemy.fireTimer = 0; sim.grace = 0;
-      sim.updateEnemy(enemy, 1 / 60);
+    for (const [distance, killed] of [
+      [weapon.enemyRange + 6, true],
+      [weapon.enemyRange + 8, false],
+    ]) {
+      const sim = duel(distance),
+        enemy = sim.enemies[0];
+      enemy.weapon = weapon;
+      enemy.angle = Math.PI;
+      enemy.reaction = 0;
+      enemy.fireTimer = 0;
+      sim.grace = 0;
+      sim.moveEnemy = () => {};
+      for (let frame = 0; frame < 14; frame++) sim.updateEnemy(enemy, 1 / 60);
       assert.equal(sim.player.alive, !killed, weapon.name + ' ' + distance);
     }
   }
@@ -256,10 +265,7 @@ test('Weapons thrown out of bounds remain on the map for recovery', () => {
 test('The yellow walls on chapter 03 block the player, enemies and navigation', () => {
   const raw = JSON.parse(
     readFileSync(
-      new URL(
-        '../public/assets/rooms/rmApartment2Upstairs.json',
-        import.meta.url,
-      ),
+      new URL('../assets/rooms/rmApartment2Upstairs.json', import.meta.url),
     ),
   );
   const sim = new Simulation(manifest, raw, PROFILES[0]);
@@ -288,17 +294,66 @@ test('The yellow walls on chapter 03 block the player, enemies and navigation', 
 });
 
 test('Mouse inventory action throws immediately during cooldown and picks up with empty hands', () => {
-  const sim = duel(23); sim.player.weapon = WEAPONS[0]; sim.player.ammo = 6; sim.player.fireTimer = 10;
-  sim.update(1 / 60, {moveX: 0, moveY: 0, weaponAction: true, attack: true, aim: {x:100,y:40}});
+  const sim = duel(23);
+  sim.player.weapon = WEAPONS[0];
+  sim.player.ammo = 6;
+  sim.player.fireTimer = 10;
+  sim.update(1 / 60, {
+    moveX: 0,
+    moveY: 0,
+    weaponAction: true,
+    attack: true,
+    aim: { x: 100, y: 40 },
+  });
   assert.equal(sim.player.weapon, UNARMED);
   sim.updateBullets(0.05);
   assert.equal(sim.enemies[0].stun, STUN_DURATION);
-  sim.update(1 / 60, {moveX:0,moveY:0,weaponAction:true});
-  assert.equal(sim.player.weapon.id, 0); assert.equal(sim.player.ammo, 6);
+  sim.update(1 / 60, { moveX: 0, moveY: 0, weaponAction: true });
+  assert.equal(sim.player.weapon.id, 0);
+  assert.equal(sim.player.ammo, 6);
 });
 test('Enemy cannot steal a ground weapon through a wall', () => {
-  const sim = fixture([actor('player',40,40),actor('enemy',70,40),wall(60,16,0,1,3)]);
-  sim.items.push({x:55,y:40,weapon:WEAPONS[0],ammo:5});
-  sim.updateEnemy(sim.enemies[0],1/60);
-  assert.equal(sim.enemies[0].weapon,UNARMED);
+  const sim = fixture([
+    actor('player', 40, 40),
+    actor('enemy', 70, 40),
+    wall(60, 16, 0, 1, 3),
+  ]);
+  sim.items.push({ x: 55, y: 40, weapon: WEAPONS[0], ammo: 5 });
+  sim.updateEnemy(sim.enemies[0], 1 / 60);
+  assert.equal(sim.enemies[0].weapon, UNARMED);
+});
+
+test('Melee wind-up gives 220 ms to counterattack and resets when the hero escapes', () => {
+  const sim = duel(20),
+    enemy = sim.enemies[0];
+  sim.grace = 0;
+  enemy.reaction = 0;
+  enemy.fireTimer = 0;
+  enemy.angle = Math.PI;
+  sim.moveEnemy = () => {};
+  for (let i = 0; i < 10; i++) sim.updateEnemy(enemy, 1 / 60);
+  assert.equal(sim.player.alive, true);
+  sim.player.x = 200;
+  sim.updateEnemy(enemy, 1 / 60);
+  assert.equal(enemy.meleeWindup, null);
+  sim.player.x = 40;
+  for (let i = 0; i < 10; i++) sim.updateEnemy(enemy, 1 / 60);
+  assert.equal(sim.player.alive, true);
+  sim.player.weapon = WEAPONS[4];
+  sim.player.angle = 0;
+  sim.attack();
+  assert.equal(enemy.alive, false);
+});
+test('A newly alerted gunman waits before his first shot', () => {
+  const sim = duel(120),
+    enemy = sim.enemies[0];
+  sim.grace = 0;
+  enemy.weapon = WEAPONS[0];
+  enemy.ammo = 10;
+  enemy.angle = Math.PI;
+  enemy.fireTimer = 0;
+  for (let i = 0; i < 20; i++) sim.updateEnemy(enemy, 1 / 60);
+  assert.equal(sim.bullets.length, 0);
+  for (let i = 0; i < 8; i++) sim.updateEnemy(enemy, 1 / 60);
+  assert.ok(sim.bullets.length > 0);
 });

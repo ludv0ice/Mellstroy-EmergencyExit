@@ -2,7 +2,7 @@
 
 Генерация выполнена встроенным **ImageGen**. Выбранные результаты нормализованы общим масштабом на всю анимацию. В текущем проекте сохранены конечные игровые текстуры; дубли исходников и увеличенные промежуточные изображения доступны в истории Git. При сокращении проекта игровые PNG не изменялись. Размеры ниже относятся к конечным игровым файлам.
 
-| Файл в `public/assets/custom/` | Исходный спрайт | Размер PNG | Кадры | Кадр | Origin |
+| Файл в `assets/custom/` | Исходный спрайт | Размер PNG | Кадры | Кадр | Origin |
 |---|---|---|---|---|---|
 | `mellstroy-walk.png` | `sprPWalkUnarmed` | 480×60 | 8 | 60×60 | 30,30 |
 | `mellstroy-punch.png` | `sprPAttackPunch` | 308×32 | 7 | 44×32 | 13,16 |
@@ -13,7 +13,7 @@
 | `streamer-desk.png` | `sprAndersDesk` | 318×25 | 6 | 53×25 | 26,14 |
 | `floor-atlas.png` | `tlFloorTiles` | 816×368 | Атлас | Исходная сетка | Исходные координаты тайлов |
 
-Манифест — `public/assets/custom/skins.json`. При первоначальной нормализации отбрасывались почти прозрачные случайные пиксели при измерении силуэта, сохранялся одинаковый масштаб внутри полосы и переносился центр видимой области каждого исходного кадра. Атлас полов приведён к исходному разрешению; его визуальное содержимое является генеративной заменой, а не гарантированной попиксельной копией сетки материалов.
+Манифест — `assets/custom/skins.json`. При первоначальной нормализации отбрасывались почти прозрачные случайные пиксели при измерении силуэта, сохранялся одинаковый масштаб внутри полосы и переносился центр видимой области каждого исходного кадра. Атлас полов приведён к исходному разрешению; его визуальное содержимое является генеративной заменой, а не гарантированной попиксельной копией сетки материалов.
 
 Герой основан на обобщённом узнаваемом образе Mellstroy: короткие каштановые волосы, борода, чёрная футболка. Фотореференс пользователя не предоставлялся.
 
@@ -26,7 +26,7 @@
 | `mellstroy-directions.png` | 480×240 | 8 ходьбы | 4 |
 | `mellstroy-attacks.png` | 420×240 | 7 удара | 4 |
 
-Исходные генерации сохранены в `assets/source/`, воспроизводимая нормализация — `python3 tools/prepare_hero.py` с Pillow. Первый исходный атлас содержит дополнительные варианты ходьбы; выбран цикл из восьми кадров. Удары подготовлены отдельным атласом, чтобы руки явно тянулись вверх/вниз и в соответствующую сторону для боковых направлений. Старые спрайты и их контрольные хеши сохранены; игра использует новые ключи `heroDirectional` и `punchDirectional` в `skins.json`.
+Исходные генерации сохранены в `tools/art-source/`, воспроизводимая нормализация — `python3 tools/prepare_hero.py` с Pillow. Первый исходный атлас содержит дополнительные варианты ходьбы; выбран цикл из восьми кадров. Удары подготовлены отдельным атласом, чтобы руки явно тянулись вверх/вниз и в соответствующую сторону для боковых направлений. Старые спрайты и их контрольные хеши сохранены; игра использует новые ключи `heroDirectional` и `punchDirectional` в `skins.json`.
 
 ## Использованные промпты
 
@@ -65,3 +65,5 @@ Edit the supplied six-frame pixel-art overhead desk texture into a contemporary 
 ### Полы
 
 Use case precise-object-edit. Edit this production top-down pixel-art floor tile atlas for a neon night police-chase browser game starring a streamer. Maintain EXACT atlas arrangement, all tile footprints, positions and transparent blank areas, do not rearrange anything. Original atlas dimensions 816x368, each small tile grid 16 pixels. Replace decorative tile materials only: contemporary dark violet and teal parquet, cool graphite concrete, muted pink motel bathroom ceramics, dim gold club tiles, asphalt and cyan pool water. Keep every tile seamless with itself, no perspective, no words or logos, no bevels or shadows outside original tile areas. Pixel-art material texture in limited palettes matching Hotline Miami pixel art, crisp pixels, compatible with original source rectangle coordinates. Keep layout identical. Transparent background where source transparent.
+
+Интерфейс обновлён 16 октября 2026: шрифт Exo 2 от Google Fonts, лицензия SIL OFL в `FONT-LICENSE.txt`. Исходный Justice сохранён для целостности оригинальных материалов, меню использует Exo 2.

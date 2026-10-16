@@ -11,13 +11,11 @@ const baseline = JSON.parse(
   readFileSync(new URL('./fixtures/campaign-baseline.json', import.meta.url)),
 );
 const manifest = JSON.parse(
-  readFileSync(new URL('../public/assets/manifest.json', import.meta.url)),
+  readFileSync(new URL('../assets/manifest.json', import.meta.url)),
 );
 const raw = (id) =>
   JSON.parse(
-    readFileSync(
-      new URL('../public/assets/rooms/' + id + '.json', import.meta.url),
-    ),
+    readFileSync(new URL('../assets/rooms/' + id + '.json', import.meta.url)),
   );
 const hash = (value) =>
   createHash('sha256').update(JSON.stringify(value)).digest('hex');

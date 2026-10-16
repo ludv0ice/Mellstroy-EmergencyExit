@@ -24,7 +24,7 @@ export async function readJson(url) {
 export async function readBytes(url) {
   if (embedded()) {
     const data = atob(assetUrl(url).split(',')[1]);
-    return Uint8Array.from(data, character => character.charCodeAt(0)).buffer;
+    return Uint8Array.from(data, (character) => character.charCodeAt(0)).buffer;
   }
   const response = await fetch(url);
   if (!response.ok) throw new Error('Не удалось загрузить ' + url);

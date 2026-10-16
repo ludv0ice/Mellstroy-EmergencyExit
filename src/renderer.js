@@ -184,7 +184,18 @@ export class GameView extends Phaser.Scene {
       e.name,
     );
   }
-  drawSprite(ctx, key, frame, x, y, angle = 0, sx = 1, sy = sx, alpha = 1, origin = null) {
+  drawSprite(
+    ctx,
+    key,
+    frame,
+    x,
+    y,
+    angle = 0,
+    sx = 1,
+    sy = sx,
+    alpha = 1,
+    origin = null,
+  ) {
     const m = this.sim.manifest.sprites[key],
       img = this.images.get(key);
     if (!m || !img) return;
@@ -513,6 +524,15 @@ export class GameView extends Phaser.Scene {
         0.75,
         pose.row,
       );
+    const target = sim.tutorial?.target;
+    if (target && this.app.mode === 'playing') {
+      ctx.fillStyle = '#79caff';
+      ctx.beginPath();
+      ctx.moveTo(target.x - 4, target.y - 25);
+      ctx.lineTo(target.x + 4, target.y - 25);
+      ctx.lineTo(target.x, target.y - 19);
+      ctx.fill();
+    }
     ctx.drawImage(this.front, 0, 0);
     for (const e of sim.room.entities.filter((e) => e.glass && e.visible)) {
       const broken = e.sprite.replace(/([HV])$/, '$1Broken');

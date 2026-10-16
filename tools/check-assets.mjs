@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { CHAPTERS } from '../src/campaign.js';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
-const assets = path.join(root, 'public/assets');
+const assets = path.join(root, 'assets');
 const manifest = JSON.parse(readFileSync(path.join(assets, 'manifest.json')));
 const skins = JSON.parse(readFileSync(path.join(assets, 'custom/skins.json')));
 const rooms = new Set([
@@ -17,6 +17,7 @@ const expected = new Set([
   '/assets/manifest.json',
   '/assets/custom/skins.json',
   '/assets/fonts/justice.ttf',
+  '/assets/fonts/exo2.ttf',
   ...[...rooms].map((id) => `/assets/rooms/${id}.json`),
   ...Object.values(manifest.sprites).map((sprite) => sprite.url),
   ...Object.values(manifest.backgrounds),
@@ -33,15 +34,13 @@ function files(directory) {
 
 const actual = new Set(
   files(assets).map(
-    (file) =>
-      '/' +
-      path.relative(path.join(root, 'public'), file).split(path.sep).join('/'),
+    (file) => '/' + path.relative(root, file).split(path.sep).join('/'),
   ),
 );
 assert.deepEqual(
   actual,
   expected,
-  'Public assets must contain exactly the declared game files',
+  'Assets must contain exactly the declared game files',
 );
 for (const id of rooms) {
   const room = JSON.parse(
@@ -60,7 +59,7 @@ for (const id of rooms) {
     );
 }
 
-const publicBytes = files(path.join(root, 'public')).reduce(
+const assetBytes = files(path.join(root, 'assets')).reduce(
   (n, file) => n + statSync(file).size,
   0,
 );
@@ -68,7 +67,7 @@ const buildDirectory = path.join(root, 'dist');
 const buildBytes = existsSync(buildDirectory)
   ? files(buildDirectory).reduce((n, file) => n + statSync(file).size, 0)
   : null;
-assert.ok(publicBytes < 100_000_000, 'Game assets exceed the 100 MB budget');
+assert.ok(assetBytes < 100_000_000, 'Game assets exceed the 100 MB budget');
 if (buildBytes !== null) {
   assert.ok(
     buildBytes < 100_000_000,
@@ -94,7 +93,7 @@ console.log(
       rooms: rooms.size,
       sprites: Object.keys(manifest.sprites).length,
       sounds: Object.keys(manifest.audio).length,
-      publicBytes,
+      assetBytes,
       buildBytes,
     },
     null,

@@ -9,13 +9,11 @@ import { buildRoom } from '../src/rooms.js';
 import { CHAPTERS } from '../src/campaign.js';
 
 const manifest = JSON.parse(
-  readFileSync(new URL('../public/assets/manifest.json', import.meta.url)),
+  readFileSync(new URL('../assets/manifest.json', import.meta.url)),
 );
 const raw = (id) =>
   JSON.parse(
-    readFileSync(
-      new URL('../public/assets/rooms/' + id + '.json', import.meta.url),
-    ),
+    readFileSync(new URL('../assets/rooms/' + id + '.json', import.meta.url)),
   );
 const prototypes = {
   objPlayerMouse: {
@@ -189,7 +187,7 @@ test('Every campaign room and declared asset exists', () => {
     assert.equal(data.entities.length, r.entities);
   }
   for (const s of Object.values(manifest.sprites))
-    assert.ok(existsSync(new URL('../public' + s.url, import.meta.url)), s.url);
+    assert.ok(existsSync(new URL('..' + s.url, import.meta.url)), s.url);
 });
 test('All campaign combat maps construct a simulation with valid spawn and finite collision geometry', () => {
   for (const r of manifest.rooms.filter((r) => r.enemies > 0)) {
@@ -207,9 +205,7 @@ test('All campaign combat maps construct a simulation with valid spawn and finit
 });
 test('Custom sheets preserve source canvas size, frame count, and origin', () => {
   const skins = JSON.parse(
-    readFileSync(
-      new URL('../public/assets/custom/skins.json', import.meta.url),
-    ),
+    readFileSync(new URL('../assets/custom/skins.json', import.meta.url)),
   );
   const pairs = {
     hero: 'sprPWalkUnarmed',
@@ -223,16 +219,14 @@ test('Custom sheets preserve source canvas size, frame count, and origin', () =>
   for (const [key, sprite] of Object.entries(pairs)) {
     const s = skins[key],
       m = manifest.sprites[sprite];
-    const png = readFileSync(new URL('../public' + s.url, import.meta.url));
+    const png = readFileSync(new URL('..' + s.url, import.meta.url));
     assert.equal(png.readUInt32BE(16), m.width * m.frames, key + ' width');
     assert.equal(png.readUInt32BE(20), m.height, key + ' height');
     assert.equal(s.frames, m.frames, key + ' frames');
     assert.equal(s.originX, m.originX, key + ' originX');
     assert.equal(s.originY, m.originY, key + ' originY');
   }
-  const floor = readFileSync(
-    new URL('../public' + skins.floor.url, import.meta.url),
-  );
+  const floor = readFileSync(new URL('..' + skins.floor.url, import.meta.url));
   assert.equal(floor.readUInt32BE(16), 816);
   assert.equal(floor.readUInt32BE(20), 368);
 });
@@ -243,7 +237,7 @@ test('All retained textures, sounds and fonts remain byte-identical to the origi
   for (const [url, expected] of Object.entries(baseline.assets)) {
     assert.equal(
       createHash('sha256')
-        .update(readFileSync(new URL('../public' + url, import.meta.url)))
+        .update(readFileSync(new URL('..' + url, import.meta.url)))
         .digest('hex'),
       expected,
       url,

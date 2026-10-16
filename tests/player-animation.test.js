@@ -13,7 +13,7 @@ import { PROFILES } from '../src/campaign.js';
 import { UNARMED, WEAPONS } from '../src/weapons.js';
 
 const manifest = JSON.parse(
-  readFileSync(new URL('../public/assets/manifest.json', import.meta.url)),
+  readFileSync(new URL('../assets/manifest.json', import.meta.url)),
 );
 const create = () =>
   new Simulation(
@@ -130,13 +130,11 @@ test('Shooting and death preserve an upright sprite while aim remains free', () 
 test('Zero motion keeps the last facing and directional atlases retain fixed anchors', () => {
   assert.equal(directionForVector(0, 0, 'left'), 'left');
   const skins = JSON.parse(
-    readFileSync(
-      new URL('../public/assets/custom/skins.json', import.meta.url),
-    ),
+    readFileSync(new URL('../assets/custom/skins.json', import.meta.url)),
   );
   for (const key of ['heroDirectional', 'punchDirectional']) {
     const skin = skins[key],
-      png = readFileSync(new URL('../public' + skin.url, import.meta.url));
+      png = readFileSync(new URL('..' + skin.url, import.meta.url));
     assert.equal(png.readUInt32BE(16), skin.width * skin.frames);
     assert.equal(png.readUInt32BE(20), skin.height * skin.rows);
     assert.deepEqual(skin.directions, PLAYER_DIRECTIONS);
@@ -147,18 +145,33 @@ test('Zero motion keeps the last facing and directional atlases retain fixed anc
 
 test('All melee weapons have distinct fixed grips and animated attacks in four directions', () => {
   const signatures = new Set();
-  for (const weapon of WEAPONS.filter(w => !w.gun && !w.throwOnly)) {
+  for (const weapon of WEAPONS.filter((w) => !w.gun && !w.throwOnly)) {
     assert.ok(MELEE_ANIMATIONS[weapon.sprite]);
     const trajectory = [];
     for (const facing of PLAYER_DIRECTIONS) {
-      const p = {weapon, facing, angle:0, attack:0, attackDuration:0.3, attackAngle:0};
+      const p = {
+        weapon,
+        facing,
+        angle: 0,
+        attack: 0,
+        attackDuration: 0.3,
+        attackAngle: 0,
+      };
       const idle = heldWeaponPose(p);
-      for(let i=0;i<16;i++) {p.angle=i*Math.PI/8;assert.deepEqual(heldWeaponPose(p),idle);}
-      for(let i=0;i<7;i++) {p.attack=0.3*(1-(i+0.1)/7);trajectory.push(heldWeaponPose(p));}
-      assert.notDeepEqual(trajectory.at(-4),idle);
-      const frozen = heldWeaponPose(p);p.angle+=1;assert.deepEqual(heldWeaponPose(p),frozen);
+      for (let i = 0; i < 16; i++) {
+        p.angle = (i * Math.PI) / 8;
+        assert.deepEqual(heldWeaponPose(p), idle);
+      }
+      for (let i = 0; i < 7; i++) {
+        p.attack = 0.3 * (1 - (i + 0.1) / 7);
+        trajectory.push(heldWeaponPose(p));
+      }
+      assert.notDeepEqual(trajectory.at(-4), idle);
+      const frozen = heldWeaponPose(p);
+      p.angle += 1;
+      assert.deepEqual(heldWeaponPose(p), frozen);
     }
     signatures.add(JSON.stringify(trajectory));
   }
-  assert.equal(signatures.size,18);
+  assert.equal(signatures.size, 18);
 });

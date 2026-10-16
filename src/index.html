@@ -6,7 +6,7 @@
       name="viewport"
       content="width=device-width,initial-scale=1,viewport-fit=cover"
     />
-    <meta name="theme-color" content="#110c1d" />
+    <meta name="theme-color" content="#080f18" />
     <title>MELLSTROY — Emergency Exit</title>
   </head>
   <body>
@@ -15,26 +15,18 @@
       <div class="scanlines" aria-hidden="true"></div>
       <div class="vignette" aria-hidden="true"></div>
       <div id="loading">
-        <span class="eyebrow">ПОДКЛЮЧЕНИЕ К ЭФИРУ</span
+        <span class="eyebrow">MELLSTROY</span
         ><strong id="load-label">Загрузка города…</strong>
         <div class="load-track"><i id="load-progress"></i></div>
       </div>
       <section id="menu" class="overlay hidden" aria-label="Главное меню">
-        <div class="broadcast"><i></i> OFFLINE <span>12 OCT / 03:47</span></div>
         <div class="menu-inner">
-          <p class="eyebrow">ПОСЛЕДНЯЯ НОЧЬ В ПРЯМОМ ЭФИРЕ</p>
           <h1>MELLSTROY<span>EMERGENCY EXIT</span></h1>
-          <p class="tagline">Эфир закончился.<br />Погоня — только началась.</p>
           <nav>
-            <button id="continue" class="primary">
-              НАЧАТЬ ПОБЕГ <span>↗</span></button
+            <button id="continue" class="primary">НАЧАТЬ ПОБЕГ</button
             ><button id="chapters-button">ВЫБРАТЬ ГЛАВУ</button
             ><button id="settings-button">НАСТРОЙКИ / УПРАВЛЕНИЕ</button>
           </nav>
-        </div>
-        <div class="menu-footer">
-          <span>WASD · ДВИЖЕНИЕ &nbsp; / &nbsp; МЫШЬ · ПРИЦЕЛ</span
-          ><span>НЕКОММЕРЧЕСКАЯ ФАН-АДАПТАЦИЯ · v0.1</span>
         </div>
       </section>
       <header id="hud" class="hidden">
@@ -44,13 +36,19 @@
         </div>
         <div class="hud-right">
           <span id="hud-enemies"></span><strong id="hud-score">0</strong
-          ><button id="pause-button" aria-label="Пауза">Ⅱ</button>
+          ><button id="pause-button" aria-label="Пауза">Пауза</button>
         </div>
       </header>
       <div id="weapon-hud" class="hidden">
         <span id="weapon-name">КУЛАКИ</span><strong id="ammo"></strong
         ><small id="context"></small>
       </div>
+      <aside id="tutorial" class="hidden" aria-live="polite">
+        <small id="tutorial-progress"></small>
+        <h2 id="tutorial-title"></h2>
+        <p id="tutorial-text"></p>
+        <strong id="tutorial-keys"></strong>
+      </aside>
       <div id="combo" class="hidden"></div>
       <div id="toast" aria-live="polite"></div>
       <section id="briefing" class="overlay dialog-overlay hidden">
@@ -60,8 +58,7 @@
           <p id="brief-text"></p>
           <label class="field-label" for="profile">ОБРАЗ</label
           ><select id="profile"></select
-          ><button id="deploy" class="primary">
-            ВЫЙТИ В НОЧЬ <span>↗</span></button
+          ><button id="deploy" class="primary">ВЫЙТИ В НОЧЬ</button
           ><button class="back">НАЗАД</button>
         </div>
       </section>
@@ -69,17 +66,15 @@
         <div class="panel">
           <div class="panel-heading">
             <div>
-              <p class="eyebrow">НОЧЬ НЕ ЗАКОНЧЕНА</p>
               <h2>МАРШРУТ ПОБЕГА</h2>
             </div>
-            <button class="back icon" aria-label="Закрыть">×</button>
+            <button class="back icon" aria-label="Закрыть">Закрыть</button>
           </div>
           <div id="chapter-list" class="chapter-list"></div>
         </div>
       </section>
       <section id="pause" class="overlay dialog-overlay hidden">
         <div class="dialog">
-          <p class="eyebrow">СВЯЗЬ ПРИОСТАНОВЛЕНА</p>
           <h2>ПАУЗА</h2>
           <button id="resume" class="primary">ПРОДОЛЖИТЬ</button
           ><button id="restart">НАЧАТЬ КОМНАТУ ЗАНОВО</button
@@ -89,7 +84,6 @@
       </section>
       <section id="death" class="overlay dialog-overlay hidden">
         <div class="dialog death">
-          <p class="eyebrow">СИГНАЛ ПОТЕРЯН</p>
           <h2>ПОЙМАН.</h2>
           <p>Ещё одна попытка.<br />Ты уже знаешь, где они стоят.</p>
           <button id="retry" class="primary">R · ПОВТОРИТЬ</button
@@ -98,21 +92,19 @@
       </section>
       <section id="result" class="overlay dialog-overlay hidden">
         <div class="dialog">
-          <p class="eyebrow">ПРЕСЛЕДОВАНИЕ ПРЕРВАНО</p>
           <h2 id="result-title">ЧИСТО.</h2>
           <div class="result-stats">
             <div><small>ОЧКИ</small><strong id="result-score"></strong></div>
             <div><small>ВРЕМЯ</small><strong id="result-time"></strong></div>
             <div><small>ОЦЕНКА</small><strong id="result-grade"></strong></div>
           </div>
-          <button id="next" class="primary">ПРОДОЛЖИТЬ ПОБЕГ ↗</button
+          <button id="next" class="primary">ПРОДОЛЖИТЬ ПОБЕГ</button
           ><button id="result-retry">ПЕРЕИГРАТЬ</button
           ><button id="result-menu">В МЕНЮ</button>
         </div>
       </section>
       <section id="settings" class="overlay dialog-overlay hidden">
         <div class="dialog settings">
-          <p class="eyebrow">ЧАСТОТА СИГНАЛА</p>
           <h2>НАСТРОЙКИ</h2>
           <label
             >ЗВУК
@@ -164,13 +156,13 @@
         <div id="move-pad"><i></i></div>
         <div class="touch-actions">
           <button data-action="pickup">E</button
-          ><button data-action="execute">✦</button
+          ><button data-action="execute">Space</button
           ><button data-action="drop">Q</button
           ><button data-action="throw">F</button
-          ><button data-action="attack" class="attack">●</button>
+          ><button data-action="attack" class="attack">ЛКМ</button>
         </div>
       </div>
     </main>
-    <script type="module" src="/main.js"></script>
+    <script type="module" src="./main.js"></script>
   </body>
 </html>

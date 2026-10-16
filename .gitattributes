@@ -10,6 +10,6 @@
 *.jpg binary
 *.wav binary
 *.ttf binary
-public/assets/** linguist-generated=true
+assets/** linguist-generated=true
 tests/fixtures/** linguist-generated=true
 index.html linguist-generated=true
