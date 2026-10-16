@@ -5,10 +5,11 @@ const root = fileURLToPath(new URL('../', import.meta.url)).replace(/\/$/, '');
 const output =
   process.env.PLAYTEST_OUTPUT ?? root + '/../artifacts/tutorial-playtest';
 fs.mkdirSync(output, { recursive: true });
-const pages = await fetch('http://127.0.0.1:9222/json').then((r) => r.json());
-const ws = new WebSocket(
-  pages.find((p) => p.type === 'page').webSocketDebuggerUrl,
-);
+// A fresh tab prevents a previous dev page's favicon/HMR traffic entering this run.
+const page = await fetch('http://127.0.0.1:9222/json/new?about:blank', {
+  method: 'PUT',
+}).then(response => response.json());
+const ws = new WebSocket(page.webSocketDebuggerUrl);
 await new Promise((r) => ws.addEventListener('open', r, { once: true }));
 let id = 0;
 const pending = new Map(),
@@ -87,6 +88,10 @@ try {
     mobile: false,
   });
   await send('Page.navigate', { url: 'about:blank' });
+  await until("location.href === 'about:blank' && document.readyState === 'complete'");
+  // Scope diagnostics to the game, excluding traffic from the previously open page.
+  requests.length = 0;
+  errors.length = 0;
   const html = fs.readFileSync(root + '/index.html', 'utf8'),
     marker = html.lastIndexOf('window.__GAME__');
   const variable = html
@@ -259,7 +264,7 @@ try {
   assert.notEqual(await evaluate('window.__GAME__.mode'), 'playing');
   await screenshot('lesson-complete');
   assert.equal(errors.length, 0, JSON.stringify(errors));
-  assert.equal(requests.length, 0);
+  assert.equal(requests.length, 0, JSON.stringify(requests));
   const result = {
     steps: visited,
     tutorialFinished: true,
