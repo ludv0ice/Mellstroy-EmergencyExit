@@ -37,8 +37,6 @@ export function playerPose(player) {
     angle: 0,
   };
 }
-
-// Fixed grips in the body's four directions; each weapon has its own stroke.
 export const MELEE_ANIMATIONS = {
   Club: ['swing', 2.0, 0.3],
   Pipe: ['swing', 1.7, 0.35],
@@ -100,7 +98,6 @@ export function heldWeaponPose(player) {
     0.2,
   ];
   const phase = attacking ? attackProgress(player) : 0;
-  // Wind-up, contact, return; no cursor-driven orbit while holding a melee weapon.
   const contact = attacking ? Math.sin(Math.PI * phase) : 0;
   const sweep = attacking ? Math.sin(2 * Math.PI * phase) : 0;
   const reach = 5 + (stroke === 'thrust' ? contact * extent : contact * 3);

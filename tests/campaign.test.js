@@ -5,8 +5,6 @@ import { createHash } from 'node:crypto';
 import { Simulation } from '../src/simulation.js';
 import { buildRoom } from '../src/rooms.js';
 import { PROFILES } from '../src/campaign.js';
-
-// Captured before removing the source archive and converting room data.
 const baseline = JSON.parse(
   readFileSync(new URL('./fixtures/campaign-baseline.json', import.meta.url)),
 );
@@ -22,7 +20,6 @@ const hash = (value) =>
 
 function geometry(room, raw) {
   const entityFields = [
-    'id',
     'name',
     'kind',
     'sprite',
@@ -58,18 +55,20 @@ function geometry(room, raw) {
     id: room.id,
     width: room.width,
     height: room.height,
-    entities: room.entities.map((e) =>
-      select(
-        /^objWallSoft[HV]$/.test(e.name)
-          ? {
-              ...e,
-              solid: raw.entities[e.id].solid ?? false,
-              isWall: raw.entities[e.id].isWall ?? false,
-            }
-          : e,
-        entityFields,
+    entities: room.entities
+      .filter((e) => e.kind !== 'enemy')
+      .map((e) =>
+        select(
+          /^objWallSoft[HV]$/.test(e.name)
+            ? {
+                ...e,
+                solid: raw.entities[e.id].solid ?? false,
+                isWall: raw.entities[e.id].isWall ?? false,
+              }
+            : e,
+          entityFields,
+        ),
       ),
-    ),
     tiles: room.tiles.map((t) => select(t, tileFields)),
   };
 }
@@ -98,14 +97,16 @@ function trace(sim) {
   return hash(states);
 }
 
-test('Every retained room preserves visual geometry and draw order while yellow-wall collision is corrected', () => {
-  for (const [id, expected] of Object.entries(baseline.geometry)) {
+test('All scenery, collisions and draw order remain intact after reducing enemy counts', () => {
+  for (const [id, expected] of Object.entries(
+    JSON.parse(
+      readFileSync(new URL('./fixtures/static-geometry.json', import.meta.url)),
+    ),
+  )) {
     const data = raw(id);
     assert.equal(hash(geometry(buildRoom(manifest, data), data)), expected, id);
   }
 });
-
-// Combat and patrol behavior intentionally changed; old gameplay hashes are historical.
 test('Every retained room remains deterministic and finite with the corrected mechanics', () => {
   for (const { id } of manifest.rooms) {
     assert.equal(
@@ -127,5 +128,19 @@ test('All 24 gameplay modifiers construct valid simulations with consistent weap
       trace(new Simulation(manifest, raw('rmTutorial'), profile)),
       profile.id,
     );
+  }
+});
+
+test('Each chapter has at most seven enemies across all of its floors', async () => {
+  const { CHAPTERS } = await import('../src/campaign.js');
+  for (const chapter of CHAPTERS) {
+    const enemies = chapter.rooms.flatMap((id) =>
+      raw(id).entities.filter((e) => e.kind === 'enemy'),
+    );
+    assert.ok(enemies.length <= 7, chapter.number + ': ' + enemies.length);
+    for (const id of chapter.rooms) {
+      const sim = new Simulation(manifest, raw(id), PROFILES[0]);
+      assert.ok(sim.enemies.length <= 7, id);
+    }
   }
 });

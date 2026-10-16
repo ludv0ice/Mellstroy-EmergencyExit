@@ -1,4 +1,3 @@
-// Weapon IDs, ammunition and timings preserve the original gameplay data.
 const definitions = [
   ['M16', 'M16', 24, 2 / 60, 1, (6 * Math.PI) / 180, 960, 'sndM16'],
   [
@@ -81,7 +80,6 @@ const definitions = [
   ['Звезда', 'Throw'],
   ['Молотов', 'Throw'],
 ];
-// Reach in world pixels, before the target's collision radius is added.
 const meleeReach = {
   Club: 48,
   Pipe: 38,

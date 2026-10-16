@@ -1,3 +1,4 @@
+import { serveTestGame } from './serve-test-game.mjs';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import assert from 'node:assert/strict';
@@ -5,10 +6,10 @@ const root = fileURLToPath(new URL('../', import.meta.url)).replace(/\/$/, '');
 const output =
   process.env.PLAYTEST_OUTPUT ?? root + '/../artifacts/tutorial-playtest';
 fs.mkdirSync(output, { recursive: true });
-// A fresh tab prevents a previous dev page's favicon/HMR traffic entering this run.
+const server = await serveTestGame(root);
 const page = await fetch('http://127.0.0.1:9222/json/new?about:blank', {
   method: 'PUT',
-}).then(response => response.json());
+}).then((response) => response.json());
 const ws = new WebSocket(page.webSocketDebuggerUrl);
 await new Promise((r) => ws.addEventListener('open', r, { once: true }));
 let id = 0;
@@ -30,7 +31,8 @@ ws.onmessage = (e) => {
     errors.push(m.params.exceptionDetails);
   else if (
     m.method === 'Network.requestWillBeSent' &&
-    /^https?:/.test(m.params.request.url)
+    /^https?:/.test(m.params.request.url) &&
+    !m.params.request.url.startsWith(server.url + '/')
   )
     requests.push(m.params.request.url);
 };
@@ -80,31 +82,14 @@ try {
   await send('Runtime.enable');
   await send('Network.enable');
   await send('Page.enable');
-  await send('Network.setBlockedURLs', { urls: ['http://*', 'https://*'] });
+  await send('Network.setBlockedURLs', { urls: ['https://*'] });
   await send('Emulation.setDeviceMetricsOverride', {
     width: 1366,
     height: 768,
     deviceScaleFactor: 1,
     mobile: false,
   });
-  await send('Page.navigate', { url: 'about:blank' });
-  await until("location.href === 'about:blank' && document.readyState === 'complete'");
-  // Scope diagnostics to the game, excluding traffic from the previously open page.
-  requests.length = 0;
-  errors.length = 0;
-  const html = fs.readFileSync(root + '/index.html', 'utf8'),
-    marker = html.lastIndexOf('window.__GAME__');
-  const variable = html
-    .slice(marker)
-    .match(/get mode\(\)\{return ([\w$]+)\.mode/)[1];
-  const frame = (await send('Page.getFrameTree')).frameTree.frame.id;
-  await send('Page.setDocumentContent', {
-    frameId: frame,
-    html: html.replace(
-      'window.__GAME__=',
-      `window.__QA_APP__=${variable};window.__GAME__=`,
-    ),
-  });
+  await send('Page.navigate', { url: server.url });
   await until("window.__GAME__?.mode==='menu'");
   await evaluate('window.__QA_APP__.game.loop.stop(); document.fonts.ready');
   await screenshot('menu-desktop');
@@ -269,11 +254,12 @@ try {
     steps: visited,
     tutorialFinished: true,
     realKeyboardAndMouse: true,
-    networkRequests: requests.length,
+    externalRequests: requests.length,
     javaScriptErrors: errors.length,
   };
   fs.writeFileSync(output + '/results.json', JSON.stringify(result, null, 2));
   console.log(JSON.stringify(result));
 } finally {
   ws.close();
+  server.close();
 }

@@ -5,11 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1",
-    "build": "vite build",
+    "build": "node tools/build-game.mjs",
     "preview": "vite preview --host 127.0.0.1",
     "test": "node --test tests/*.test.js",
-    "check:assets": "node tools/check-assets.mjs",
-    "build:standalone": "node tools/build-standalone.mjs"
+    "check:assets": "node tools/check-assets.mjs"
   },
   "dependencies": {
     "phaser": "^3.90.0"

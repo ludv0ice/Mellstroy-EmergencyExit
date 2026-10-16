@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { readdirSync, readFileSync, statSync, existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { runInNewContext } from 'node:vm';
 import { CHAPTERS } from '../src/campaign.js';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -15,6 +16,8 @@ const rooms = new Set([
 assert.deepEqual(new Set(manifest.rooms.map((room) => room.id)), rooms);
 const expected = new Set([
   '/assets/manifest.json',
+  '/assets/data.js',
+  '/assets/vendor/phaser.js',
   '/assets/custom/skins.json',
   '/assets/fonts/justice.ttf',
   '/assets/fonts/exo2.ttf',
@@ -42,6 +45,20 @@ assert.deepEqual(
   expected,
   'Assets must contain exactly the declared game files',
 );
+const context = {
+  URL,
+  document: { currentScript: { src: 'file:///game/assets/data.js' } },
+};
+runInNewContext(readFileSync(path.join(assets, 'data.js'), 'utf8'), context);
+const cached = context.__EMERGENCY_EXIT_ASSETS__.json;
+for (const url of expected) {
+  if (url.endsWith('.json'))
+    assert.equal(
+      JSON.stringify(cached[url]),
+      JSON.stringify(JSON.parse(readFileSync(path.join(root, url.slice(1))))),
+      url,
+    );
+}
 for (const id of rooms) {
   const room = JSON.parse(
     readFileSync(path.join(assets, 'rooms', `${id}.json`)),

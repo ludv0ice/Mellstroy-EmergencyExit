@@ -1,4 +1,3 @@
-"""Normalize the approved directional atlas; Pillow is only a developer art tool."""
 from pathlib import Path
 from collections import deque
 from PIL import Image
@@ -48,8 +47,8 @@ def extract(source_path, minimum_columns):
 
 
 def head_anchor(image):
-    # The largest brown component is the hair, not the moving fist. This also
-    # works when the back-facing arm extends above the head.
+
+
     brown = {(x, y) for y in range(image.height) for x in range(image.width)
              if (lambda r, g, b, a: a > 100 and 20 <= r < 120 and g < 100
                  and b < 70 and r > g * 1.15 and r > b * 1.3)(*image.getpixel((x, y)))}
@@ -75,7 +74,7 @@ def head_anchor(image):
 def main():
     cells = extract(SOURCE, 15)
 
-    # Generation supplied ten walk candidates; use eight and retain all seven attacks.
+
     walks = [row[:8] for row in cells]
     attacks = [row[:7] for row in extract(ATTACK_SOURCE, 7)]
     walk_scale = BODY_HEIGHT / max(image.getbbox()[3] - image.getbbox()[1]
@@ -91,8 +90,8 @@ def main():
             for frame_index, image in enumerate(row):
                 bounds = image.getbbox()
                 image = image.crop(bounds)
-                # Align the head/body, not the full silhouette: extended hands must not
-                # move the torso's anchor sideways during a punch.
+
+
                 if name == 'mellstroy-directions':
                     head = image.getchannel('A').crop((0, 0, image.width, round(image.height * .28))).getbbox()
                     center_x = (head[0] + head[2]) / 2

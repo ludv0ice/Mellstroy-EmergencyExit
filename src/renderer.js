@@ -140,7 +140,6 @@ export class GameView extends Phaser.Scene {
     ctx.imageSmoothingEnabled = false;
     ctx.fillStyle = '#241a35';
     ctx.fillRect(0, 0, this.floor.width, this.floor.height);
-    // Descending GM depth: large positive depths are painted first.
     const entries = [
       ...sim.room.tiles.map((tile) => ({ tile, depth: tile.depth })),
       ...sim.room.entities

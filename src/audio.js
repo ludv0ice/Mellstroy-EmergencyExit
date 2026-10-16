@@ -1,11 +1,9 @@
-import { readBytes } from './assets.js';
-
-// Original effects, new procedural soundtrack; starts only after a user gesture.
+import { assetUrl } from './assets.js';
 export class AudioEngine {
   constructor(manifest, settings) {
     this.manifest = manifest;
     this.settings = settings;
-    this.buffers = new Map();
+    this.voices = new Map();
     this.last = new Map();
     this.step = 0;
     this.active = false;
@@ -13,8 +11,6 @@ export class AudioEngine {
   start() {
     if (!this.ctx) {
       this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-      this.master = this.ctx.createGain();
-      this.master.connect(this.ctx.destination);
       this.music = this.ctx.createGain();
       this.music.connect(this.ctx.destination);
       this.updateVolumes();
@@ -24,8 +20,10 @@ export class AudioEngine {
     this.active = true;
   }
   updateVolumes() {
+    for (const voices of this.voices.values()) {
+      for (const voice of voices) voice.volume = this.settings.sound / 100;
+    }
     if (this.ctx) {
-      this.master.gain.value = this.settings.sound / 100;
       this.music.gain.value = (this.settings.music / 100) * 0.2;
     }
   }
@@ -36,21 +34,19 @@ export class AudioEngine {
     this.last.set(key, now);
     const url = this.manifest.audio[key];
     if (!url) return;
-    try {
-      if (!this.buffers.has(key))
-        this.buffers.set(
-          key,
-          readBytes(url).then((b) => this.ctx.decodeAudioData(b)),
-        );
-      const buffer = await this.buffers.get(key);
-      if (this.ctx.state !== 'running') return;
-      const source = this.ctx.createBufferSource();
-      source.buffer = buffer;
-      source.connect(this.master);
-      source.start();
-    } catch {
-      this.buffers.delete(key);
+    const voices = this.voices.get(key) ?? [];
+    let voice = voices.find((audio) => audio.paused || audio.ended);
+    if (!voice && voices.length < 8) {
+      voice = new Audio(assetUrl(url));
+      voices.push(voice);
+      this.voices.set(key, voices);
     }
+    voice ??= voices[0];
+    voice.volume = this.settings.sound / 100;
+    voice.currentTime = 0;
+    try {
+      await voice.play();
+    } catch {}
   }
   tone(freq, type, time, length, gain = 0.2) {
     const o = this.ctx.createOscillator(),

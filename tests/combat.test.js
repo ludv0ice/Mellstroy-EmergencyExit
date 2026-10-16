@@ -357,3 +357,53 @@ test('A newly alerted gunman waits before his first shot', () => {
   for (let i = 0; i < 8; i++) sim.updateEnemy(enemy, 1 / 60);
   assert.ok(sim.bullets.length > 0);
 });
+
+test('The player cannot walk through a living or stunned enemy, even with a large movement step', () => {
+  for (const stunned of [false, true]) {
+    const sim = duel(40),
+      enemy = sim.enemies[0];
+    if (stunned) sim.stun(enemy, STUN_DURATION);
+    sim.move(sim.player, 160, 0, 1);
+    assert.ok(sim.player.x <= enemy.x - 14);
+    assert.ok(Math.hypot(sim.player.x - enemy.x, sim.player.y - enemy.y) >= 14);
+  }
+});
+
+test('Enemy movement also respects the player and other enemies', () => {
+  const sim = fixture([
+    actor('player', 100, 100),
+    actor('enemy', 40, 100),
+    actor('enemy', 160, 100),
+  ]);
+  const [first, second] = sim.enemies;
+  sim.move(first, 160, 0, 1);
+  assert.ok(first.x <= 86);
+  sim.move(second, -160, 0, 1);
+  assert.ok(second.x >= 114);
+  sim.player.y = 160;
+  sim.move(first, 160, 0, 1);
+  assert.ok(first.x <= second.x - 14);
+});
+
+test('Corpses do not block movement and pre-existing overlaps allow actors to separate', () => {
+  const sim = duel(40),
+    enemy = sim.enemies[0];
+  sim.kill(enemy, 'blunt');
+  sim.move(sim.player, 100, 0, 1);
+  assert.equal(sim.player.x, 140);
+  const overlap = duel(0);
+  overlap.move(overlap.player, -30, 0, 1);
+  assert.equal(overlap.player.x, 10);
+});
+
+test('A hero touching an enemy can slide around him and still attack at melee distance', () => {
+  const sim = duel(14),
+    enemy = sim.enemies[0];
+  sim.move(sim.player, 0, 30, 1);
+  assert.equal(sim.player.y, 70);
+  sim.move(sim.player, 30, 0, 1);
+  assert.ok(sim.player.x > enemy.x);
+  const contact = duel(14);
+  contact.attack();
+  assert.equal(contact.enemies[0].stun, STUN_DURATION);
+});

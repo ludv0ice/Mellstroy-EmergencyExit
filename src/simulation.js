@@ -13,6 +13,7 @@ import {
 } from './physics.js';
 
 export const STUN_DURATION = 3.1;
+export const MAX_ENEMIES = 7;
 
 export class Simulation {
   constructor(manifest, raw, profile, seed = 1) {
@@ -58,6 +59,7 @@ export class Simulation {
     );
     this.enemies = this.room.entities
       .filter((e) => e.kind === 'enemy')
+      .slice(0, MAX_ENEMIES)
       .map((e) => {
         const dog = /Dog/.test(e.name),
           fat = /Fat/.test(e.name),
@@ -74,6 +76,7 @@ export class Simulation {
           state: 'patrol',
           origin: { x: e.x, y: e.y },
           alive: true,
+          radius: fat ? 12 : 7,
           stun: 0,
           reaction: 0.45,
           fireTimer: 0.35,
@@ -221,6 +224,18 @@ export class Simulation {
     }
     return { x: this.player.x, y: this.player.y };
   }
+  canMoveTo(actor, x, y) {
+    if (this.blocked(x, y, 7)) return false;
+    const others =
+      actor === this.player ? this.enemies : [this.player, ...this.enemies];
+    return !others.some((other) => {
+      if (!other || other === actor || !other.alive) return false;
+      const radius = (actor.radius ?? 7) + (other.radius ?? 7);
+      const next = (x - other.x) ** 2 + (y - other.y) ** 2;
+      const current = (actor.x - other.x) ** 2 + (actor.y - other.y) ** 2;
+      return next < radius ** 2 && next <= current + 0.000001;
+    });
+  }
   move(actor, dx, dy, dt) {
     const steps = Math.max(1, Math.ceil(Math.hypot(dx, dy) / 4)),
       sx = dx / steps,
@@ -242,18 +257,40 @@ export class Simulation {
           }
         }
       }
-      if (!this.blocked(actor.x + sx, actor.y, 7)) actor.x += sx;
-      else if (actor === this.player && sy === 0 && sx !== 0) {
-        if (!this.blocked(actor.x + sx, actor.y - 8, 7))
+      if (this.canMoveTo(actor, actor.x + sx, actor.y)) actor.x += sx;
+      else if (
+        actor === this.player &&
+        sy === 0 &&
+        sx !== 0 &&
+        this.blocked(actor.x + sx, actor.y, 7)
+      ) {
+        if (
+          !this.blocked(actor.x + sx, actor.y - 8, 7) &&
+          this.canMoveTo(actor, actor.x, actor.y - Math.abs(sx))
+        )
           actor.y -= Math.abs(sx);
-        else if (!this.blocked(actor.x + sx, actor.y + 8, 7))
+        else if (
+          !this.blocked(actor.x + sx, actor.y + 8, 7) &&
+          this.canMoveTo(actor, actor.x, actor.y + Math.abs(sx))
+        )
           actor.y += Math.abs(sx);
       }
-      if (!this.blocked(actor.x, actor.y + sy, 7)) actor.y += sy;
-      else if (actor === this.player && sx === 0 && sy !== 0) {
-        if (!this.blocked(actor.x - 8, actor.y + sy, 7))
+      if (this.canMoveTo(actor, actor.x, actor.y + sy)) actor.y += sy;
+      else if (
+        actor === this.player &&
+        sx === 0 &&
+        sy !== 0 &&
+        this.blocked(actor.x, actor.y + sy, 7)
+      ) {
+        if (
+          !this.blocked(actor.x - 8, actor.y + sy, 7) &&
+          this.canMoveTo(actor, actor.x - Math.abs(sy), actor.y)
+        )
           actor.x -= Math.abs(sy);
-        else if (!this.blocked(actor.x + 8, actor.y + sy, 7))
+        else if (
+          !this.blocked(actor.x + 8, actor.y + sy, 7) &&
+          this.canMoveTo(actor, actor.x + Math.abs(sy), actor.y)
+        )
           actor.x += Math.abs(sy);
       }
     }
@@ -721,7 +758,6 @@ export class Simulation {
           e.fireTimer <= 0;
         if (!ready) e.meleeWindup = null;
         else {
-          // A short, committed wind-up gives a new player time to strike first.
           e.meleeWindup = (e.meleeWindup ?? 0.22) - dt;
           if (e.meleeWindup <= 0) {
             this.die();
@@ -867,7 +903,6 @@ export class Simulation {
       )
         b.dead = true;
       if (b.dead && b.thrown) {
-        // Keep a recovered weapon on the near side of a wall and inside the map.
         const speed = Math.hypot(b.vx, b.vy);
         const offset = hit?.box ? 9 : 0;
         const at = this.safeSpawn({

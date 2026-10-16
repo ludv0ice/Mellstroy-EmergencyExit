@@ -1,3 +1,4 @@
+import { serveTestGame } from './serve-test-game.mjs';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import assert from 'node:assert/strict';
@@ -5,10 +6,10 @@ const root = fileURLToPath(new URL('../', import.meta.url)).replace(/\/$/, '');
 const output =
   process.env.PLAYTEST_OUTPUT ?? root + '/../artifacts/weapons-playtest';
 fs.mkdirSync(output, { recursive: true });
-// A fresh tab prevents a previous dev page's favicon/HMR traffic entering this run.
+const server = await serveTestGame(root);
 const page = await fetch('http://127.0.0.1:9222/json/new?about:blank', {
   method: 'PUT',
-}).then(response => response.json());
+}).then((response) => response.json());
 const ws = new WebSocket(page.webSocketDebuggerUrl);
 await new Promise((r) => ws.addEventListener('open', r, { once: true }));
 let id = 0;
@@ -30,7 +31,8 @@ ws.onmessage = (e) => {
     errors.push(m.params.exceptionDetails);
   else if (
     m.method === 'Network.requestWillBeSent' &&
-    /^https?:/.test(m.params.request.url)
+    /^https?:/.test(m.params.request.url) &&
+    !m.params.request.url.startsWith(server.url + '/')
   )
     requests.push(m.params.request.url);
 };
@@ -94,31 +96,14 @@ try {
   await send('Runtime.enable');
   await send('Network.enable');
   await send('Page.enable');
-  await send('Network.setBlockedURLs', { urls: ['http://*', 'https://*'] });
+  await send('Network.setBlockedURLs', { urls: ['https://*'] });
   await send('Emulation.setDeviceMetricsOverride', {
     width: 1366,
     height: 768,
     deviceScaleFactor: 1,
     mobile: false,
   });
-  await send('Page.navigate', { url: 'about:blank' });
-  await until("location.href === 'about:blank' && document.readyState === 'complete'");
-  // Scope diagnostics to the game, excluding traffic from the previously open page.
-  requests.length = 0;
-  errors.length = 0;
-  const html = fs.readFileSync(root + '/index.html', 'utf8'),
-    marker = html.lastIndexOf('window.__GAME__');
-  const variable = html
-    .slice(marker)
-    .match(/get mode\(\)\{return ([\w$]+)\.mode/)[1];
-  const frame = (await send('Page.getFrameTree')).frameTree.frame.id;
-  await send('Page.setDocumentContent', {
-    frameId: frame,
-    html: html.replace(
-      'window.__GAME__=',
-      `window.__QA_APP__=${variable};window.__GAME__=`,
-    ),
-  });
+  await send('Page.navigate', { url: server.url });
   await until("window.__GAME__?.mode==='menu'");
   await evaluate('window.__QA_APP__.game.loop.stop(); document.fonts.ready');
   await evaluate(
@@ -159,7 +144,18 @@ try {
   await press('KeyQ');
   await mouse('right', point);
   assert.equal((await evaluate('window.__GAME__.getState()')).player.weapon, 5);
-  // Inspect every distinct melee grip and stroke in the actual renderer.
+  await arena(2, 185);
+  await evaluate('window.__QA_APP__.sim.enemies[0].stun=3.1;true');
+  await key('KeyD', 'keyDown');
+  await tick(60);
+  await key('KeyD', 'keyUp');
+  await tick();
+  const contact = await evaluate('window.__GAME__.getState()');
+  assert.ok(contact.player.x <= contact.actors[0].x - 14);
+  await screenshot('solid-enemy-contact');
+  await until(
+    "window.__QA_APP__.audio.voices.get('sndPickupWeapon')?.some(v => v.readyState >= 2 && !v.error)",
+  );
   const meleeIds = [
     2, 3, 4, 5, 8, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 26,
   ];
@@ -278,7 +274,6 @@ try {
   await new Promise((r) => setTimeout(r, 300));
   await evaluate('window.__QA_APP__.game.scale.step(1000,1000);true');
   await arena(4, 220);
-  // Verify the touch control handler through genuine pointer events.
   await evaluate(
     "document.getElementById('touch-controls').classList.remove('hidden');true",
   );
@@ -308,7 +303,9 @@ try {
     throwRecovery: true,
     yellowWallPlayerAndEnemy: true,
     touchDrop: true,
-    networkRequests: 0,
+    externalRequests: 0,
+    solidEnemyContact: true,
+    localWavDecoded: true,
     javaScriptErrors: 0,
   };
   fs.writeFileSync(output + '/results.json', JSON.stringify(report, null, 2));
@@ -318,4 +315,5 @@ try {
   throw error;
 } finally {
   ws.close();
+  server.close();
 }

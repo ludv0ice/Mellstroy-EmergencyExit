@@ -1,64 +1,85 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
-import { readJson, readBytes, assetUrl } from '../src/assets.js';
+import { readFileSync, existsSync } from 'node:fs';
+import { readJson, assetUrl } from '../src/assets.js';
+import { AudioEngine } from '../src/audio.js';
 
-test('Portable resources load real room data and sound bytes without network access', async (t) => {
+test('Local resources use the game folder and preloaded room data without fetch', async (t) => {
   const room = JSON.parse(
     readFileSync(new URL('../assets/rooms/rmTutorial.json', import.meta.url)),
   );
-  const sound = readFileSync(
-    new URL('../assets/audio/sndCarOpen.wav', import.meta.url),
-  );
   globalThis.__EMERGENCY_EXIT_ASSETS__ = {
     json: { '/assets/rooms/rmTutorial.json': room },
-    files: {
-      '/assets/audio/sndCarOpen.wav':
-        'data:audio/wav;base64,' + sound.toString('base64'),
-    },
   };
-  t.after(() => delete globalThis.__EMERGENCY_EXIT_ASSETS__);
-  t.mock.method(globalThis, 'fetch', () => {
-    throw new Error('Network access is forbidden');
+  globalThis.__EMERGENCY_EXIT_ROOT__ = 'file:///Games/My%20Game/';
+  t.after(() => {
+    delete globalThis.__EMERGENCY_EXIT_ASSETS__;
+    delete globalThis.__EMERGENCY_EXIT_ROOT__;
   });
+  t.mock.method(globalThis, 'fetch', () => {
+    throw new Error('No fetch allowed');
+  });
+  assert.deepEqual(await readJson('/assets/rooms/rmTutorial.json'), room);
   assert.equal(
-    (await readJson('/assets/rooms/rmTutorial.json')).id,
-    'rmTutorial',
+    assetUrl('/assets/audio/sndCarOpen.wav'),
+    'file:///Games/My%20Game/assets/audio/sndCarOpen.wav',
   );
-  assert.deepEqual(
-    Buffer.from(await readBytes('/assets/audio/sndCarOpen.wav')),
-    sound,
-  );
-  assert.ok(
-    assetUrl('/assets/audio/sndCarOpen.wav').startsWith(
-      'data:audio/wav;base64,',
-    ),
-  );
-  await assert.rejects(
-    readJson('/assets/missing.json'),
-    /Missing embedded JSON/,
-  );
-  assert.throws(
-    () => assetUrl('/assets/missing.png'),
-    /Missing embedded asset/,
-  );
+  await assert.rejects(readJson('/missing.json'), /Missing game data/);
 });
 
-test('Development resource loading preserves HTTP errors and binary responses', async (t) => {
-  const requests = [];
-  t.mock.method(globalThis, 'fetch', async (url) => {
-    requests.push(url);
-    if (url === '/missing') return new Response('', { status: 404 });
-    if (url === '/room') return Response.json({ id: 'rmTutorial' });
-    return new Response(new Uint8Array([82, 73, 70, 70]));
-  });
-  assert.equal(assetUrl('/image.png'), '/image.png');
-  assert.deepEqual(await readJson('/room'), { id: 'rmTutorial' });
-  assert.deepEqual(
-    [...new Uint8Array(await readBytes('/sound'))],
-    [82, 73, 70, 70],
+test('Development requests preserve HTTP errors', async (t) => {
+  t.mock.method(globalThis, 'fetch', async (url) =>
+    url === '/missing'
+      ? new Response('', { status: 404 })
+      : Response.json({ id: 'rmTutorial' }),
   );
+  assert.equal(assetUrl('/assets/image.png'), '/assets/image.png');
+  assert.deepEqual(await readJson('/room'), { id: 'rmTutorial' });
   await assert.rejects(readJson('/missing'), /Не удалось загрузить/);
-  await assert.rejects(readBytes('/missing'), /Не удалось загрузить/);
-  assert.deepEqual(requests, ['/room', '/sound', '/missing', '/missing']);
+});
+
+test('The launch page contains only markup and external file references', () => {
+  const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+  assert.ok(Buffer.byteLength(html) < 15000);
+  assert.doesNotMatch(html, /base64|<style|<script(?![^>]*src=)/i);
+  const files = [...html.matchAll(/(?:src|href)="(\.\/[^"#]+)"/g)].map(
+    (match) => match[1],
+  );
+  assert.ok(files.length >= 4);
+  for (const file of files)
+    assert.ok(existsSync(new URL('../' + file, import.meta.url)), file);
+});
+
+test('Sound effects play local WAV files and follow the volume setting', async (t) => {
+  const voices = [];
+  const original = globalThis.Audio;
+  globalThis.Audio = class {
+    constructor(src) {
+      this.src = src;
+      this.paused = true;
+      voices.push(this);
+    }
+    async play() {
+      this.paused = false;
+      this.played = true;
+    }
+  };
+  t.after(() => {
+    if (original) globalThis.Audio = original;
+    else delete globalThis.Audio;
+  });
+  const audio = new AudioEngine(
+    { audio: { sndHit: '/assets/audio/sndHit.wav' } },
+    { sound: 50, music: 0 },
+  );
+  audio.ctx = {};
+  audio.master = { gain: {} };
+  audio.music = { gain: {} };
+  await audio.play('sndHit');
+  assert.equal(voices[0].src, '/assets/audio/sndHit.wav');
+  assert.equal(voices[0].volume, 0.5);
+  assert.equal(voices[0].played, true);
+  audio.settings.sound = 25;
+  audio.updateVolumes();
+  assert.equal(voices[0].volume, 0.25);
 });

@@ -55,8 +55,6 @@ const steps = [
     'Все приёмы освоены. Подойди к выходу и нажми E. Esc — пауза, R — перезапуск.',
   ],
 ];
-
-// Level 00 advances on results in the world, never just on a key press.
 export class Tutorial {
   constructor(sim) {
     this.sim = sim;
@@ -94,7 +92,6 @@ export class Tutorial {
       ['pickup', 'retrieve', 'recover', 'gun'].includes(this.step) ||
       (this.step === 'throw' && this.sim.player.weapon === UNARMED);
     const throwing = this.step === 'throw';
-    // Accept the same keyboard, mouse and touch actions as normal play.
     return {
       ...input,
       attack: input.attack && ['punch', 'melee', 'shoot'].includes(this.step),
@@ -110,7 +107,6 @@ export class Tutorial {
     const sim = this.sim,
       p = sim.player;
     const [first, second, third] = sim.enemies;
-    // Training targets wait for the lesson and stay down until the follow-up.
     for (const enemy of sim.enemies) {
       if (enemy.stun > 0) enemy.stun = Math.max(2, enemy.stun);
     }

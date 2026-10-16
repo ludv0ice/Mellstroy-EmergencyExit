@@ -457,7 +457,6 @@ async function boot() {
       fps: { target: 60, forceSetTimeOut: false },
     });
     bindUI();
-    // Read-only, serializable bridge for reproducible gameplay verification.
     window.__GAME__ = {
       getState: () => app.sim?.snapshot() ?? { status: app.mode },
       get mode() {

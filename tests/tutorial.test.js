@@ -88,7 +88,6 @@ test('Every lesson completes through gameplay results, and all 13 steps can be f
   assert.equal(sim.tutorial.step, 'aim');
   act(sim, { aim: { x: sim.player.x, y: sim.player.y + 100 } });
   assert.equal(sim.tutorial.step, 'punch');
-  // A missed punch is not sufficient.
   act(sim, { attack: true, aim: { x: 0, y: 0 } });
   assert.equal(sim.tutorial.step, 'punch');
   stand(sim, 140, 100);
@@ -106,7 +105,6 @@ test('Every lesson completes through gameplay results, and all 13 steps can be f
   assert.equal(sim.tutorial.step, 'retrieve');
   act(sim, { pickup: true });
   assert.equal(sim.tutorial.step, 'throw');
-  // A miss does not advance. Recover and retry with the same weapon.
   stand(sim, 200, 100);
   act(sim, { throw: true, aim: { x: 220, y: 100 } });
   for (let i = 0; i < 5; i++) step(sim);

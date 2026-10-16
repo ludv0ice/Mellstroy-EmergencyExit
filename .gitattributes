@@ -13,3 +13,4 @@
 assets/** linguist-generated=true
 tests/fixtures/** linguist-generated=true
 index.html linguist-generated=true
+src/game.js linguist-generated=true
