@@ -316,32 +316,8 @@ export class Simulation {
     this.grace = Math.max(0, this.grace - dt);
     this.comboTimer = Math.max(0, this.comboTimer - dt);
     if (this.comboTimer === 0) this.combo = 0;
+    input = this.updatePlayer(dt, input);
     const p = this.player;
-    p.fireTimer = Math.max(0, p.fireTimer - dt);
-    p.attack = Math.max(0, p.attack - dt);
-    p.execution = Math.max(0, p.execution - dt);
-    if (input.aim) p.angle = Math.atan2(input.aim.y - p.y, input.aim.x - p.x);
-    const acceleration = 1800 * dt,
-      max = this.profile.speed;
-    if (this.profile.reversed)
-      input = { ...input, moveX: -input.moveX, moveY: -input.moveY };
-    const approach = (v, target) =>
-      v < target
-        ? Math.min(target, v + acceleration)
-        : Math.max(target, v - acceleration);
-    p.vx = approach(p.vx, input.moveX * max);
-    p.vy = approach(p.vy, input.moveY * max);
-    if (Math.abs(p.vx) + Math.abs(p.vy) > max + 120) {
-      const f = (max + 120) / (Math.abs(p.vx) + Math.abs(p.vy));
-      p.vx *= f;
-      p.vy *= f;
-    }
-    p.moving = Math.hypot(p.vx, p.vy);
-    if (p.execution <= 0) this.move(p, p.vx * dt, p.vy * dt, dt);
-    if (p.moving > 4) {
-      p.facing = directionForVector(p.vx, p.vy, p.facing);
-      p.frame = (p.frame + dt * p.moving * 0.05) % 8;
-    } else p.frame = 0;
     this.updateInventory(
       input.interact && this.exitReady ? { ...input, pickup: false } : input,
     );
@@ -363,31 +339,61 @@ export class Simulation {
     this.updateParticles(dt);
     this.checkClear();
     this.tutorial?.update(input);
-    const nearest = this.items
-      .filter((i) => !i.taken)
-      .sort((a, b) => distance(a, p) - distance(b, p))[0];
-    const down = this.enemies.find(
-      (e) => e.alive && e.stun > 0 && distance(p, e) < 31,
-    );
-    this.context = this.exitReady
-      ? this.exit.transition === 'stairs'
-        ? 'E · СЛЕДУЮЩИЙ ЭТАЖ'
-        : 'E · ВЫЙТИ'
-      : down
-        ? 'SPACE · ДОБИТЬ'
-        : nearest && distance(nearest, p) < 30
-          ? (p.weapon === UNARMED ? 'E / ПКМ · ' : 'E · ') +
-            nearest.weapon.name.toUpperCase()
-          : this.cleared
-            ? this.exit.transition === 'stairs'
-              ? 'К ЛЕСТНИЦЕ → E'
-              : 'К ДВЕРИ → E'
-            : '';
+    this.context = this.contextHint();
     if (input.interact && this.exitReady) {
       this.status = 'complete';
       this.sound('sndComplete');
       this.emit('complete');
     }
+  }
+  updatePlayer(dt, input) {
+    const player = this.player;
+    player.fireTimer = Math.max(0, player.fireTimer - dt);
+    player.attack = Math.max(0, player.attack - dt);
+    player.execution = Math.max(0, player.execution - dt);
+    if (input.aim) player.angle = Math.atan2(input.aim.y - player.y, input.aim.x - player.x);
+    const acceleration = 1800 * dt,
+      max = this.profile.speed;
+    if (this.profile.reversed)
+      input = { ...input, moveX: -input.moveX, moveY: -input.moveY };
+    const approach = (v, target) =>
+      v < target
+        ? Math.min(target, v + acceleration)
+        : Math.max(target, v - acceleration);
+    player.vx = approach(player.vx, input.moveX * max);
+    player.vy = approach(player.vy, input.moveY * max);
+    if (Math.abs(player.vx) + Math.abs(player.vy) > max + 120) {
+      const f = (max + 120) / (Math.abs(player.vx) + Math.abs(player.vy));
+      player.vx *= f;
+      player.vy *= f;
+    }
+    player.moving = Math.hypot(player.vx, player.vy);
+    if (player.execution <= 0) this.move(player, player.vx * dt, player.vy * dt, dt);
+    if (player.moving > 4) {
+      player.facing = directionForVector(player.vx, player.vy, player.facing);
+      player.frame = (player.frame + dt * player.moving * 0.05) % 8;
+    } else player.frame = 0;
+    return input;
+  }
+  contextHint() {
+    const player = this.player;
+    const stairs = this.exit.transition === 'stairs';
+    if (this.exitReady) return stairs ? 'E · СЛЕДУЮЩИЙ ЭТАЖ' : 'E · ВЫЙТИ';
+
+    const stunned = this.enemies.some(
+      (enemy) => enemy.alive && enemy.stun > 0 && distance(player, enemy) < 31,
+    );
+    if (stunned) return 'SPACE · ДОБИТЬ';
+
+    const nearest = this.items
+      .filter((item) => !item.taken)
+      .sort((a, b) => distance(a, player) - distance(b, player))[0];
+    if (nearest && distance(nearest, player) < 30) {
+      const key = player.weapon === UNARMED ? 'E / ПКМ · ' : 'E · ';
+      return key + nearest.weapon.name.toUpperCase();
+    }
+    if (this.cleared) return stairs ? 'К ЛЕСТНИЦЕ → E' : 'К ДВЕРИ → E';
+    return '';
   }
   get exitReady() {
     return (
@@ -418,16 +424,7 @@ export class Simulation {
     items.sort((a, b) => distance(a, p) - distance(b, p));
     const item = items[0];
     if (!item) return;
-    if (p.weapon !== UNARMED)
-      this.items.push({
-        x: p.x,
-        y: p.y,
-        angle: p.angle,
-        weapon: p.weapon,
-        ammo: p.ammo,
-        frame: p.weapon.id,
-        ammoBonusApplied: true,
-      });
+    if (p.weapon !== UNARMED) this.dropItem(p);
     p.weapon = item.weapon;
     p.ammo = Math.round(
       item.ammo * (item.ammoBonusApplied ? 1 : (this.profile.ammoBonus ?? 1)),
@@ -437,80 +434,86 @@ export class Simulation {
     this.sound('sndPickupWeapon');
   }
   attack() {
-    const p = this.player,
-      w = p.weapon;
-    if (w.throwOnly) {
-      this.throwWeapon();
+    const weapon = this.player.weapon;
+    if (weapon.throwOnly) this.throwWeapon();
+    else if (weapon.gun) this.shoot();
+    else this.meleeAttack();
+  }
+  shoot() {
+    const player = this.player;
+    const weapon = player.weapon;
+    if (player.ammo <= 0) {
+      this.sound('sndLock');
+      player.fireTimer = 0.2;
       return;
     }
-    if (w.gun) {
-      if (p.ammo <= 0) {
-        this.sound('sndLock');
-        p.fireTimer = 0.2;
-        return;
-      }
-      p.ammo--;
-      this.shots++;
-      p.fireTimer = w.cooldown;
-      p.attack = 0.12;
-      this.fire(p, w, 'player');
-      this.sound(w.sound);
-      this.emit('shake', { amount: 1.8 });
-    } else {
-      p.fireTimer = w.cooldown;
-      p.attackDuration = w.id < 0 ? 0.18 : Math.min(0.42, w.cooldown);
-      p.attack = p.attackDuration;
-      p.attackAngle = p.angle;
-      this.sound(w.sound);
-      for (const enemy of this.enemies) {
-        if (
-          !enemy.alive ||
-          (this.tutorial && !this.tutorial.allowsHit(enemy)) ||
-          distance(enemy, p) > w.range + 6 ||
-          this.lineBlocked(p, enemy)
-        )
-          continue;
-        const diff = Math.abs(
-          angleDelta(Math.atan2(enemy.y - p.y, enemy.x - p.x), p.angle),
-        );
-        if (diff > 1.1) continue;
-        if (w === UNARMED && !this.profile.punchKill && !enemy.dog) {
-          const stolen =
-            this.profile.disarm && enemy.weapon !== UNARMED
-              ? { weapon: enemy.weapon, ammo: enemy.ammo }
-              : null;
-          this.stun(enemy, STUN_DURATION);
-          if (stolen) {
-            p.weapon = stolen.weapon;
-            p.ammo = stolen.ammo;
-            const drop = this.items.at(-1);
-            if (
-              drop &&
-              drop.weapon === stolen.weapon &&
-              Math.hypot(drop.x - enemy.x, drop.y - enemy.y) < 12
-            )
-              drop.taken = true;
-            this.sound('sndPickupWeapon');
-          }
-        } else if (enemy.fat && (!w.sharp || w === UNARMED))
-          this.stun(enemy, 0.5);
-        else this.kill(enemy, w.sharp ? 'cut' : 'melee');
-      }
-      for (const box of this.staticBoxes)
-        if (
-          box.entity.glass &&
-          !box.entity.broken &&
-          rayRect(
-            p.x,
-            p.y,
-            p.x + Math.cos(p.angle) * w.range,
-            p.y + Math.sin(p.angle) * w.range,
-            box,
-            6,
-          ) !== null
-        )
-          this.breakGlass(box.entity);
+    player.ammo--;
+    this.shots++;
+    player.fireTimer = weapon.cooldown;
+    player.attack = 0.12;
+    this.fire(player, weapon, 'player');
+    this.sound(weapon.sound);
+    this.emit('shake', { amount: 1.8 });
+  }
+  meleeAttack() {
+    const player = this.player;
+    const weapon = player.weapon;
+    player.fireTimer = weapon.cooldown;
+    player.attackDuration = weapon.id < 0 ? 0.18 : Math.min(0.42, weapon.cooldown);
+    player.attack = player.attackDuration;
+    player.attackAngle = player.angle;
+    this.sound(weapon.sound);
+    for (const enemy of this.enemies) {
+      if (
+        !enemy.alive ||
+        (this.tutorial && !this.tutorial.allowsHit(enemy)) ||
+        distance(enemy, player) > weapon.range + 6 ||
+        this.lineBlocked(player, enemy)
+      )
+        continue;
+      const diff = Math.abs(
+        angleDelta(
+          Math.atan2(enemy.y - player.y, enemy.x - player.x),
+          player.angle,
+        ),
+      );
+      if (diff > 1.1) continue;
+      if (weapon === UNARMED && !this.profile.punchKill && !enemy.dog) {
+        const stolen =
+          this.profile.disarm && enemy.weapon !== UNARMED
+            ? { weapon: enemy.weapon, ammo: enemy.ammo }
+            : null;
+        this.stun(enemy, STUN_DURATION);
+        if (stolen) {
+          player.weapon = stolen.weapon;
+          player.ammo = stolen.ammo;
+          const drop = this.items.at(-1);
+          if (
+            drop &&
+            drop.weapon === stolen.weapon &&
+            Math.hypot(drop.x - enemy.x, drop.y - enemy.y) < 12
+          )
+            drop.taken = true;
+          this.sound('sndPickupWeapon');
+        }
+      } else if (enemy.fat && (!weapon.sharp || weapon === UNARMED))
+        this.stun(enemy, 0.5);
+      else this.kill(enemy, weapon.sharp ? 'cut' : 'melee');
     }
+    for (const box of this.staticBoxes)
+      if (
+        box.entity.glass &&
+        !box.entity.broken &&
+        rayRect(
+          player.x,
+          player.y,
+          player.x + Math.cos(player.angle) * weapon.range,
+          player.y + Math.sin(player.angle) * weapon.range,
+          box,
+          6,
+        ) !== null
+      )
+        this.breakGlass(box.entity);
   }
   fire(actor, w, team) {
     for (let i = 0; i < w.pellets; i++) {
@@ -539,6 +542,17 @@ export class Simulation {
     if (!w.silent && !(team === 'player' && this.profile.silentShots))
       this.noise(actor, 320);
   }
+  dropItem(actor, position = actor, ammoBonusApplied = true) {
+    this.items.push({
+      x: position.x,
+      y: position.y,
+      angle: actor.angle,
+      weapon: actor.weapon,
+      ammo: actor.ammo,
+      frame: actor.weapon.id,
+      ammoBonusApplied,
+    });
+  }
   dropWeapon() {
     const p = this.player;
     if (p.weapon === UNARMED) return;
@@ -550,15 +564,7 @@ export class Simulation {
       !this.blocked(ahead.x, ahead.y, 7) && !this.lineBlocked(p, ahead, true)
         ? ahead
         : p;
-    this.items.push({
-      x: at.x,
-      y: at.y,
-      angle: p.angle,
-      weapon: p.weapon,
-      ammo: p.ammo,
-      frame: p.weapon.id,
-      ammoBonusApplied: true,
-    });
+    this.dropItem(p, at);
     p.weapon = UNARMED;
     p.ammo = 0;
     p.attack = 0;
@@ -615,15 +621,7 @@ export class Simulation {
   }
   dropEnemyWeapon(e) {
     if (e.weapon === UNARMED) return;
-    this.items.push({
-      x: e.x + 4,
-      y: e.y + 4,
-      angle: e.angle,
-      weapon: e.weapon,
-      ammo: e.ammo,
-      frame: e.weapon.id,
-      ammoBonusApplied: !!e.ammoBonusApplied,
-    });
+    this.dropItem(e, { x: e.x + 4, y: e.y + 4 }, !!e.ammoBonusApplied);
     e.weapon = UNARMED;
     e.ammo = 0;
   }
@@ -709,136 +707,142 @@ export class Simulation {
         glass: true,
       });
   }
-  updateEnemy(e, dt) {
-    if (e.dog && this.profile.friendlyDogs) {
-      e.state = 'friendly';
+  updateEnemy(enemy, dt) {
+    if (enemy.dog && this.profile.friendlyDogs) {
+      enemy.state = 'friendly';
       return;
     }
-    e.fireTimer = Math.max(0, e.fireTimer - dt);
-    e.routeTimer -= dt;
-    e.patrolTurn = Math.max(0, e.patrolTurn - dt);
-    if (e.stun > 0) {
-      e.stun = Math.max(0, e.stun - dt);
-      if (e.stun === 0) {
-        e.state = 'search';
-        e.alert = 4;
+    enemy.fireTimer = Math.max(0, enemy.fireTimer - dt);
+    enemy.routeTimer -= dt;
+    enemy.patrolTurn = Math.max(0, enemy.patrolTurn - dt);
+    if (enemy.stun > 0) {
+      enemy.stun = Math.max(0, enemy.stun - dt);
+      if (enemy.stun === 0) {
+        enemy.state = 'search';
+        enemy.alert = 4;
       }
       return;
     }
-    const p = this.player,
-      d = distance(e, p),
-      angle = Math.atan2(p.y - e.y, p.x - e.x);
+    const player = this.player,
+      d = distance(enemy, player),
+      angle = Math.atan2(player.y - enemy.y, player.x - enemy.x);
     const cone =
-      Math.abs(angleDelta(angle, e.angle)) < (e.alert > 0 ? Math.PI : 1.45);
+      Math.abs(angleDelta(angle, enemy.angle)) < (enemy.alert > 0 ? Math.PI : 1.45);
     const sees =
       this.grace <= 0 &&
       d < (this.profile.stealth ? 140 : 260) &&
       cone &&
-      !this.lineBlocked(e, p, false, false) &&
+      !this.lineBlocked(enemy, player, false, false) &&
       !(this.room.id === 'eeTraining' && d > 45);
     if (sees) {
-      e.lastSeen = { x: p.x, y: p.y };
-      e.alert = 5;
-      e.reaction -= dt;
-      e.state = 'chase';
+      enemy.lastSeen = { x: player.x, y: player.y };
+      enemy.alert = 5;
+      enemy.reaction -= dt;
+      enemy.state = 'chase';
     } else {
-      e.alert = Math.max(0, e.alert - dt);
-      e.reaction = 0.45;
+      enemy.alert = Math.max(0, enemy.alert - dt);
+      enemy.reaction = 0.45;
     }
-    if (e.alert > 0 && e.lastSeen) {
-      e.angle = angle;
-      if (e.weapon.gun && e.ammo > 0 && sees && d < 280 && d > 55) {
-        e.moving = 0;
-        if (e.reaction <= 0 && e.fireTimer <= 0) {
-          e.ammo--;
-          e.fireTimer = e.weapon.cooldown + 0.12;
-          this.fire(e, e.weapon, 'enemy');
-          this.sound(e.weapon.sound);
-        }
-      } else {
-        const target = e.lastSeen;
-        if (!this.pathBlocked(e, target)) {
-          this.moveEnemy(e, target, (e.dog ? 180 : 120) * dt, dt);
-        } else {
-          if (e.routeTimer <= 0) {
-            e.route = this.navigation.path(e, target);
-            e.routeTimer = 0.6 + this.random() * 0.4;
-          }
-          if (e.route.length) {
-            if (distance(e, e.route[0]) < 9) e.route.shift();
-            if (e.route[0])
-              this.moveEnemy(e, e.route[0], (e.dog ? 175 : 115) * dt, dt);
-          }
-        }
-        const melee = e.weapon.gun ? UNARMED : e.weapon;
-        const inReach = d < (melee.enemyRange ?? melee.range) + p.radius;
-        const ready =
-          inReach &&
-          sees &&
-          !this.lineBlocked(e, p) &&
-          e.reaction <= 0 &&
-          e.fireTimer <= 0;
-        if (!ready) e.meleeWindup = null;
-        else {
-          e.meleeWindup = (e.meleeWindup ?? 0.22) - dt;
-          if (e.meleeWindup <= 0) {
-            this.die();
-            e.fireTimer = 0.4;
-            e.meleeWindup = null;
-          }
-        }
-      }
-    } else {
-      e.state = 'patrol';
-      e.lastSeen = null;
-      e.moving = 0;
-      if (!e.stationary) {
-        const clear = (angle) =>
-          !this.blocked(
-            e.x + Math.cos(angle) * 12,
-            e.y + Math.sin(angle) * 12,
-            8,
-          );
-        if (!clear(e.angle) && e.patrolTurn === 0) {
-          const next = [
-            e.angle + Math.PI / 2,
-            e.angle - Math.PI / 2,
-            e.angle + Math.PI,
-          ].find(clear);
-          if (next !== undefined)
-            e.angle = Math.atan2(Math.sin(next), Math.cos(next));
-          e.patrolTurn = 0.35;
-        }
-        if (clear(e.angle)) {
-          const before = { x: e.x, y: e.y };
-          this.move(
-            e,
-            Math.cos(e.angle) * 60 * dt,
-            Math.sin(e.angle) * 60 * dt,
-            dt,
-          );
-          e.moving = dt > 0 ? distance(before, e) / dt : 0;
-        }
-      }
-    }
-    if (e.moving > 0) e.frame = (e.frame + dt * e.moving * 0.06) % 8;
-    if (e.weapon === UNARMED && !e.dog && !e.fat) {
+    if (enemy.alert > 0 && enemy.lastSeen) {
+      enemy.angle = angle;
+      this.chaseEnemy(enemy, dt, sees, d);
+    } else this.patrolEnemy(enemy, dt);
+    if (enemy.moving > 0)
+      enemy.frame = (enemy.frame + dt * enemy.moving * 0.06) % 8;
+    if (enemy.weapon === UNARMED && !enemy.dog && !enemy.fat) {
       const item = this.items.find(
-        (i) => !i.taken && distance(i, e) < 18 && !this.lineBlocked(i, e),
+        (i) => !i.taken && distance(i, enemy) < 18 && !this.lineBlocked(i, enemy),
       );
       if (item) {
-        e.weapon = item.weapon;
-        e.ammo = item.ammo;
-        e.ammoBonusApplied = !!item.ammoBonusApplied;
+        enemy.weapon = item.weapon;
+        enemy.ammo = item.ammo;
+        enemy.ammoBonusApplied = !!item.ammoBonusApplied;
         item.taken = true;
       }
     }
   }
-  moveEnemy(e, target, step, dt) {
-    const a = Math.atan2(target.y - e.y, target.x - e.x);
-    e.angle = a;
-    e.moving = step / dt;
-    this.move(e, Math.cos(a) * step, Math.sin(a) * step, dt);
+  chaseEnemy(enemy, dt, sees, d) {
+    const player = this.player;
+    if (enemy.weapon.gun && enemy.ammo > 0 && sees && d < 280 && d > 55) {
+      enemy.moving = 0;
+      if (enemy.reaction <= 0 && enemy.fireTimer <= 0) {
+        enemy.ammo--;
+        enemy.fireTimer = enemy.weapon.cooldown + 0.12;
+        this.fire(enemy, enemy.weapon, 'enemy');
+        this.sound(enemy.weapon.sound);
+      }
+    } else {
+      const target = enemy.lastSeen;
+      if (!this.pathBlocked(enemy, target)) {
+        this.moveEnemy(enemy, target, (enemy.dog ? 180 : 120) * dt, dt);
+      } else {
+        if (enemy.routeTimer <= 0) {
+          enemy.route = this.navigation.path(enemy, target);
+          enemy.routeTimer = 0.6 + this.random() * 0.4;
+        }
+        if (enemy.route.length) {
+          if (distance(enemy, enemy.route[0]) < 9) enemy.route.shift();
+          if (enemy.route[0])
+            this.moveEnemy(enemy, enemy.route[0], (enemy.dog ? 175 : 115) * dt, dt);
+        }
+      }
+      const melee = enemy.weapon.gun ? UNARMED : enemy.weapon;
+      const inReach = d < (melee.enemyRange ?? melee.range) + player.radius;
+      const ready =
+        inReach &&
+        sees &&
+        !this.lineBlocked(enemy, player) &&
+        enemy.reaction <= 0 &&
+        enemy.fireTimer <= 0;
+      if (!ready) enemy.meleeWindup = null;
+      else {
+        enemy.meleeWindup = (enemy.meleeWindup ?? 0.22) - dt;
+        if (enemy.meleeWindup <= 0) {
+          this.die();
+          enemy.fireTimer = 0.4;
+          enemy.meleeWindup = null;
+        }
+      }
+    }
+  }
+  patrolEnemy(enemy, dt) {
+    enemy.state = 'patrol';
+    enemy.lastSeen = null;
+    enemy.moving = 0;
+    if (!enemy.stationary) {
+      const clear = (angle) =>
+        !this.blocked(
+          enemy.x + Math.cos(angle) * 12,
+          enemy.y + Math.sin(angle) * 12,
+          8,
+        );
+      if (!clear(enemy.angle) && enemy.patrolTurn === 0) {
+        const next = [
+          enemy.angle + Math.PI / 2,
+          enemy.angle - Math.PI / 2,
+          enemy.angle + Math.PI,
+        ].find(clear);
+        if (next !== undefined)
+          enemy.angle = Math.atan2(Math.sin(next), Math.cos(next));
+        enemy.patrolTurn = 0.35;
+      }
+      if (clear(enemy.angle)) {
+        const before = { x: enemy.x, y: enemy.y };
+        this.move(
+          enemy,
+          Math.cos(enemy.angle) * 60 * dt,
+          Math.sin(enemy.angle) * 60 * dt,
+          dt,
+        );
+        enemy.moving = dt > 0 ? distance(before, enemy) / dt : 0;
+      }
+    }
+  }
+  moveEnemy(enemy, target, step, dt) {
+    const a = Math.atan2(target.y - enemy.y, target.x - enemy.x);
+    enemy.angle = a;
+    enemy.moving = step / dt;
+    this.move(enemy, Math.cos(a) * step, Math.sin(a) * step, dt);
   }
   updateBullets(dt) {
     for (const b of this.bullets) {
@@ -931,15 +935,7 @@ export class Simulation {
           x: clamp(b.x - (b.vx / speed) * offset, 8, this.room.width - 8),
           y: clamp(b.y - (b.vy / speed) * offset, 8, this.room.height - 8),
         });
-        this.items.push({
-          x: at.x,
-          y: at.y,
-          angle: b.angle,
-          weapon: b.weapon,
-          ammo: b.ammo,
-          frame: b.weapon.id,
-          ammoBonusApplied: true,
-        });
+        this.dropItem(b, at);
       }
     }
     this.bullets = this.bullets.filter((b) => !b.dead);

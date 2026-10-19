@@ -3,14 +3,13 @@ import './style.css';
 import { GameView } from './renderer.js';
 import { Simulation } from './simulation.js';
 import { Tutorial } from './tutorial.js';
-import { MenuNavigation } from './menu-navigation.js';
 import { CHAPTERS, PROFILES } from './campaign.js';
 import { AudioEngine } from './audio.js';
 import { connectsTo } from './rooms.js';
 import { readJson } from './assets.js';
 import { EndingPlayer, endingSprites } from './ending.js';
-import { CheatConsole } from './cheats.js';
 import { endingUnlocked } from './ending-sequence.js';
+import { bindUI, updateHUD, renderChapters } from './ui.js';
 
 const $ = (id) => document.getElementById(id);
 const overlays = [
@@ -168,15 +167,18 @@ const app = {
     this.profile =
       PROFILES.find((p) => p.id === $('profile').value) ?? PROFILES[0];
     if (this.chapter.index === 0) this.profile = PROFILES[0];
-    this.floorIndex = 0;
-    this.runScore = 0;
-    this.runTime = 0;
+    this.resetRun();
     this.deaths = 0;
-    this.floorStates.clear();
-    this.checkpoints.clear();
     this.progress.last = this.chapter.index;
     save('emergency-exit-progress', this.progress);
     this.load(this.chapter.rooms[0]);
+  },
+  resetRun() {
+    this.floorIndex = 0;
+    this.runScore = 0;
+    this.runTime = 0;
+    this.floorStates.clear();
+    this.checkpoints.clear();
   },
   restart() {
     if (!this.sim) return;
@@ -273,16 +275,10 @@ const app = {
     this.mode = 'result';
     this.overlay('result');
     $('combo').classList.add('hidden');
-    const base =
-        [...this.floorStates.values()].reduce((n, s) => n + s.total, 0) * 400,
-      grade =
-        this.runScore > base * 2.5
-          ? 'A+'
-          : this.runScore > base * 1.6
-            ? 'A'
-            : this.runScore > base
-              ? 'B'
-              : 'C';
+    const base = [...this.floorStates.values()].reduce(
+      (total, floor) => total + floor.total * 400, 0,
+    );
+    const grade = gradeFor(this.runScore, base);
     $('result-score').textContent = this.runScore.toLocaleString('ru-RU');
     $('result-time').textContent = this.runTime.toFixed(1) + 's';
     $('result-grade').textContent = grade;
@@ -299,7 +295,6 @@ const app = {
         grade,
         time: this.runTime,
       };
-    save('emergency-exit-progress', this.progress);
     this.progress.last = Math.min(CHAPTERS.length - 1, this.chapter.index + 1);
     save('emergency-exit-progress', this.progress);
     $('next').textContent =
@@ -313,44 +308,7 @@ const app = {
       this.showEnding();
   },
   updateHUD() {
-    const tutorial = this.sim?.tutorial;
-    const panel = $('tutorial');
-    panel.classList.toggle('hidden', !tutorial || this.mode !== 'playing');
-    if (tutorial) {
-      const hint = tutorial.hint;
-      $('tutorial-progress').textContent =
-        `ОБУЧЕНИЕ ${hint.number} / ${hint.total}`;
-      $('tutorial-title').textContent = hint.title;
-      $('tutorial-text').textContent = hint.text;
-      $('tutorial-keys').textContent =
-        tutorial.step === 'move'
-          ? ['W', 'A', 'S', 'D']
-              .map((key) => (hint.directions.includes(key) ? key + ' +' : key))
-              .join('   ')
-          : '';
-    }
-    const s = this.sim;
-    if (!s) return;
-    $('hud-number').textContent = this.chapter.number + ' /';
-    $('hud-title').textContent = this.chapter.title;
-    $('hud-floor').textContent =
-      `ЛОКАЦИЯ ${this.floorIndex + 1} / ${this.chapter.rooms.length} · ${s.room.design?.title ?? this.profile.name}`;
-    $('hud-enemies').textContent = s.cleared
-      ? 'ПЕРИМЕТР ЧИСТ'
-      : `${s.total - s.kills} / ${s.total} НА ПЕРИМЕТРЕ`;
-    $('hud-score').textContent = (this.runScore + s.score).toLocaleString(
-      'ru-RU',
-    );
-    $('weapon-name').textContent = s.player.weapon.name.toUpperCase();
-    $('ammo').textContent = s.player.weapon.gun
-      ? String(s.player.ammo).padStart(2, '0')
-      : '';
-    $('context').textContent = s.context;
-    $('combo').classList.toggle(
-      'hidden',
-      s.combo < 2 || this.mode !== 'playing',
-    );
-    $('combo').textContent = s.combo + 'x COMBO';
+    updateHUD(this);
   },
   toast(text) {
     $('toast').textContent = text;
@@ -359,33 +317,7 @@ const app = {
     this.toastTimer = setTimeout(() => ($('toast').style.opacity = '0'), 2800);
   },
   renderChapters() {
-    const list = $('chapter-list');
-    list.replaceChildren();
-    for (const chapter of CHAPTERS) {
-      const b = document.createElement('button'),
-        best = this.progress.best[chapter.index];
-      const num = document.createElement('span');
-      num.className = 'number';
-      num.textContent = chapter.number;
-      const text = document.createElement('span'),
-        strong = document.createElement('strong'),
-        small = document.createElement('small');
-      strong.textContent = chapter.title;
-      small.textContent =
-        chapter.rooms.length +
-        ' ЛОКАЦИИ' +
-        (chapter.index > this.progress.unlocked ? ' · ЕЩЁ НЕ ПРОЙДЕНА' : '');
-      text.append(strong, small);
-      b.append(num, text);
-      if (best) {
-        const grade = document.createElement('span');
-        grade.className = 'grade';
-        grade.textContent = best.grade;
-        b.append(grade);
-      }
-      b.addEventListener('click', () => this.briefing(chapter.index));
-      list.append(b);
-    }
+    renderChapters(this);
   },
   settingsFrom: null,
   showSettings() {
@@ -400,6 +332,13 @@ const app = {
     save('emergency-exit-settings', this.settings);
   },
 };
+
+function gradeFor(score, base) {
+  if (score > base * 2.5) return 'A+';
+  if (score > base * 1.6) return 'A';
+  if (score > base) return 'B';
+  return 'C';
+}
 
 async function boot() {
   try {
@@ -436,7 +375,7 @@ async function boot() {
       input: { activePointers: 3 },
       fps: { target: 60, forceSetTimeOut: false },
     });
-    bindUI();
+    bindUI(app, () => save('emergency-exit-progress', app.progress));
     window.__GAME__ = {
       getState: () => app.sim?.snapshot() ?? { status: app.mode },
       get mode() {
@@ -455,126 +394,6 @@ async function boot() {
     };
   } catch (error) {
     app.fail(error);
-  }
-}
-function bindUI() {
-  app.cheats = new CheatConsole(app, () =>
-    save('emergency-exit-progress', app.progress),
-  );
-  app.menuNavigation = new MenuNavigation();
-  $('continue').textContent = app.progress.unlocked
-    ? 'ПРОДОЛЖИТЬ ПОБЕГ'
-    : 'НАЧАТЬ ПОБЕГ';
-  $('continue').onclick = () => {
-    app.audio.start();
-    app.briefing(app.progress.last ?? 0);
-  };
-  $('deploy').onclick = () => app.start();
-  $('ending-button').onclick = () => app.showEnding();
-  $('chapters-button').onclick = () => {
-    app.mode = 'chapters';
-    app.renderChapters();
-    app.overlay('chapter-panel');
-  };
-  for (const b of document.querySelectorAll('.back'))
-    b.onclick = () => app.menu();
-  $('pause-button').onclick = () => app.togglePause();
-  $('resume').onclick = () => app.togglePause();
-  $('restart').onclick = () => app.restart();
-  for (const id of ['to-menu', 'death-menu', 'result-menu'])
-    $(id).onclick = () => app.menu();
-  $('retry').onclick = () => app.restart();
-  $('result-retry').onclick = () => {
-    app.runScore = 0;
-    app.runTime = 0;
-    app.floorIndex = 0;
-    app.floorStates.clear();
-    app.checkpoints.clear();
-    app.load(app.chapter.rooms[0]);
-  };
-  $('next').onclick = () => {
-    if (app.chapter.index === CHAPTERS.length - 1) app.menu();
-    else app.briefing(app.chapter.index + 1);
-  };
-  $('settings-button').onclick = () => app.showSettings();
-  $('pause-settings').onclick = () => app.showSettings();
-  $('settings-back').onclick = () => {
-    app.mode = app.settingsFrom;
-    if (app.mode === 'paused') app.overlay('pause');
-    else app.menu();
-  };
-  for (const [id, key] of [
-    ['sound-volume', 'sound'],
-    ['music-volume', 'music'],
-  ]) {
-    $(id).value = app.settings[key];
-    $(id).oninput = () => {
-      app.settings[key] = Number($(id).value);
-      app.audio.start();
-      app.applySettings();
-    };
-  }
-  for (const key of ['effects', 'crt']) {
-    $(key).checked = app.settings[key];
-    $(key).onchange = () => {
-      app.settings[key] = $(key).checked;
-      app.applySettings();
-    };
-  }
-  $('fullscreen').onclick = () => {
-    if (!document.fullscreenElement)
-      document.documentElement.requestFullscreen?.();
-    else document.exitFullscreen?.();
-  };
-  window.addEventListener('blur', () => {
-    if (app.mode === 'playing') app.togglePause();
-  });
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden && app.mode === 'playing') app.togglePause();
-  });
-  touchInput();
-}
-function touchInput() {
-  const pad = $('move-pad'),
-    stick = pad.querySelector('i');
-  let touch = null;
-  pad.onpointerdown = (e) => {
-    touch = e.pointerId;
-    pad.setPointerCapture(touch);
-    app.audio.start();
-    update(e);
-  };
-  pad.onpointermove = (e) => {
-    if (e.pointerId === touch) update(e);
-  };
-  function update(e) {
-    const r = pad.getBoundingClientRect(),
-      dx = (e.clientX - r.left - 60) / 45,
-      dy = (e.clientY - r.top - 60) / 45,
-      length = Math.max(1, Math.hypot(dx, dy));
-    app.view.controls.moveX = dx / length;
-    app.view.controls.moveY = dy / length;
-    stick.style.transform = `translate(${(dx / length) * 35}px,${(dy / length) * 35}px)`;
-  }
-  const end = () => {
-    touch = null;
-    app.view.controls.moveX = 0;
-    app.view.controls.moveY = 0;
-    stick.style.transform = '';
-  };
-  pad.onpointerup = end;
-  pad.onpointercancel = end;
-  for (const b of document.querySelectorAll('[data-action]')) {
-    b.onpointerdown = (e) => {
-      e.preventDefault();
-      b.setPointerCapture(e.pointerId);
-      const a = b.dataset.action;
-      if (a === 'attack') app.view.controls.attack = true;
-      else app.view.pending[a] = true;
-      if (a === 'pickup') app.view.pending.pickup = true;
-    };
-    b.onpointerup = () => (app.view.controls.attack = false);
-    b.onpointercancel = () => (app.view.controls.attack = false);
   }
 }
 boot();

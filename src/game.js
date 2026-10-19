@@ -345,12 +345,12 @@
   }
   function playerPose(player) {
     const attacking = player.alive && player.attack > 0;
-    const melee = attacking && !player.weapon.gun;
+    const melee2 = attacking && !player.weapon.gun;
     let frame = 0;
     if (player.alive) frame = Math.floor(player.frame) % 8;
-    if (melee) frame = Math.min(6, Math.floor(attackProgress(player) * 7));
+    if (melee2) frame = Math.min(6, Math.floor(attackProgress(player) * 7));
     return {
-      key: melee ? "punchDirectional" : "heroDirectional",
+      key: melee2 ? "punchDirectional" : "heroDirectional",
       row: Math.max(
         0,
         PLAYER_DIRECTIONS.indexOf(facingDirection(player, attacking))
@@ -1014,147 +1014,160 @@
     }
   };
   var definitions = [
-    ["M16", "M16", 24, 2 / 60, 1, 6 * Math.PI / 180, 960, "sndM16"],
-    [
-      "\u0414\u0440\u043E\u0431\u043E\u0432\u0438\u043A",
-      "Shotgun",
-      6,
-      30 / 60,
-      8,
-      12 * Math.PI / 180,
-      960,
-      "sndShotgun"
-    ],
-    ["\u041A\u043B\u044E\u0448\u043A\u0430", "Club"],
-    ["\u0422\u0440\u0443\u0431\u0430", "Pipe"],
-    ["\u0411\u0438\u0442\u0430", "Bat"],
-    ["\u041D\u043E\u0436", "Knife"],
-    [
-      "\u0414\u0432\u0443\u0441\u0442\u0432\u043E\u043B\u043A\u0430",
-      "DoubleBarrel",
-      2,
-      8 / 60,
-      16,
-      20 * Math.PI / 180,
-      960,
-      "sndDoubleBarrel"
-    ],
-    [
-      "\u041F\u0438\u0441\u0442\u043E\u043B\u0435\u0442 \u0441 \u0433\u043B\u0443\u0448\u0438\u0442\u0435\u043B\u0435\u043C",
-      "Silencer",
-      13,
-      10 / 60,
-      1,
-      6 * Math.PI / 180,
-      960,
-      "sndSilencer"
-    ],
-    ["\u041A\u0430\u0442\u0430\u043D\u0430", "Sword"],
-    ["UZI", "Uzi", 30, 1 / 60, 1, 10 * Math.PI / 180, 960, "sndUzi"],
-    ["\u041C\u0430\u0433\u043D\u0443\u043C", "Magnum", 6, 8 / 60, 1, 0, 960, "sndMagnum"],
-    [
-      "Scorpion",
-      "Scorpion",
-      20,
-      2 / 60,
-      1,
-      6 * Math.PI / 180,
-      960,
-      "sndScorpion"
-    ],
-    ["MP5", "MP5", 32, 2 / 60, 1, 10 * Math.PI / 180, 960, "sndMP5"],
-    ["\u0411\u0438\u043B\u044C\u044F\u0440\u0434\u043D\u044B\u0439 \u043A\u0438\u0439", "Pool"],
-    ["\u0421\u043B\u043E\u043C\u0430\u043D\u043D\u044B\u0439 \u043A\u0438\u0439", "PoolBroke"],
-    ["\u0422\u043E\u043F\u043E\u0440", "Axe"],
-    ["\u0414\u0443\u0431\u0438\u043D\u043A\u0430", "NightStick"],
-    ["\u041B\u043E\u043C", "Crowbar"],
-    ["\u041C\u0430\u0447\u0435\u0442\u0435", "Machete"],
-    ["\u041A\u0443\u0432\u0430\u043B\u0434\u0430", "SledgeHammer"],
-    ["\u041A\u0443\u0431\u043E\u043A", "Trophy"],
-    ["\u0414\u0440\u0435\u043B\u044C", "Drill"],
-    ["\u0421\u043A\u043E\u0432\u043E\u0440\u043E\u0434\u0430", "Pan"],
-    ["\u041A\u0438\u043F\u044F\u0442\u043E\u043A", "BoilingPot"],
-    ["\u041A\u0430\u0441\u0442\u0440\u044E\u043B\u044F", "Pot"],
-    [
-      "UZI \u0441 \u0433\u043B\u0443\u0448\u0438\u0442\u0435\u043B\u0435\u043C",
-      "SilencedUzi",
-      30,
-      2 / 60,
-      1,
-      10 * Math.PI / 180,
-      960,
-      "sndSilencer"
-    ],
-    ["\u041F\u0430\u043A\u0435\u0442", "Bag"],
-    ["\u041A\u0438\u0440\u043F\u0438\u0447", "Throw"],
-    ["\u0411\u0443\u0442\u044B\u043B\u043A\u0430", "Throw"],
-    ["\u0414\u0440\u043E\u0442\u0438\u043A", "Throw"],
-    ["\u041D\u043E\u0436 \u0434\u043B\u044F \u043C\u0435\u0442\u0430\u043D\u0438\u044F", "Throw"],
-    ["\u041D\u043E\u0436\u043D\u0438\u0446\u044B", "Throw"],
-    ["\u041C\u043E\u043B\u043E\u0442\u043E\u043A", "Throw"],
-    ["\u0417\u0432\u0435\u0437\u0434\u0430", "Throw"],
-    ["\u041C\u043E\u043B\u043E\u0442\u043E\u0432", "Throw"]
+    {
+      name: "M16",
+      sprite: "M16",
+      ammo: 24,
+      cooldown: 2 / 60,
+      pellets: 1,
+      spread: 6 * Math.PI / 180,
+      sound: "sndM16"
+    },
+    {
+      name: "\u0414\u0440\u043E\u0431\u043E\u0432\u0438\u043A",
+      sprite: "Shotgun",
+      ammo: 6,
+      cooldown: 30 / 60,
+      pellets: 8,
+      spread: 12 * Math.PI / 180,
+      sound: "sndShotgun"
+    },
+    { name: "\u041A\u043B\u044E\u0448\u043A\u0430", sprite: "Club" },
+    { name: "\u0422\u0440\u0443\u0431\u0430", sprite: "Pipe" },
+    { name: "\u0411\u0438\u0442\u0430", sprite: "Bat" },
+    { name: "\u041D\u043E\u0436", sprite: "Knife" },
+    {
+      name: "\u0414\u0432\u0443\u0441\u0442\u0432\u043E\u043B\u043A\u0430",
+      sprite: "DoubleBarrel",
+      ammo: 2,
+      cooldown: 8 / 60,
+      pellets: 16,
+      spread: 20 * Math.PI / 180,
+      sound: "sndDoubleBarrel"
+    },
+    {
+      name: "\u041F\u0438\u0441\u0442\u043E\u043B\u0435\u0442 \u0441 \u0433\u043B\u0443\u0448\u0438\u0442\u0435\u043B\u0435\u043C",
+      sprite: "Silencer",
+      ammo: 13,
+      cooldown: 10 / 60,
+      pellets: 1,
+      spread: 6 * Math.PI / 180,
+      sound: "sndSilencer"
+    },
+    { name: "\u041A\u0430\u0442\u0430\u043D\u0430", sprite: "Sword" },
+    {
+      name: "UZI",
+      sprite: "Uzi",
+      ammo: 30,
+      cooldown: 1 / 60,
+      pellets: 1,
+      spread: 10 * Math.PI / 180,
+      sound: "sndUzi"
+    },
+    {
+      name: "\u041C\u0430\u0433\u043D\u0443\u043C",
+      sprite: "Magnum",
+      ammo: 6,
+      cooldown: 8 / 60,
+      pellets: 1,
+      spread: 0 * Math.PI / 180,
+      sound: "sndMagnum"
+    },
+    {
+      name: "Scorpion",
+      sprite: "Scorpion",
+      ammo: 20,
+      cooldown: 2 / 60,
+      pellets: 1,
+      spread: 6 * Math.PI / 180,
+      sound: "sndScorpion"
+    },
+    {
+      name: "MP5",
+      sprite: "MP5",
+      ammo: 32,
+      cooldown: 2 / 60,
+      pellets: 1,
+      spread: 10 * Math.PI / 180,
+      sound: "sndMP5"
+    },
+    { name: "\u0411\u0438\u043B\u044C\u044F\u0440\u0434\u043D\u044B\u0439 \u043A\u0438\u0439", sprite: "Pool" },
+    { name: "\u0421\u043B\u043E\u043C\u0430\u043D\u043D\u044B\u0439 \u043A\u0438\u0439", sprite: "PoolBroke" },
+    { name: "\u0422\u043E\u043F\u043E\u0440", sprite: "Axe" },
+    { name: "\u0414\u0443\u0431\u0438\u043D\u043A\u0430", sprite: "NightStick" },
+    { name: "\u041B\u043E\u043C", sprite: "Crowbar" },
+    { name: "\u041C\u0430\u0447\u0435\u0442\u0435", sprite: "Machete" },
+    { name: "\u041A\u0443\u0432\u0430\u043B\u0434\u0430", sprite: "SledgeHammer" },
+    { name: "\u041A\u0443\u0431\u043E\u043A", sprite: "Trophy" },
+    { name: "\u0414\u0440\u0435\u043B\u044C", sprite: "Drill" },
+    { name: "\u0421\u043A\u043E\u0432\u043E\u0440\u043E\u0434\u0430", sprite: "Pan" },
+    { name: "\u041A\u0438\u043F\u044F\u0442\u043E\u043A", sprite: "BoilingPot" },
+    { name: "\u041A\u0430\u0441\u0442\u0440\u044E\u043B\u044F", sprite: "Pot" },
+    {
+      name: "UZI \u0441 \u0433\u043B\u0443\u0448\u0438\u0442\u0435\u043B\u0435\u043C",
+      sprite: "SilencedUzi",
+      ammo: 30,
+      cooldown: 2 / 60,
+      pellets: 1,
+      spread: 10 * Math.PI / 180,
+      sound: "sndSilencer"
+    },
+    { name: "\u041F\u0430\u043A\u0435\u0442", sprite: "Bag" },
+    { name: "\u041A\u0438\u0440\u043F\u0438\u0447", sprite: "Throw" },
+    { name: "\u0411\u0443\u0442\u044B\u043B\u043A\u0430", sprite: "Throw" },
+    { name: "\u0414\u0440\u043E\u0442\u0438\u043A", sprite: "Throw" },
+    { name: "\u041D\u043E\u0436 \u0434\u043B\u044F \u043C\u0435\u0442\u0430\u043D\u0438\u044F", sprite: "Throw" },
+    { name: "\u041D\u043E\u0436\u043D\u0438\u0446\u044B", sprite: "Throw" },
+    { name: "\u041C\u043E\u043B\u043E\u0442\u043E\u043A", sprite: "Throw" },
+    { name: "\u0417\u0432\u0435\u0437\u0434\u0430", sprite: "Throw" },
+    { name: "\u041C\u043E\u043B\u043E\u0442\u043E\u0432", sprite: "Throw" }
   ];
-  var meleeReach = {
-    Club: 48,
-    Pipe: 38,
-    Bat: 42,
-    Knife: 28,
-    Sword: 52,
-    Pool: 58,
-    PoolBroke: 36,
-    Axe: 40,
-    NightStick: 34,
-    Crowbar: 37,
-    Machete: 44,
-    SledgeHammer: 50,
-    Trophy: 30,
-    Drill: 27,
-    Pan: 33,
-    BoilingPot: 31,
-    Pot: 29,
-    Bag: 26
+  var melee = {
+    Club: { reach: 48, cooldown: 19 / 60 },
+    Pipe: { reach: 38, cooldown: 22 / 60 },
+    Bat: { reach: 42, cooldown: 25 / 60 },
+    Knife: { reach: 28, cooldown: 10 / 60 },
+    Sword: { reach: 52, cooldown: 15 / 60 },
+    Pool: { reach: 58, cooldown: 20 / 60 },
+    PoolBroke: { reach: 36, cooldown: 20 / 60 },
+    Axe: { reach: 40, cooldown: 30 / 60 },
+    NightStick: { reach: 34, cooldown: 15 / 60 },
+    Crowbar: { reach: 37, cooldown: 20 / 60 },
+    Machete: { reach: 44, cooldown: 12 / 60 },
+    SledgeHammer: { reach: 50, cooldown: 30 / 60 },
+    Trophy: { reach: 30, cooldown: 20 / 60 },
+    Drill: { reach: 27, cooldown: 20 / 60 },
+    Pan: { reach: 33, cooldown: 20 / 60 },
+    BoilingPot: { reach: 31, cooldown: 25 / 60 },
+    Pot: { reach: 29, cooldown: 25 / 60 },
+    Bag: { reach: 26, cooldown: 20 / 60 },
+    Throw: { reach: 0, cooldown: 20 / 60 }
   };
-  var WEAPONS = definitions.map((d, id) => ({
-    id,
-    name: d[0],
-    sprite: d[1],
-    ammo: d[2] ?? 0,
-    gun: d[2] > 0,
-    cooldown: d[3] ?? (id === 19 ? 0.5 : 0.26),
-    pellets: d[4] ?? 0,
-    spread: d[5] ?? 0,
-    speed: d[6] ?? 0,
-    sound: d[7] ?? "sndSwing1",
-    range: Math.round((meleeReach[d[1]] ?? 0) * 1.2),
-    enemyRange: Math.round((meleeReach[d[1]] ?? 0) * 0.7),
-    sharp: [5, 8, 15, 18, 21].includes(id),
-    throwOnly: id >= 27,
-    silent: [7, 25].includes(id)
-  }));
-  var meleeReload = {
-    Club: 19,
-    Pipe: 22,
-    Bat: 25,
-    Knife: 10,
-    Sword: 15,
-    Pool: 20,
-    PoolBroke: 20,
-    Axe: 30,
-    NightStick: 15,
-    Crowbar: 20,
-    Machete: 12,
-    SledgeHammer: 30,
-    Trophy: 20,
-    Drill: 20,
-    Pan: 20,
-    BoilingPot: 25,
-    Pot: 25,
-    Bag: 20,
-    Throw: 20
-  };
-  for (const weapon of WEAPONS)
-    if (!weapon.gun) weapon.cooldown = (meleeReload[weapon.sprite] ?? 20) / 60;
+  var sharpWeapons = ["Knife", "Sword", "Axe", "Machete", "Drill"];
+  var silentGuns = ["Silencer", "SilencedUzi"];
+  var WEAPONS = definitions.map((definition, id) => {
+    var _a;
+    const { sprite: sprite2, ammo = 0 } = definition;
+    const gun = ammo > 0;
+    const reach = ((_a = melee[sprite2]) == null ? void 0 : _a.reach) ?? 0;
+    return {
+      id,
+      name: definition.name,
+      sprite: sprite2,
+      ammo,
+      gun,
+      cooldown: gun ? definition.cooldown : melee[sprite2].cooldown,
+      pellets: definition.pellets ?? 0,
+      spread: definition.spread ?? 0,
+      speed: gun ? 960 : 0,
+      sound: definition.sound ?? "sndSwing1",
+      range: Math.round(reach * 1.2),
+      enemyRange: Math.round(reach * 0.7),
+      sharp: sharpWeapons.includes(sprite2),
+      throwOnly: sprite2 === "Throw",
+      silent: silentGuns.includes(sprite2)
+    };
+  });
   var UNARMED = {
     id: -1,
     name: "\u041A\u0443\u043B\u0430\u043A\u0438",
@@ -1165,9 +1178,10 @@
     range: 25,
     sound: "sndPunch"
   };
-  var weaponBySprite = (name = "") => WEAPONS.find(
-    (w) => name.replace(/^(sprPolice|sprE|sprP)(Walk|Attack)/, "") === w.sprite
-  ) ?? UNARMED;
+  function weaponBySprite(name = "") {
+    const sprite2 = name.replace(/^(sprPolice|sprE|sprP)(Walk|Attack)/, "");
+    return WEAPONS.find((weapon) => weapon.sprite === sprite2) ?? UNARMED;
+  }
   var defaults = {
     kind: "decor",
     scaleX: 1,
@@ -1457,28 +1471,8 @@
       this.grace = Math.max(0, this.grace - dt);
       this.comboTimer = Math.max(0, this.comboTimer - dt);
       if (this.comboTimer === 0) this.combo = 0;
+      input = this.updatePlayer(dt, input);
       const p = this.player;
-      p.fireTimer = Math.max(0, p.fireTimer - dt);
-      p.attack = Math.max(0, p.attack - dt);
-      p.execution = Math.max(0, p.execution - dt);
-      if (input.aim) p.angle = Math.atan2(input.aim.y - p.y, input.aim.x - p.x);
-      const acceleration = 1800 * dt, max = this.profile.speed;
-      if (this.profile.reversed)
-        input = { ...input, moveX: -input.moveX, moveY: -input.moveY };
-      const approach = (v, target) => v < target ? Math.min(target, v + acceleration) : Math.max(target, v - acceleration);
-      p.vx = approach(p.vx, input.moveX * max);
-      p.vy = approach(p.vy, input.moveY * max);
-      if (Math.abs(p.vx) + Math.abs(p.vy) > max + 120) {
-        const f = (max + 120) / (Math.abs(p.vx) + Math.abs(p.vy));
-        p.vx *= f;
-        p.vy *= f;
-      }
-      p.moving = Math.hypot(p.vx, p.vy);
-      if (p.execution <= 0) this.move(p, p.vx * dt, p.vy * dt, dt);
-      if (p.moving > 4) {
-        p.facing = directionForVector(p.vx, p.vy, p.facing);
-        p.frame = (p.frame + dt * p.moving * 0.05) % 8;
-      } else p.frame = 0;
       this.updateInventory(
         input.interact && this.exitReady ? { ...input, pickup: false } : input
       );
@@ -1499,16 +1493,53 @@
       this.updateParticles(dt);
       this.checkClear();
       (_a = this.tutorial) == null ? void 0 : _a.update(input);
-      const nearest = this.items.filter((i) => !i.taken).sort((a, b) => distance(a, p) - distance(b, p))[0];
-      const down = this.enemies.find(
-        (e) => e.alive && e.stun > 0 && distance(p, e) < 31
-      );
-      this.context = this.exitReady ? this.exit.transition === "stairs" ? "E \xB7 \u0421\u041B\u0415\u0414\u0423\u042E\u0429\u0418\u0419 \u042D\u0422\u0410\u0416" : "E \xB7 \u0412\u042B\u0419\u0422\u0418" : down ? "SPACE \xB7 \u0414\u041E\u0411\u0418\u0422\u042C" : nearest && distance(nearest, p) < 30 ? (p.weapon === UNARMED ? "E / \u041F\u041A\u041C \xB7 " : "E \xB7 ") + nearest.weapon.name.toUpperCase() : this.cleared ? this.exit.transition === "stairs" ? "\u041A \u041B\u0415\u0421\u0422\u041D\u0418\u0426\u0415 \u2192 E" : "\u041A \u0414\u0412\u0415\u0420\u0418 \u2192 E" : "";
+      this.context = this.contextHint();
       if (input.interact && this.exitReady) {
         this.status = "complete";
         this.sound("sndComplete");
         this.emit("complete");
       }
+    }
+    updatePlayer(dt, input) {
+      const player = this.player;
+      player.fireTimer = Math.max(0, player.fireTimer - dt);
+      player.attack = Math.max(0, player.attack - dt);
+      player.execution = Math.max(0, player.execution - dt);
+      if (input.aim) player.angle = Math.atan2(input.aim.y - player.y, input.aim.x - player.x);
+      const acceleration = 1800 * dt, max = this.profile.speed;
+      if (this.profile.reversed)
+        input = { ...input, moveX: -input.moveX, moveY: -input.moveY };
+      const approach = (v, target) => v < target ? Math.min(target, v + acceleration) : Math.max(target, v - acceleration);
+      player.vx = approach(player.vx, input.moveX * max);
+      player.vy = approach(player.vy, input.moveY * max);
+      if (Math.abs(player.vx) + Math.abs(player.vy) > max + 120) {
+        const f = (max + 120) / (Math.abs(player.vx) + Math.abs(player.vy));
+        player.vx *= f;
+        player.vy *= f;
+      }
+      player.moving = Math.hypot(player.vx, player.vy);
+      if (player.execution <= 0) this.move(player, player.vx * dt, player.vy * dt, dt);
+      if (player.moving > 4) {
+        player.facing = directionForVector(player.vx, player.vy, player.facing);
+        player.frame = (player.frame + dt * player.moving * 0.05) % 8;
+      } else player.frame = 0;
+      return input;
+    }
+    contextHint() {
+      const player = this.player;
+      const stairs = this.exit.transition === "stairs";
+      if (this.exitReady) return stairs ? "E \xB7 \u0421\u041B\u0415\u0414\u0423\u042E\u0429\u0418\u0419 \u042D\u0422\u0410\u0416" : "E \xB7 \u0412\u042B\u0419\u0422\u0418";
+      const stunned = this.enemies.some(
+        (enemy) => enemy.alive && enemy.stun > 0 && distance(player, enemy) < 31
+      );
+      if (stunned) return "SPACE \xB7 \u0414\u041E\u0411\u0418\u0422\u042C";
+      const nearest = this.items.filter((item) => !item.taken).sort((a, b) => distance(a, player) - distance(b, player))[0];
+      if (nearest && distance(nearest, player) < 30) {
+        const key = player.weapon === UNARMED ? "E / \u041F\u041A\u041C \xB7 " : "E \xB7 ";
+        return key + nearest.weapon.name.toUpperCase();
+      }
+      if (this.cleared) return stairs ? "\u041A \u041B\u0415\u0421\u0422\u041D\u0418\u0426\u0415 \u2192 E" : "\u041A \u0414\u0412\u0415\u0420\u0418 \u2192 E";
+      return "";
     }
     get exitReady() {
       return this.exits.includes(this.exit) && this.cleared && (!this.tutorial || this.tutorial.canExit) && distance(this.player, this.exit) < 48;
@@ -1529,16 +1560,7 @@
       items.sort((a, b) => distance(a, p) - distance(b, p));
       const item = items[0];
       if (!item) return;
-      if (p.weapon !== UNARMED)
-        this.items.push({
-          x: p.x,
-          y: p.y,
-          angle: p.angle,
-          weapon: p.weapon,
-          ammo: p.ammo,
-          frame: p.weapon.id,
-          ammoBonusApplied: true
-        });
+      if (p.weapon !== UNARMED) this.dropItem(p);
       p.weapon = item.weapon;
       p.ammo = Math.round(
         item.ammo * (item.ammoBonusApplied ? 1 : this.profile.ammoBonus ?? 1)
@@ -1548,63 +1570,70 @@
       this.sound("sndPickupWeapon");
     }
     attack() {
-      const p = this.player, w = p.weapon;
-      if (w.throwOnly) {
-        this.throwWeapon();
+      const weapon = this.player.weapon;
+      if (weapon.throwOnly) this.throwWeapon();
+      else if (weapon.gun) this.shoot();
+      else this.meleeAttack();
+    }
+    shoot() {
+      const player = this.player;
+      const weapon = player.weapon;
+      if (player.ammo <= 0) {
+        this.sound("sndLock");
+        player.fireTimer = 0.2;
         return;
       }
-      if (w.gun) {
-        if (p.ammo <= 0) {
-          this.sound("sndLock");
-          p.fireTimer = 0.2;
-          return;
-        }
-        p.ammo--;
-        this.shots++;
-        p.fireTimer = w.cooldown;
-        p.attack = 0.12;
-        this.fire(p, w, "player");
-        this.sound(w.sound);
-        this.emit("shake", { amount: 1.8 });
-      } else {
-        p.fireTimer = w.cooldown;
-        p.attackDuration = w.id < 0 ? 0.18 : Math.min(0.42, w.cooldown);
-        p.attack = p.attackDuration;
-        p.attackAngle = p.angle;
-        this.sound(w.sound);
-        for (const enemy of this.enemies) {
-          if (!enemy.alive || this.tutorial && !this.tutorial.allowsHit(enemy) || distance(enemy, p) > w.range + 6 || this.lineBlocked(p, enemy))
-            continue;
-          const diff = Math.abs(
-            angleDelta(Math.atan2(enemy.y - p.y, enemy.x - p.x), p.angle)
-          );
-          if (diff > 1.1) continue;
-          if (w === UNARMED && !this.profile.punchKill && !enemy.dog) {
-            const stolen = this.profile.disarm && enemy.weapon !== UNARMED ? { weapon: enemy.weapon, ammo: enemy.ammo } : null;
-            this.stun(enemy, STUN_DURATION);
-            if (stolen) {
-              p.weapon = stolen.weapon;
-              p.ammo = stolen.ammo;
-              const drop = this.items.at(-1);
-              if (drop && drop.weapon === stolen.weapon && Math.hypot(drop.x - enemy.x, drop.y - enemy.y) < 12)
-                drop.taken = true;
-              this.sound("sndPickupWeapon");
-            }
-          } else if (enemy.fat && (!w.sharp || w === UNARMED))
-            this.stun(enemy, 0.5);
-          else this.kill(enemy, w.sharp ? "cut" : "melee");
-        }
-        for (const box of this.staticBoxes)
-          if (box.entity.glass && !box.entity.broken && rayRect(
-            p.x,
-            p.y,
-            p.x + Math.cos(p.angle) * w.range,
-            p.y + Math.sin(p.angle) * w.range,
-            box,
-            6
-          ) !== null)
-            this.breakGlass(box.entity);
+      player.ammo--;
+      this.shots++;
+      player.fireTimer = weapon.cooldown;
+      player.attack = 0.12;
+      this.fire(player, weapon, "player");
+      this.sound(weapon.sound);
+      this.emit("shake", { amount: 1.8 });
+    }
+    meleeAttack() {
+      const player = this.player;
+      const weapon = player.weapon;
+      player.fireTimer = weapon.cooldown;
+      player.attackDuration = weapon.id < 0 ? 0.18 : Math.min(0.42, weapon.cooldown);
+      player.attack = player.attackDuration;
+      player.attackAngle = player.angle;
+      this.sound(weapon.sound);
+      for (const enemy of this.enemies) {
+        if (!enemy.alive || this.tutorial && !this.tutorial.allowsHit(enemy) || distance(enemy, player) > weapon.range + 6 || this.lineBlocked(player, enemy))
+          continue;
+        const diff = Math.abs(
+          angleDelta(
+            Math.atan2(enemy.y - player.y, enemy.x - player.x),
+            player.angle
+          )
+        );
+        if (diff > 1.1) continue;
+        if (weapon === UNARMED && !this.profile.punchKill && !enemy.dog) {
+          const stolen = this.profile.disarm && enemy.weapon !== UNARMED ? { weapon: enemy.weapon, ammo: enemy.ammo } : null;
+          this.stun(enemy, STUN_DURATION);
+          if (stolen) {
+            player.weapon = stolen.weapon;
+            player.ammo = stolen.ammo;
+            const drop = this.items.at(-1);
+            if (drop && drop.weapon === stolen.weapon && Math.hypot(drop.x - enemy.x, drop.y - enemy.y) < 12)
+              drop.taken = true;
+            this.sound("sndPickupWeapon");
+          }
+        } else if (enemy.fat && (!weapon.sharp || weapon === UNARMED))
+          this.stun(enemy, 0.5);
+        else this.kill(enemy, weapon.sharp ? "cut" : "melee");
       }
+      for (const box of this.staticBoxes)
+        if (box.entity.glass && !box.entity.broken && rayRect(
+          player.x,
+          player.y,
+          player.x + Math.cos(player.angle) * weapon.range,
+          player.y + Math.sin(player.angle) * weapon.range,
+          box,
+          6
+        ) !== null)
+          this.breakGlass(box.entity);
     }
     fire(actor, w, team) {
       for (let i = 0; i < w.pellets; i++) {
@@ -1629,6 +1658,17 @@
       if (!w.silent && !(team === "player" && this.profile.silentShots))
         this.noise(actor, 320);
     }
+    dropItem(actor, position = actor, ammoBonusApplied = true) {
+      this.items.push({
+        x: position.x,
+        y: position.y,
+        angle: actor.angle,
+        weapon: actor.weapon,
+        ammo: actor.ammo,
+        frame: actor.weapon.id,
+        ammoBonusApplied
+      });
+    }
     dropWeapon() {
       const p = this.player;
       if (p.weapon === UNARMED) return;
@@ -1637,15 +1677,7 @@
         y: p.y + Math.sin(p.angle) * 12
       };
       const at = !this.blocked(ahead.x, ahead.y, 7) && !this.lineBlocked(p, ahead, true) ? ahead : p;
-      this.items.push({
-        x: at.x,
-        y: at.y,
-        angle: p.angle,
-        weapon: p.weapon,
-        ammo: p.ammo,
-        frame: p.weapon.id,
-        ammoBonusApplied: true
-      });
+      this.dropItem(p, at);
       p.weapon = UNARMED;
       p.ammo = 0;
       p.attack = 0;
@@ -1698,15 +1730,7 @@
     }
     dropEnemyWeapon(e) {
       if (e.weapon === UNARMED) return;
-      this.items.push({
-        x: e.x + 4,
-        y: e.y + 4,
-        angle: e.angle,
-        weapon: e.weapon,
-        ammo: e.ammo,
-        frame: e.weapon.id,
-        ammoBonusApplied: !!e.ammoBonusApplied
-      });
+      this.dropItem(e, { x: e.x + 4, y: e.y + 4 }, !!e.ammoBonusApplied);
       e.weapon = UNARMED;
       e.ammo = 0;
     }
@@ -1793,122 +1817,128 @@
           glass: true
         });
     }
-    updateEnemy(e, dt) {
-      if (e.dog && this.profile.friendlyDogs) {
-        e.state = "friendly";
+    updateEnemy(enemy, dt) {
+      if (enemy.dog && this.profile.friendlyDogs) {
+        enemy.state = "friendly";
         return;
       }
-      e.fireTimer = Math.max(0, e.fireTimer - dt);
-      e.routeTimer -= dt;
-      e.patrolTurn = Math.max(0, e.patrolTurn - dt);
-      if (e.stun > 0) {
-        e.stun = Math.max(0, e.stun - dt);
-        if (e.stun === 0) {
-          e.state = "search";
-          e.alert = 4;
+      enemy.fireTimer = Math.max(0, enemy.fireTimer - dt);
+      enemy.routeTimer -= dt;
+      enemy.patrolTurn = Math.max(0, enemy.patrolTurn - dt);
+      if (enemy.stun > 0) {
+        enemy.stun = Math.max(0, enemy.stun - dt);
+        if (enemy.stun === 0) {
+          enemy.state = "search";
+          enemy.alert = 4;
         }
         return;
       }
-      const p = this.player, d = distance(e, p), angle = Math.atan2(p.y - e.y, p.x - e.x);
-      const cone = Math.abs(angleDelta(angle, e.angle)) < (e.alert > 0 ? Math.PI : 1.45);
-      const sees = this.grace <= 0 && d < (this.profile.stealth ? 140 : 260) && cone && !this.lineBlocked(e, p, false, false) && !(this.room.id === "eeTraining" && d > 45);
+      const player = this.player, d = distance(enemy, player), angle = Math.atan2(player.y - enemy.y, player.x - enemy.x);
+      const cone = Math.abs(angleDelta(angle, enemy.angle)) < (enemy.alert > 0 ? Math.PI : 1.45);
+      const sees = this.grace <= 0 && d < (this.profile.stealth ? 140 : 260) && cone && !this.lineBlocked(enemy, player, false, false) && !(this.room.id === "eeTraining" && d > 45);
       if (sees) {
-        e.lastSeen = { x: p.x, y: p.y };
-        e.alert = 5;
-        e.reaction -= dt;
-        e.state = "chase";
+        enemy.lastSeen = { x: player.x, y: player.y };
+        enemy.alert = 5;
+        enemy.reaction -= dt;
+        enemy.state = "chase";
       } else {
-        e.alert = Math.max(0, e.alert - dt);
-        e.reaction = 0.45;
+        enemy.alert = Math.max(0, enemy.alert - dt);
+        enemy.reaction = 0.45;
       }
-      if (e.alert > 0 && e.lastSeen) {
-        e.angle = angle;
-        if (e.weapon.gun && e.ammo > 0 && sees && d < 280 && d > 55) {
-          e.moving = 0;
-          if (e.reaction <= 0 && e.fireTimer <= 0) {
-            e.ammo--;
-            e.fireTimer = e.weapon.cooldown + 0.12;
-            this.fire(e, e.weapon, "enemy");
-            this.sound(e.weapon.sound);
-          }
-        } else {
-          const target = e.lastSeen;
-          if (!this.pathBlocked(e, target)) {
-            this.moveEnemy(e, target, (e.dog ? 180 : 120) * dt, dt);
-          } else {
-            if (e.routeTimer <= 0) {
-              e.route = this.navigation.path(e, target);
-              e.routeTimer = 0.6 + this.random() * 0.4;
-            }
-            if (e.route.length) {
-              if (distance(e, e.route[0]) < 9) e.route.shift();
-              if (e.route[0])
-                this.moveEnemy(e, e.route[0], (e.dog ? 175 : 115) * dt, dt);
-            }
-          }
-          const melee = e.weapon.gun ? UNARMED : e.weapon;
-          const inReach = d < (melee.enemyRange ?? melee.range) + p.radius;
-          const ready = inReach && sees && !this.lineBlocked(e, p) && e.reaction <= 0 && e.fireTimer <= 0;
-          if (!ready) e.meleeWindup = null;
-          else {
-            e.meleeWindup = (e.meleeWindup ?? 0.22) - dt;
-            if (e.meleeWindup <= 0) {
-              this.die();
-              e.fireTimer = 0.4;
-              e.meleeWindup = null;
-            }
-          }
-        }
-      } else {
-        e.state = "patrol";
-        e.lastSeen = null;
-        e.moving = 0;
-        if (!e.stationary) {
-          const clear = (angle2) => !this.blocked(
-            e.x + Math.cos(angle2) * 12,
-            e.y + Math.sin(angle2) * 12,
-            8
-          );
-          if (!clear(e.angle) && e.patrolTurn === 0) {
-            const next = [
-              e.angle + Math.PI / 2,
-              e.angle - Math.PI / 2,
-              e.angle + Math.PI
-            ].find(clear);
-            if (next !== void 0)
-              e.angle = Math.atan2(Math.sin(next), Math.cos(next));
-            e.patrolTurn = 0.35;
-          }
-          if (clear(e.angle)) {
-            const before = { x: e.x, y: e.y };
-            this.move(
-              e,
-              Math.cos(e.angle) * 60 * dt,
-              Math.sin(e.angle) * 60 * dt,
-              dt
-            );
-            e.moving = dt > 0 ? distance(before, e) / dt : 0;
-          }
-        }
-      }
-      if (e.moving > 0) e.frame = (e.frame + dt * e.moving * 0.06) % 8;
-      if (e.weapon === UNARMED && !e.dog && !e.fat) {
+      if (enemy.alert > 0 && enemy.lastSeen) {
+        enemy.angle = angle;
+        this.chaseEnemy(enemy, dt, sees, d);
+      } else this.patrolEnemy(enemy, dt);
+      if (enemy.moving > 0)
+        enemy.frame = (enemy.frame + dt * enemy.moving * 0.06) % 8;
+      if (enemy.weapon === UNARMED && !enemy.dog && !enemy.fat) {
         const item = this.items.find(
-          (i) => !i.taken && distance(i, e) < 18 && !this.lineBlocked(i, e)
+          (i) => !i.taken && distance(i, enemy) < 18 && !this.lineBlocked(i, enemy)
         );
         if (item) {
-          e.weapon = item.weapon;
-          e.ammo = item.ammo;
-          e.ammoBonusApplied = !!item.ammoBonusApplied;
+          enemy.weapon = item.weapon;
+          enemy.ammo = item.ammo;
+          enemy.ammoBonusApplied = !!item.ammoBonusApplied;
           item.taken = true;
         }
       }
     }
-    moveEnemy(e, target, step, dt) {
-      const a = Math.atan2(target.y - e.y, target.x - e.x);
-      e.angle = a;
-      e.moving = step / dt;
-      this.move(e, Math.cos(a) * step, Math.sin(a) * step, dt);
+    chaseEnemy(enemy, dt, sees, d) {
+      const player = this.player;
+      if (enemy.weapon.gun && enemy.ammo > 0 && sees && d < 280 && d > 55) {
+        enemy.moving = 0;
+        if (enemy.reaction <= 0 && enemy.fireTimer <= 0) {
+          enemy.ammo--;
+          enemy.fireTimer = enemy.weapon.cooldown + 0.12;
+          this.fire(enemy, enemy.weapon, "enemy");
+          this.sound(enemy.weapon.sound);
+        }
+      } else {
+        const target = enemy.lastSeen;
+        if (!this.pathBlocked(enemy, target)) {
+          this.moveEnemy(enemy, target, (enemy.dog ? 180 : 120) * dt, dt);
+        } else {
+          if (enemy.routeTimer <= 0) {
+            enemy.route = this.navigation.path(enemy, target);
+            enemy.routeTimer = 0.6 + this.random() * 0.4;
+          }
+          if (enemy.route.length) {
+            if (distance(enemy, enemy.route[0]) < 9) enemy.route.shift();
+            if (enemy.route[0])
+              this.moveEnemy(enemy, enemy.route[0], (enemy.dog ? 175 : 115) * dt, dt);
+          }
+        }
+        const melee2 = enemy.weapon.gun ? UNARMED : enemy.weapon;
+        const inReach = d < (melee2.enemyRange ?? melee2.range) + player.radius;
+        const ready = inReach && sees && !this.lineBlocked(enemy, player) && enemy.reaction <= 0 && enemy.fireTimer <= 0;
+        if (!ready) enemy.meleeWindup = null;
+        else {
+          enemy.meleeWindup = (enemy.meleeWindup ?? 0.22) - dt;
+          if (enemy.meleeWindup <= 0) {
+            this.die();
+            enemy.fireTimer = 0.4;
+            enemy.meleeWindup = null;
+          }
+        }
+      }
+    }
+    patrolEnemy(enemy, dt) {
+      enemy.state = "patrol";
+      enemy.lastSeen = null;
+      enemy.moving = 0;
+      if (!enemy.stationary) {
+        const clear = (angle) => !this.blocked(
+          enemy.x + Math.cos(angle) * 12,
+          enemy.y + Math.sin(angle) * 12,
+          8
+        );
+        if (!clear(enemy.angle) && enemy.patrolTurn === 0) {
+          const next = [
+            enemy.angle + Math.PI / 2,
+            enemy.angle - Math.PI / 2,
+            enemy.angle + Math.PI
+          ].find(clear);
+          if (next !== void 0)
+            enemy.angle = Math.atan2(Math.sin(next), Math.cos(next));
+          enemy.patrolTurn = 0.35;
+        }
+        if (clear(enemy.angle)) {
+          const before = { x: enemy.x, y: enemy.y };
+          this.move(
+            enemy,
+            Math.cos(enemy.angle) * 60 * dt,
+            Math.sin(enemy.angle) * 60 * dt,
+            dt
+          );
+          enemy.moving = dt > 0 ? distance(before, enemy) / dt : 0;
+        }
+      }
+    }
+    moveEnemy(enemy, target, step, dt) {
+      const a = Math.atan2(target.y - enemy.y, target.x - enemy.x);
+      enemy.angle = a;
+      enemy.moving = step / dt;
+      this.move(enemy, Math.cos(a) * step, Math.sin(a) * step, dt);
     }
     updateBullets(dt) {
       for (const b of this.bullets) {
@@ -1986,15 +2016,7 @@
             x: clamp(b.x - b.vx / speed * offset, 8, this.room.width - 8),
             y: clamp(b.y - b.vy / speed * offset, 8, this.room.height - 8)
           });
-          this.items.push({
-            x: at.x,
-            y: at.y,
-            angle: b.angle,
-            weapon: b.weapon,
-            ammo: b.ammo,
-            frame: b.weapon.id,
-            ammoBonusApplied: true
-          });
+          this.dropItem(b, at);
         }
       }
       this.bullets = this.bullets.filter((b) => !b.dead);
@@ -2200,64 +2222,6 @@
     }
     get canExit() {
       return this.step === "exit";
-    }
-  };
-  var panels = ["menu", "pause", "briefing", "chapter-panel"];
-  var MenuNavigation = class {
-    constructor() {
-      this.panel = null;
-      this.index = 0;
-      document.addEventListener("keydown", (event) => this.keydown(event), true);
-      for (const panel of panels) {
-        const track = (event) => {
-          const button = event.target.closest("button");
-          if (button && this.buttons.includes(button))
-            this.select(this.buttons.indexOf(button), false);
-        };
-        const element = document.getElementById(panel);
-        element.addEventListener("pointerover", track);
-        element.addEventListener("focusin", track);
-      }
-    }
-    get buttons() {
-      if (!this.panel) return [];
-      const buttons = this.panel.id === "chapter-panel" ? [
-        ...this.panel.querySelectorAll("#chapter-list button"),
-        this.panel.querySelector(".back")
-      ] : [...this.panel.querySelectorAll("button")];
-      return buttons.filter(
-        (button) => button && !button.disabled && button.getClientRects().length
-      );
-    }
-    show(id) {
-      document.querySelectorAll(".menu-selected").forEach((button) => button.classList.remove("menu-selected"));
-      this.panel = panels.includes(id) ? document.getElementById(id) : null;
-      this.index = 0;
-      if (this.panel) this.select(0, true);
-    }
-    select(index, focus) {
-      const buttons = this.buttons;
-      if (!buttons.length) return;
-      this.index = (index + buttons.length) % buttons.length;
-      buttons.forEach(
-        (button, i) => button.classList.toggle("menu-selected", i === this.index)
-      );
-      if (focus) buttons[this.index].focus({ preventScroll: true });
-      if (focus && this.panel.id === "chapter-panel")
-        buttons[this.index].scrollIntoView({ block: "nearest" });
-    }
-    keydown(event) {
-      var _a;
-      if (!this.panel || this.panel.classList.contains("hidden")) return;
-      if (event.target.matches("select, input")) return;
-      const direction = { KeyW: -1, ArrowUp: -1, KeyS: 1, ArrowDown: 1 }[event.code];
-      if (!direction && event.code !== "Enter" && event.code !== "NumpadEnter")
-        return;
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      if (event.repeat) return;
-      if (direction) this.select(this.index + direction, true);
-      else (_a = this.buttons[this.index]) == null ? void 0 : _a.click();
     }
   };
   var CHAPTERS = [
@@ -3460,7 +3424,226 @@
       return "\u041D\u0435\u0438\u0437\u0432\u0435\u0441\u0442\u043D\u0430\u044F \u043A\u043E\u043C\u0430\u043D\u0434\u0430. help \u2014 \u0441\u043F\u0438\u0441\u043E\u043A \u043A\u043E\u043C\u0430\u043D\u0434.";
     }
   };
+  var panels = ["menu", "pause", "briefing", "chapter-panel"];
+  var MenuNavigation = class {
+    constructor() {
+      this.panel = null;
+      this.index = 0;
+      document.addEventListener("keydown", (event) => this.keydown(event), true);
+      for (const panel of panels) {
+        const track = (event) => {
+          const button = event.target.closest("button");
+          if (button && this.buttons.includes(button))
+            this.select(this.buttons.indexOf(button), false);
+        };
+        const element = document.getElementById(panel);
+        element.addEventListener("pointerover", track);
+        element.addEventListener("focusin", track);
+      }
+    }
+    get buttons() {
+      if (!this.panel) return [];
+      const buttons = this.panel.id === "chapter-panel" ? [
+        ...this.panel.querySelectorAll("#chapter-list button"),
+        this.panel.querySelector(".back")
+      ] : [...this.panel.querySelectorAll("button")];
+      return buttons.filter(
+        (button) => button && !button.disabled && button.getClientRects().length
+      );
+    }
+    show(id) {
+      document.querySelectorAll(".menu-selected").forEach((button) => button.classList.remove("menu-selected"));
+      this.panel = panels.includes(id) ? document.getElementById(id) : null;
+      this.index = 0;
+      if (this.panel) this.select(0, true);
+    }
+    select(index, focus) {
+      const buttons = this.buttons;
+      if (!buttons.length) return;
+      this.index = (index + buttons.length) % buttons.length;
+      buttons.forEach(
+        (button, i) => button.classList.toggle("menu-selected", i === this.index)
+      );
+      if (focus) buttons[this.index].focus({ preventScroll: true });
+      if (focus && this.panel.id === "chapter-panel")
+        buttons[this.index].scrollIntoView({ block: "nearest" });
+    }
+    keydown(event) {
+      var _a;
+      if (!this.panel || this.panel.classList.contains("hidden")) return;
+      if (event.target.matches("select, input")) return;
+      const direction = { KeyW: -1, ArrowUp: -1, KeyS: 1, ArrowDown: 1 }[event.code];
+      if (!direction && event.code !== "Enter" && event.code !== "NumpadEnter")
+        return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      if (event.repeat) return;
+      if (direction) this.select(this.index + direction, true);
+      else (_a = this.buttons[this.index]) == null ? void 0 : _a.click();
+    }
+  };
   var $ = (id) => document.getElementById(id);
+  function onClick(ids, action) {
+    for (const id of ids) $(id).onclick = action;
+  }
+  function updateHUD(app2) {
+    var _a, _b;
+    const tutorial = (_a = app2.sim) == null ? void 0 : _a.tutorial;
+    const panel = $("tutorial");
+    panel.classList.toggle("hidden", !tutorial || app2.mode !== "playing");
+    if (tutorial) {
+      const hint = tutorial.hint;
+      $("tutorial-progress").textContent = `\u041E\u0411\u0423\u0427\u0415\u041D\u0418\u0415 ${hint.number} / ${hint.total}`;
+      $("tutorial-title").textContent = hint.title;
+      $("tutorial-text").textContent = hint.text;
+      $("tutorial-keys").textContent = tutorial.step === "move" ? ["W", "A", "S", "D"].map((key) => hint.directions.includes(key) ? key + " +" : key).join("   ") : "";
+    }
+    const s = app2.sim;
+    if (!s) return;
+    $("hud-number").textContent = app2.chapter.number + " /";
+    $("hud-title").textContent = app2.chapter.title;
+    $("hud-floor").textContent = `\u041B\u041E\u041A\u0410\u0426\u0418\u042F ${app2.floorIndex + 1} / ${app2.chapter.rooms.length} \xB7 ${((_b = s.room.design) == null ? void 0 : _b.title) ?? app2.profile.name}`;
+    $("hud-enemies").textContent = s.cleared ? "\u041F\u0415\u0420\u0418\u041C\u0415\u0422\u0420 \u0427\u0418\u0421\u0422" : `${s.total - s.kills} / ${s.total} \u041D\u0410 \u041F\u0415\u0420\u0418\u041C\u0415\u0422\u0420\u0415`;
+    $("hud-score").textContent = (app2.runScore + s.score).toLocaleString(
+      "ru-RU"
+    );
+    $("weapon-name").textContent = s.player.weapon.name.toUpperCase();
+    $("ammo").textContent = s.player.weapon.gun ? String(s.player.ammo).padStart(2, "0") : "";
+    $("context").textContent = s.context;
+    $("combo").classList.toggle(
+      "hidden",
+      s.combo < 2 || app2.mode !== "playing"
+    );
+    $("combo").textContent = s.combo + "x COMBO";
+  }
+  function renderChapters(app2) {
+    const list = $("chapter-list");
+    list.replaceChildren();
+    for (const chapter of CHAPTERS) {
+      const b = document.createElement("button"), best = app2.progress.best[chapter.index];
+      const num = document.createElement("span");
+      num.className = "number";
+      num.textContent = chapter.number;
+      const text2 = document.createElement("span"), strong = document.createElement("strong"), small = document.createElement("small");
+      strong.textContent = chapter.title;
+      small.textContent = chapter.rooms.length + " \u041B\u041E\u041A\u0410\u0426\u0418\u0418" + (chapter.index > app2.progress.unlocked ? " \xB7 \u0415\u0429\u0401 \u041D\u0415 \u041F\u0420\u041E\u0419\u0414\u0415\u041D\u0410" : "");
+      text2.append(strong, small);
+      b.append(num, text2);
+      if (best) {
+        const grade = document.createElement("span");
+        grade.className = "grade";
+        grade.textContent = best.grade;
+        b.append(grade);
+      }
+      b.addEventListener("click", () => app2.briefing(chapter.index));
+      list.append(b);
+    }
+  }
+  function bindUI(app2, saveProgress) {
+    app2.cheats = new CheatConsole(app2, saveProgress);
+    app2.menuNavigation = new MenuNavigation();
+    $("continue").textContent = app2.progress.unlocked ? "\u041F\u0420\u041E\u0414\u041E\u041B\u0416\u0418\u0422\u042C \u041F\u041E\u0411\u0415\u0413" : "\u041D\u0410\u0427\u0410\u0422\u042C \u041F\u041E\u0411\u0415\u0413";
+    $("continue").onclick = () => {
+      app2.audio.start();
+      app2.briefing(app2.progress.last ?? 0);
+    };
+    $("deploy").onclick = () => app2.start();
+    $("ending-button").onclick = () => app2.showEnding();
+    $("chapters-button").onclick = () => {
+      app2.mode = "chapters";
+      app2.renderChapters();
+      app2.overlay("chapter-panel");
+    };
+    for (const b of document.querySelectorAll(".back"))
+      b.onclick = () => app2.menu();
+    onClick(["pause-button", "resume"], () => app2.togglePause());
+    onClick(["restart", "retry"], () => app2.restart());
+    onClick(["to-menu", "death-menu", "result-menu"], () => app2.menu());
+    $("result-retry").onclick = () => {
+      app2.resetRun();
+      app2.load(app2.chapter.rooms[0]);
+    };
+    $("next").onclick = () => {
+      if (app2.chapter.index === CHAPTERS.length - 1) app2.menu();
+      else app2.briefing(app2.chapter.index + 1);
+    };
+    onClick(["settings-button", "pause-settings"], () => app2.showSettings());
+    $("settings-back").onclick = () => {
+      app2.mode = app2.settingsFrom;
+      if (app2.mode === "paused") app2.overlay("pause");
+      else app2.menu();
+    };
+    for (const [id, key] of [
+      ["sound-volume", "sound"],
+      ["music-volume", "music"]
+    ]) {
+      $(id).value = app2.settings[key];
+      $(id).oninput = () => {
+        app2.settings[key] = Number($(id).value);
+        app2.audio.start();
+        app2.applySettings();
+      };
+    }
+    for (const key of ["effects", "crt"]) {
+      $(key).checked = app2.settings[key];
+      $(key).onchange = () => {
+        app2.settings[key] = $(key).checked;
+        app2.applySettings();
+      };
+    }
+    $("fullscreen").onclick = () => {
+      var _a, _b, _c;
+      if (!document.fullscreenElement)
+        (_b = (_a = document.documentElement).requestFullscreen) == null ? void 0 : _b.call(_a);
+      else (_c = document.exitFullscreen) == null ? void 0 : _c.call(document);
+    };
+    window.addEventListener("blur", () => {
+      if (app2.mode === "playing") app2.togglePause();
+    });
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden && app2.mode === "playing") app2.togglePause();
+    });
+    touchInput(app2);
+  }
+  function touchInput(app2) {
+    const pad = $("move-pad"), stick = pad.querySelector("i");
+    let touch = null;
+    pad.onpointerdown = (e) => {
+      touch = e.pointerId;
+      pad.setPointerCapture(touch);
+      app2.audio.start();
+      update(e);
+    };
+    pad.onpointermove = (e) => {
+      if (e.pointerId === touch) update(e);
+    };
+    function update(e) {
+      const r = pad.getBoundingClientRect(), dx = (e.clientX - r.left - 60) / 45, dy = (e.clientY - r.top - 60) / 45, length = Math.max(1, Math.hypot(dx, dy));
+      app2.view.controls.moveX = dx / length;
+      app2.view.controls.moveY = dy / length;
+      stick.style.transform = `translate(${dx / length * 35}px,${dy / length * 35}px)`;
+    }
+    const end = () => {
+      touch = null;
+      app2.view.controls.moveX = 0;
+      app2.view.controls.moveY = 0;
+      stick.style.transform = "";
+    };
+    pad.onpointerup = end;
+    pad.onpointercancel = end;
+    for (const b of document.querySelectorAll("[data-action]")) {
+      b.onpointerdown = (e) => {
+        e.preventDefault();
+        b.setPointerCapture(e.pointerId);
+        const a = b.dataset.action;
+        if (a === "attack") app2.view.controls.attack = true;
+        else app2.view.pending[a] = true;
+      };
+      b.onpointerup = () => app2.view.controls.attack = false;
+      b.onpointercancel = () => app2.view.controls.attack = false;
+    }
+  }
+  var $2 = (id) => document.getElementById(id);
   var overlays = [
     "menu",
     "briefing",
@@ -3517,7 +3700,7 @@
     overlay(id) {
       var _a, _b, _c, _d;
       for (const name of overlays)
-        $(name).classList.toggle("hidden", name !== id);
+        $2(name).classList.toggle("hidden", name !== id);
       (_a = this.menuNavigation) == null ? void 0 : _a.show(id);
       if ((_b = this.view) == null ? void 0 : _b.input.keyboard)
         this.view.input.keyboard.enabled = ["playing", "paused", "dead"].includes(
@@ -3525,10 +3708,10 @@
         );
       (_d = (_c = this.view) == null ? void 0 : _c.input.keyboard) == null ? void 0 : _d.resetKeys();
       const playing = ["playing", "paused", "dead", "result"].includes(this.mode);
-      $("hud").classList.toggle("hidden", !playing);
-      if (id || this.mode !== "playing") $("tutorial").classList.add("hidden");
-      $("weapon-hud").classList.toggle("hidden", !playing);
-      $("touch-controls").classList.toggle(
+      $2("hud").classList.toggle("hidden", !playing);
+      if (id || this.mode !== "playing") $2("tutorial").classList.add("hidden");
+      $2("weapon-hud").classList.toggle("hidden", !playing);
+      $2("touch-controls").classList.toggle(
         "hidden",
         this.mode !== "playing" || !window.matchMedia("(pointer:coarse)").matches
       );
@@ -3539,23 +3722,23 @@
         const raw = await this.room("eeHideout");
         const sim = new Simulation(this.manifest, raw, PROFILES[0]);
         await view.setWorld(sim, true);
-        $("loading").classList.add("hidden");
+        $2("loading").classList.add("hidden");
         this.menu();
       } catch (error) {
         this.fail(error);
       }
     },
     fail(error) {
-      $("loading").classList.remove("hidden");
-      $("load-label").textContent = error.message;
+      $2("loading").classList.remove("hidden");
+      $2("load-label").textContent = error.message;
       console.error(error);
     },
     async load(id, carry = null, reuse = false) {
       this.mode = "loading";
       this.overlay(null);
-      $("loading").classList.remove("hidden");
-      $("load-label").textContent = "\u0417\u0430\u0433\u0440\u0443\u0437\u043A\u0430 " + id + "\u2026";
-      $("load-progress").style.width = "70%";
+      $2("loading").classList.remove("hidden");
+      $2("load-label").textContent = "\u0417\u0430\u0433\u0440\u0443\u0437\u043A\u0430 " + id + "\u2026";
+      $2("load-progress").style.width = "70%";
       try {
         const raw = await this.room(id);
         const sim = reuse && this.floorStates.has(id) ? this.floorStates.get(id) : new Simulation(this.manifest, raw, this.profile);
@@ -3587,7 +3770,7 @@
         this.sim = sim;
         this.mode = "playing";
         this.overlay(null);
-        $("loading").classList.add("hidden");
+        $2("loading").classList.add("hidden");
         this.audio.start();
         this.updateHUD();
         if (!sim.tutorial)
@@ -3602,25 +3785,28 @@
       this.chapter = CHAPTERS[index];
       this.mode = "briefing";
       this.overlay("briefing");
-      $("brief-number").textContent = "\u0413\u041B\u0410\u0412\u0410 " + this.chapter.number + " / \u041F\u041E\u0411\u0415\u0413 \u0418\u0417 \u0413\u041E\u0420\u041E\u0414\u0410";
-      $("brief-title").textContent = this.chapter.title;
-      $("brief-text").textContent = this.chapter.brief;
-      $("profile").disabled = index === 0;
-      if (index === 0) $("profile").value = PROFILES[0].id;
-      $("deploy").textContent = index === 0 ? "\u041D\u0410\u0427\u0410\u0422\u042C \u041E\u0411\u0423\u0427\u0415\u041D\u0418\u0415" : "\u041D\u0410\u0427\u0410\u0422\u042C \u0413\u041B\u0410\u0412\u0423";
+      $2("brief-number").textContent = "\u0413\u041B\u0410\u0412\u0410 " + this.chapter.number + " / \u041F\u041E\u0411\u0415\u0413 \u0418\u0417 \u0413\u041E\u0420\u041E\u0414\u0410";
+      $2("brief-title").textContent = this.chapter.title;
+      $2("brief-text").textContent = this.chapter.brief;
+      $2("profile").disabled = index === 0;
+      if (index === 0) $2("profile").value = PROFILES[0].id;
+      $2("deploy").textContent = index === 0 ? "\u041D\u0410\u0427\u0410\u0422\u042C \u041E\u0411\u0423\u0427\u0415\u041D\u0418\u0415" : "\u041D\u0410\u0427\u0410\u0422\u042C \u0413\u041B\u0410\u0412\u0423";
     },
     start() {
-      this.profile = PROFILES.find((p) => p.id === $("profile").value) ?? PROFILES[0];
+      this.profile = PROFILES.find((p) => p.id === $2("profile").value) ?? PROFILES[0];
       if (this.chapter.index === 0) this.profile = PROFILES[0];
-      this.floorIndex = 0;
-      this.runScore = 0;
-      this.runTime = 0;
+      this.resetRun();
       this.deaths = 0;
-      this.floorStates.clear();
-      this.checkpoints.clear();
       this.progress.last = this.chapter.index;
       save("emergency-exit-progress", this.progress);
       this.load(this.chapter.rooms[0]);
+    },
+    resetRun() {
+      this.floorIndex = 0;
+      this.runScore = 0;
+      this.runTime = 0;
+      this.floorStates.clear();
+      this.checkpoints.clear();
     },
     restart() {
       if (!this.sim) return;
@@ -3642,11 +3828,11 @@
       if (!endingUnlocked(this.progress) || this.ending) return false;
       this.mode = "ending";
       this.overlay(null);
-      $("combo").classList.add("hidden");
+      $2("combo").classList.add("hidden");
       clearTimeout(this.toastTimer);
-      $("toast").style.opacity = "0";
+      $2("toast").style.opacity = "0";
       this.ending = new EndingPlayer(
-        $("ending"),
+        $2("ending"),
         endingSprites(this.view.images, this.skins, this.manifest),
         this.audio,
         this.settings,
@@ -3660,12 +3846,12 @@
     menu() {
       this.mode = "menu";
       this.overlay("menu");
-      $("ending-button").hidden = !endingUnlocked(this.progress);
-      $("continue").textContent = this.progress.unlocked ? "\u041F\u0420\u041E\u0414\u041E\u041B\u0416\u0418\u0422\u042C \u041F\u041E\u0411\u0415\u0413" : "\u041D\u0410\u0427\u0410\u0422\u042C \u041F\u041E\u0411\u0415\u0413";
-      $("combo").classList.add("hidden");
+      $2("ending-button").hidden = !endingUnlocked(this.progress);
+      $2("continue").textContent = this.progress.unlocked ? "\u041F\u0420\u041E\u0414\u041E\u041B\u0416\u0418\u0422\u042C \u041F\u041E\u0411\u0415\u0413" : "\u041D\u0410\u0427\u0410\u0422\u042C \u041F\u041E\u0411\u0415\u0413";
+      $2("combo").classList.add("hidden");
       clearTimeout(this.toastTimer);
-      $("toast").style.opacity = "0";
-      $("toast").textContent = "";
+      $2("toast").style.opacity = "0";
+      $2("toast").textContent = "";
       if (this.view) this.view.preview = true;
       this.audio.active = true;
       this.renderChapters();
@@ -3675,7 +3861,7 @@
         this.mode = "dead";
         this.overlay("death");
         this.audio.active = false;
-        $("combo").classList.add("hidden");
+        $2("combo").classList.add("hidden");
       }
       if (event.type === "clear" && !this.sim.tutorial)
         this.toast("\u041F\u0415\u0420\u0418\u041C\u0415\u0422\u0420 \u0427\u0418\u0421\u0422 \xB7 \u041A \u0412\u042B\u0425\u041E\u0414\u0423");
@@ -3711,12 +3897,16 @@
       );
       this.mode = "result";
       this.overlay("result");
-      $("combo").classList.add("hidden");
-      const base = [...this.floorStates.values()].reduce((n, s) => n + s.total, 0) * 400, grade = this.runScore > base * 2.5 ? "A+" : this.runScore > base * 1.6 ? "A" : this.runScore > base ? "B" : "C";
-      $("result-score").textContent = this.runScore.toLocaleString("ru-RU");
-      $("result-time").textContent = this.runTime.toFixed(1) + "s";
-      $("result-grade").textContent = grade;
-      $("result-title").textContent = this.chapter.index === 15 ? "\u0413\u041E\u0420\u041E\u0414 \u041F\u041E\u0417\u0410\u0414\u0418." : "\u0427\u0418\u0421\u0422\u041E.";
+      $2("combo").classList.add("hidden");
+      const base = [...this.floorStates.values()].reduce(
+        (total, floor) => total + floor.total * 400,
+        0
+      );
+      const grade = gradeFor(this.runScore, base);
+      $2("result-score").textContent = this.runScore.toLocaleString("ru-RU");
+      $2("result-time").textContent = this.runTime.toFixed(1) + "s";
+      $2("result-grade").textContent = grade;
+      $2("result-title").textContent = this.chapter.index === 15 ? "\u0413\u041E\u0420\u041E\u0414 \u041F\u041E\u0417\u0410\u0414\u0418." : "\u0427\u0418\u0421\u0422\u041E.";
       this.progress.unlocked = Math.max(
         this.progress.unlocked,
         Math.min(CHAPTERS.length - 1, this.chapter.index + 1)
@@ -3728,71 +3918,23 @@
           grade,
           time: this.runTime
         };
-      save("emergency-exit-progress", this.progress);
       this.progress.last = Math.min(CHAPTERS.length - 1, this.chapter.index + 1);
       save("emergency-exit-progress", this.progress);
-      $("next").textContent = this.chapter.index === CHAPTERS.length - 1 ? "\u0417\u0410\u0412\u0415\u0420\u0428\u0418\u0422\u042C \u041F\u041E\u0411\u0415\u0413" : "\u0421\u041B\u0415\u0414\u0423\u042E\u0429\u0410\u042F \u0413\u041B\u0410\u0412\u0410";
+      $2("next").textContent = this.chapter.index === CHAPTERS.length - 1 ? "\u0417\u0410\u0412\u0415\u0420\u0428\u0418\u0422\u042C \u041F\u041E\u0411\u0415\u0413" : "\u0421\u041B\u0415\u0414\u0423\u042E\u0429\u0410\u042F \u0413\u041B\u0410\u0412\u0410";
       if (this.chapter.index === CHAPTERS.length - 1 && endingUnlocked(this.progress))
         this.showEnding();
     },
     updateHUD() {
-      var _a, _b;
-      const tutorial = (_a = this.sim) == null ? void 0 : _a.tutorial;
-      const panel = $("tutorial");
-      panel.classList.toggle("hidden", !tutorial || this.mode !== "playing");
-      if (tutorial) {
-        const hint = tutorial.hint;
-        $("tutorial-progress").textContent = `\u041E\u0411\u0423\u0427\u0415\u041D\u0418\u0415 ${hint.number} / ${hint.total}`;
-        $("tutorial-title").textContent = hint.title;
-        $("tutorial-text").textContent = hint.text;
-        $("tutorial-keys").textContent = tutorial.step === "move" ? ["W", "A", "S", "D"].map((key) => hint.directions.includes(key) ? key + " +" : key).join("   ") : "";
-      }
-      const s = this.sim;
-      if (!s) return;
-      $("hud-number").textContent = this.chapter.number + " /";
-      $("hud-title").textContent = this.chapter.title;
-      $("hud-floor").textContent = `\u041B\u041E\u041A\u0410\u0426\u0418\u042F ${this.floorIndex + 1} / ${this.chapter.rooms.length} \xB7 ${((_b = s.room.design) == null ? void 0 : _b.title) ?? this.profile.name}`;
-      $("hud-enemies").textContent = s.cleared ? "\u041F\u0415\u0420\u0418\u041C\u0415\u0422\u0420 \u0427\u0418\u0421\u0422" : `${s.total - s.kills} / ${s.total} \u041D\u0410 \u041F\u0415\u0420\u0418\u041C\u0415\u0422\u0420\u0415`;
-      $("hud-score").textContent = (this.runScore + s.score).toLocaleString(
-        "ru-RU"
-      );
-      $("weapon-name").textContent = s.player.weapon.name.toUpperCase();
-      $("ammo").textContent = s.player.weapon.gun ? String(s.player.ammo).padStart(2, "0") : "";
-      $("context").textContent = s.context;
-      $("combo").classList.toggle(
-        "hidden",
-        s.combo < 2 || this.mode !== "playing"
-      );
-      $("combo").textContent = s.combo + "x COMBO";
+      updateHUD(this);
     },
     toast(text2) {
-      $("toast").textContent = text2;
-      $("toast").style.opacity = "1";
+      $2("toast").textContent = text2;
+      $2("toast").style.opacity = "1";
       clearTimeout(this.toastTimer);
-      this.toastTimer = setTimeout(() => $("toast").style.opacity = "0", 2800);
+      this.toastTimer = setTimeout(() => $2("toast").style.opacity = "0", 2800);
     },
     renderChapters() {
-      const list = $("chapter-list");
-      list.replaceChildren();
-      for (const chapter of CHAPTERS) {
-        const b = document.createElement("button"), best = this.progress.best[chapter.index];
-        const num = document.createElement("span");
-        num.className = "number";
-        num.textContent = chapter.number;
-        const text2 = document.createElement("span"), strong = document.createElement("strong"), small = document.createElement("small");
-        strong.textContent = chapter.title;
-        small.textContent = chapter.rooms.length + " \u041B\u041E\u041A\u0410\u0426\u0418\u0418" + (chapter.index > this.progress.unlocked ? " \xB7 \u0415\u0429\u0401 \u041D\u0415 \u041F\u0420\u041E\u0419\u0414\u0415\u041D\u0410" : "");
-        text2.append(strong, small);
-        b.append(num, text2);
-        if (best) {
-          const grade = document.createElement("span");
-          grade.className = "grade";
-          grade.textContent = best.grade;
-          b.append(grade);
-        }
-        b.addEventListener("click", () => this.briefing(chapter.index));
-        list.append(b);
-      }
+      renderChapters(this);
     },
     settingsFrom: null,
     showSettings() {
@@ -3808,6 +3950,12 @@
       save("emergency-exit-settings", this.settings);
     }
   };
+  function gradeFor(score, base) {
+    if (score > base * 2.5) return "A+";
+    if (score > base * 1.6) return "A";
+    if (score > base) return "B";
+    return "C";
+  }
   async function boot() {
     try {
       [app.manifest, app.skins] = await Promise.all([
@@ -3820,10 +3968,10 @@
         const o = document.createElement("option");
         o.value = profile.id;
         o.textContent = profile.name + " \u2014 " + profile.tag;
-        $("profile").append(o);
+        $2("profile").append(o);
       }
       app.renderChapters();
-      $("load-progress").style.width = "35%";
+      $2("load-progress").style.width = "35%";
       const scene = new GameView();
       scene.app = app;
       app.game = new phaser_default.Game({
@@ -3843,7 +3991,7 @@
         input: { activePointers: 3 },
         fps: { target: 60, forceSetTimeOut: false }
       });
-      bindUI();
+      bindUI(app, () => save("emergency-exit-progress", app.progress));
       window.__GAME__ = {
         getState: () => {
           var _a;
@@ -3865,122 +4013,6 @@
       };
     } catch (error) {
       app.fail(error);
-    }
-  }
-  function bindUI() {
-    app.cheats = new CheatConsole(
-      app,
-      () => save("emergency-exit-progress", app.progress)
-    );
-    app.menuNavigation = new MenuNavigation();
-    $("continue").textContent = app.progress.unlocked ? "\u041F\u0420\u041E\u0414\u041E\u041B\u0416\u0418\u0422\u042C \u041F\u041E\u0411\u0415\u0413" : "\u041D\u0410\u0427\u0410\u0422\u042C \u041F\u041E\u0411\u0415\u0413";
-    $("continue").onclick = () => {
-      app.audio.start();
-      app.briefing(app.progress.last ?? 0);
-    };
-    $("deploy").onclick = () => app.start();
-    $("ending-button").onclick = () => app.showEnding();
-    $("chapters-button").onclick = () => {
-      app.mode = "chapters";
-      app.renderChapters();
-      app.overlay("chapter-panel");
-    };
-    for (const b of document.querySelectorAll(".back"))
-      b.onclick = () => app.menu();
-    $("pause-button").onclick = () => app.togglePause();
-    $("resume").onclick = () => app.togglePause();
-    $("restart").onclick = () => app.restart();
-    for (const id of ["to-menu", "death-menu", "result-menu"])
-      $(id).onclick = () => app.menu();
-    $("retry").onclick = () => app.restart();
-    $("result-retry").onclick = () => {
-      app.runScore = 0;
-      app.runTime = 0;
-      app.floorIndex = 0;
-      app.floorStates.clear();
-      app.checkpoints.clear();
-      app.load(app.chapter.rooms[0]);
-    };
-    $("next").onclick = () => {
-      if (app.chapter.index === CHAPTERS.length - 1) app.menu();
-      else app.briefing(app.chapter.index + 1);
-    };
-    $("settings-button").onclick = () => app.showSettings();
-    $("pause-settings").onclick = () => app.showSettings();
-    $("settings-back").onclick = () => {
-      app.mode = app.settingsFrom;
-      if (app.mode === "paused") app.overlay("pause");
-      else app.menu();
-    };
-    for (const [id, key] of [
-      ["sound-volume", "sound"],
-      ["music-volume", "music"]
-    ]) {
-      $(id).value = app.settings[key];
-      $(id).oninput = () => {
-        app.settings[key] = Number($(id).value);
-        app.audio.start();
-        app.applySettings();
-      };
-    }
-    for (const key of ["effects", "crt"]) {
-      $(key).checked = app.settings[key];
-      $(key).onchange = () => {
-        app.settings[key] = $(key).checked;
-        app.applySettings();
-      };
-    }
-    $("fullscreen").onclick = () => {
-      var _a, _b, _c;
-      if (!document.fullscreenElement)
-        (_b = (_a = document.documentElement).requestFullscreen) == null ? void 0 : _b.call(_a);
-      else (_c = document.exitFullscreen) == null ? void 0 : _c.call(document);
-    };
-    window.addEventListener("blur", () => {
-      if (app.mode === "playing") app.togglePause();
-    });
-    document.addEventListener("visibilitychange", () => {
-      if (document.hidden && app.mode === "playing") app.togglePause();
-    });
-    touchInput();
-  }
-  function touchInput() {
-    const pad = $("move-pad"), stick = pad.querySelector("i");
-    let touch = null;
-    pad.onpointerdown = (e) => {
-      touch = e.pointerId;
-      pad.setPointerCapture(touch);
-      app.audio.start();
-      update(e);
-    };
-    pad.onpointermove = (e) => {
-      if (e.pointerId === touch) update(e);
-    };
-    function update(e) {
-      const r = pad.getBoundingClientRect(), dx = (e.clientX - r.left - 60) / 45, dy = (e.clientY - r.top - 60) / 45, length = Math.max(1, Math.hypot(dx, dy));
-      app.view.controls.moveX = dx / length;
-      app.view.controls.moveY = dy / length;
-      stick.style.transform = `translate(${dx / length * 35}px,${dy / length * 35}px)`;
-    }
-    const end = () => {
-      touch = null;
-      app.view.controls.moveX = 0;
-      app.view.controls.moveY = 0;
-      stick.style.transform = "";
-    };
-    pad.onpointerup = end;
-    pad.onpointercancel = end;
-    for (const b of document.querySelectorAll("[data-action]")) {
-      b.onpointerdown = (e) => {
-        e.preventDefault();
-        b.setPointerCapture(e.pointerId);
-        const a = b.dataset.action;
-        if (a === "attack") app.view.controls.attack = true;
-        else app.view.pending[a] = true;
-        if (a === "pickup") app.view.pending.pickup = true;
-      };
-      b.onpointerup = () => app.view.controls.attack = false;
-      b.onpointercancel = () => app.view.controls.attack = false;
     }
   }
   boot();

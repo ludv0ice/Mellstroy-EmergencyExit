@@ -23,7 +23,8 @@ assets/
   manifest.json   описание ресурсов
   data.js         подготовленные JSON-данные для локального запуска
 src/
-  main.js         экраны, запуск и переходы между уровнями
+  main.js         запуск, состояние игры и переходы между уровнями
+  ui.js           кнопки, HUD, список глав и сенсорное управление
   simulation.js   движение, столкновения и бой
   renderer.js     отрисовка и ввод
   tutorial.js     задания обучения
@@ -124,7 +125,7 @@ npm run build
 npm run check:assets
 ```
 
-`npm run build` обновляет `index.html`, `src/game.js`, `assets/data.js`, копию Phaser и `dist/`. Для изменения логики редактируйте модули в `src/`; для изменения уровней — JSON в `assets/rooms/`.
+`npm run build` обновляет `index.html`, `src/game.js`, `assets/data.js`, копию Phaser и `dist/`. Для изменения логики редактируйте модули в `src/`; для изменения уровней — JSON в `assets/rooms/`. Краткий путеводитель по коду и настройкам — в [docs/CODE.md](docs/CODE.md).
 
 Для разработки: `npm run dev`, затем `http://127.0.0.1:5173/src/index.html`. Для проверки веб-сборки: `npm run preview`.
 
