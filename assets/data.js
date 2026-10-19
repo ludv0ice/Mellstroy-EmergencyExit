@@ -84,6 +84,22 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
         ],
         "originX": 30,
         "originY": 30
+      },
+      "endingCar": {
+        "url": "/assets/custom/escape-car.png",
+        "width": 107,
+        "height": 70,
+        "frames": 13,
+        "originX": 53,
+        "originY": 46
+      },
+      "heroDetonator": {
+        "url": "/assets/custom/mellstroy-detonator.png",
+        "width": 60,
+        "height": 60,
+        "frames": 4,
+        "originX": 30,
+        "originY": 30
       }
     },
     "/assets/manifest.json": {

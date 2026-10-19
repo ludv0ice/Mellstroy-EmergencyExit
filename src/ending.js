@@ -1,10 +1,27 @@
 import { drawEnding } from './ending-art.js';
 import { ENDING, endingCaption, endingPhase } from './ending-sequence.js';
 
+export function endingSprites(images, skins, manifest) {
+  const custom = (name) => ({
+    ...skins[name],
+    image: images.get('custom-' + name),
+  });
+  const original = (name) => ({
+    ...manifest.sprites[name],
+    image: images.get(name),
+  });
+  return {
+    hero: custom('heroDirectional'),
+    detonator: custom('heroDetonator'),
+    car: custom('endingCar'),
+    traffic: ['sprBossCar1', 'sprBossCar2', 'sprCopCar'].map(original),
+  };
+}
+
 export class EndingPlayer {
-  constructor(root, image, audio, settings, onClose) {
+  constructor(root, sprites, audio, settings, onClose) {
     this.root = root;
-    this.image = image;
+    this.sprites = sprites;
     this.audio = audio;
     this.settings = settings;
     this.onClose = onClose;
@@ -90,7 +107,7 @@ export class EndingPlayer {
     const effects =
       this.settings.effects &&
       !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    drawEnding(this.ctx, this.time, this.image, effects);
+    drawEnding(this.ctx, this.time, this.sprites, effects);
     const phase = endingPhase(this.time);
     if (phase !== this.phase) {
       this.phase = phase;

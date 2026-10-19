@@ -234,7 +234,6 @@ test('All retained textures, sounds and fonts remain byte-identical to the origi
     readFileSync(new URL('./fixtures/campaign-baseline.json', import.meta.url)),
   );
   const removed = new Set([
-    '/assets/custom/escape-car.png',
     '/assets/original/sprPlayerCar.png',
     '/assets/audio/sndCarOpen.wav',
     '/assets/audio/sndCarEngine.wav',

@@ -138,6 +138,20 @@ try {
     await evaluate("document.body.classList.contains('ending-active')"),
     true,
   );
+  assert.ok(
+    await evaluate(
+      "window.__QA_APP__.ending.sprites.car.image.currentSrc.endsWith('/assets/custom/escape-car.png')",
+    ),
+  );
+  assert.equal(
+    await evaluate('window.__QA_APP__.ending.sprites.car.frames'),
+    13,
+  );
+  assert.equal(
+    await evaluate('window.__QA_APP__.ending.sprites.detonator.frames'),
+    4,
+  );
+  const drivingFrames = [];
   const frames = [
     [3.5, 'walk-out'],
     [7.8, 'detonator'],
@@ -146,6 +160,9 @@ try {
     [19.8, 'boarding'],
     [23, 'departure'],
     [28.5, 'highway'],
+    [30, 'overtake-left'],
+    [33, 'overtake-center'],
+    [36.5, 'overtake-right'],
     [45, 'authors'],
     [83, 'finished'],
   ];
@@ -153,9 +170,25 @@ try {
     await evaluate(
       `(()=>{const e=window.__QA_APP__.ending;e.advance(${time}-e.time);e.render();return true})()`,
     );
+    if (name.startsWith('overtake-')) {
+      const geometry = await evaluate(`(()=>{
+        const e=window.__QA_APP__.ending,ctx=e.ctx,draw=ctx.drawImage,trace={traffic:0};
+        ctx.drawImage=function(image,...args){
+          if(image===e.sprites.car.image){const transform=this.getTransform();trace.player={x:transform.e,y:transform.f,vertical:transform.b};}
+          if(e.sprites.traffic.some(asset=>asset.image===image))trace.traffic++;
+          return draw.call(this,image,...args);
+        };
+        try{e.render()}finally{ctx.drawImage=draw}
+        return trace;
+      })()`);
+      assert.ok(geometry.player.vertical < -0.7);
+      assert.ok(geometry.traffic >= 2);
+      drivingFrames.push(Math.round(geometry.player.x));
+    }
     await screenshot(name);
     assert.equal(await evaluate('window.__GAME__.mode'), 'ending');
   }
+  assert.deepEqual(drivingFrames, [88, 188, 288]);
   assert.deepEqual(await evaluate('window.__QA_APP__.__cues'), [
     'door',
     'detonator',
@@ -253,6 +286,10 @@ try {
     storyCuesOnce: true,
     authorsVisible: true,
     highwayMusic: true,
+    topDownTraffic: true,
+    laneChanges: drivingFrames,
+    restoredCar: true,
+    detonatorSprites: true,
     musicRms: renderedMusic.rms,
     musicPeak: renderedMusic.peak,
     realAnimationFrames: true,

@@ -64,3 +64,47 @@ test('Final credits contain both requested author names and nicknames', () => {
     'Maksim Barbolin (Macan PRIME67)',
   ]);
 });
+
+test('The overhead drive changes lanes, overtakes traffic and remains collision free through repeated loops', async () => {
+  const { endingDriveFrame } = await import('../src/ending-drive.js');
+  const lanes = new Set();
+  let passes = 0;
+  let previous = endingDriveFrame(ENDING.highway);
+  for (let elapsed = 0.05; elapsed <= 180; elapsed += 0.05) {
+    const current = endingDriveFrame(ENDING.highway + elapsed);
+    if ([88, 188, 288].includes(current.player.x)) lanes.add(current.player.x);
+    assert.ok(current.player.x >= 88 && current.player.x <= 288);
+    assert.ok(Math.abs(current.player.angle + Math.PI / 2) < 0.3);
+    for (const car of current.traffic) {
+      assert.ok(
+        Math.abs(car.x - current.player.x) >= 56 ||
+          Math.abs(car.y - current.player.y) >= 85,
+        `Collision at ${elapsed}: ${JSON.stringify({ player: current.player, car })}`,
+      );
+      const old = previous.traffic.find((vehicle) => vehicle.id === car.id);
+      if (old) {
+        assert.ok(car.y > old.y);
+        if (old.y < current.player.y && car.y >= current.player.y) passes++;
+      }
+    }
+    for (let a = 0; a < current.traffic.length; a++)
+      for (let b = a + 1; b < current.traffic.length; b++) {
+        const first = current.traffic[a],
+          second = current.traffic[b];
+        assert.ok(
+          first.lane !== second.lane || Math.abs(first.y - second.y) > 85,
+        );
+      }
+    previous = current;
+  }
+  assert.equal(lanes.size, 3);
+  assert.ok(
+    passes >= 110,
+    'Expected continuous overtaking throughout the credits',
+  );
+});
+
+test('Separate detonator frames follow the hold, raise, press and release cues', async () => {
+  const { detonatorFrame } = await import('../src/ending-sequence.js');
+  assert.deepEqual([3, 6.5, 7.8, 9].map(detonatorFrame), [0, 1, 2, 3]);
+});

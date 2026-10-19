@@ -8,7 +8,7 @@ import { CHAPTERS, PROFILES } from './campaign.js';
 import { AudioEngine } from './audio.js';
 import { connectsTo } from './rooms.js';
 import { readJson } from './assets.js';
-import { EndingPlayer } from './ending.js';
+import { EndingPlayer, endingSprites } from './ending.js';
 import { CheatConsole } from './cheats.js';
 import { endingUnlocked } from './ending-sequence.js';
 
@@ -203,7 +203,7 @@ const app = {
     $('toast').style.opacity = '0';
     this.ending = new EndingPlayer(
       $('ending'),
-      this.view.images.get('custom-heroDirectional'),
+      endingSprites(this.view.images, this.skins, this.manifest),
       this.audio,
       this.settings,
       () => {

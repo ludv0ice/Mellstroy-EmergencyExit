@@ -529,6 +529,9 @@
         "sprBloodSplat",
         "sprBullet",
         "sprDogWalk",
+        "sprBossCar1",
+        "sprBossCar2",
+        "sprCopCar",
         "sprDogDeadBlunt",
         "sprDogAttack",
         "sprPBackMachinegun",
@@ -2645,6 +2648,11 @@
     if (time < ENDING.credits) return "highway";
     return time < ENDING.finished ? "credits" : "finished";
   }
+  function detonatorFrame(time) {
+    if (time < ENDING.detonator) return 0;
+    if (time < 7.7) return 1;
+    return time < 8.1 ? 2 : 3;
+  }
   function endingCaption(time) {
     const phase = endingPhase(time);
     if (phase === "establish") return "\u041F\u043E\u043B\u0438\u0446\u0435\u0439\u0441\u043A\u0438\u0439 \u0443\u0447\u0430\u0441\u0442\u043E\u043A. \u041F\u043E\u0441\u043B\u0435\u0434\u043D\u044F\u044F \u043D\u043E\u0447\u044C.";
@@ -2655,7 +2663,77 @@
     if (phase === "approach" || phase === "boarding")
       return "\u041C\u0435\u043B\u043B\u0441\u0442\u0440\u043E\u0439 \u0441\u0430\u0434\u0438\u0442\u0441\u044F \u0432 \u043C\u0430\u0448\u0438\u043D\u0443.";
     if (phase === "departure") return "\u041C\u0430\u0448\u0438\u043D\u0430 \u0443\u0435\u0437\u0436\u0430\u0435\u0442 \u043E\u0442 \u0440\u0430\u0437\u0440\u0443\u0448\u0435\u043D\u043D\u043E\u0433\u043E \u0443\u0447\u0430\u0441\u0442\u043A\u0430.";
-    return phase === "finished" ? "\u041A\u043E\u043D\u0435\u0446. \u0421\u043F\u0430\u0441\u0438\u0431\u043E \u0437\u0430 \u0438\u0433\u0440\u0443." : "\u041D\u043E\u0447\u043D\u0430\u044F \u0442\u0440\u0430\u0441\u0441\u0430. \u041C\u0443\u0437\u044B\u043A\u0430 \u0438 \u0444\u0438\u043D\u0430\u043B\u044C\u043D\u044B\u0435 \u0442\u0438\u0442\u0440\u044B.";
+    return phase === "finished" ? "\u041A\u043E\u043D\u0435\u0446. \u0421\u043F\u0430\u0441\u0438\u0431\u043E \u0437\u0430 \u0438\u0433\u0440\u0443." : "\u0412\u0438\u0434 \u0441\u0432\u0435\u0440\u0445\u0443: \u043C\u0430\u0448\u0438\u043D\u0430 \u043E\u0431\u0433\u043E\u043D\u044F\u0435\u0442 \u0442\u0440\u0430\u0444\u0438\u043A \u043D\u0430 \u043D\u043E\u0447\u043D\u043E\u0439 \u0442\u0440\u0430\u0441\u0441\u0435. \u041C\u0443\u0437\u044B\u043A\u0430 \u0438 \u0444\u0438\u043D\u0430\u043B\u044C\u043D\u044B\u0435 \u0442\u0438\u0442\u0440\u044B.";
+  }
+  var LANES = [88, 188, 288];
+  var CYCLE = 18;
+  var TRAFFIC = [
+    [0, 0.5],
+    [2, 0.5],
+    [1, 4],
+    [2, 4],
+    [2, 7.5],
+    [0, 8],
+    [1, 11],
+    [0, 11],
+    [2, 15],
+    [0, 15.5],
+    [0, 17.5],
+    [2, 17.5]
+  ];
+  var ROUTE = [
+    [0, 1],
+    [2, 1],
+    [3, 0],
+    [6, 0],
+    [7, 1],
+    [9, 1],
+    [10, 2],
+    [13, 2],
+    [14, 1],
+    [18, 1]
+  ];
+  function lanePosition(time) {
+    const phase = (time % CYCLE + CYCLE) % CYCLE;
+    for (let i = 1; i < ROUTE.length; i++) {
+      const [end, lane] = ROUTE[i];
+      if (phase > end) continue;
+      const [start, previous] = ROUTE[i - 1];
+      const fraction = (phase - start) / (end - start);
+      const smooth2 = fraction * fraction * (3 - 2 * fraction);
+      return LANES[previous] + (LANES[lane] - LANES[previous]) * smooth2;
+    }
+    return LANES[1];
+  }
+  function endingDriveFrame(time) {
+    const drive = Math.max(0, time - ENDING.highway);
+    const traffic = [];
+    for (let index = 0; index < TRAFFIC.length; index++) {
+      const [lane, encounter] = TRAFFIC[index];
+      const cycle = Math.floor((drive - encounter) / CYCLE);
+      for (let offset = 0; offset <= 1; offset++) {
+        const passage = (cycle + offset) * CYCLE + encounter;
+        const y = 252 + (drive - passage) * 92;
+        if (y > -90 && y < 450)
+          traffic.push({
+            id: `${index}:${cycle + offset}`,
+            lane,
+            x: LANES[lane],
+            y,
+            type: index % 3
+          });
+      }
+    }
+    const velocityX = (lanePosition(drive + 0.025) - lanePosition(drive - 0.025)) / 0.05;
+    return {
+      player: {
+        x: lanePosition(drive),
+        y: 252,
+        angle: -Math.PI / 2 + Math.atan2(velocityX, 580)
+      },
+      traffic,
+      roadOffset: drive * 480 % 64
+    };
   }
   var limit = (value) => Math.max(0, Math.min(1, value));
   var blend = (a, b, fraction) => a + (b - a) * limit(fraction);
@@ -2846,70 +2924,81 @@
       ctx.fillRect(0, 0, 640, 360);
     }
   }
-  function sedan(ctx, x, y, door = 0, occupied = false) {
+  function sprite(ctx, asset, frame, x, y, angle = 0, scale = 1) {
     ctx.save();
     ctx.translate(Math.round(x), Math.round(y));
-    rectangle(ctx, "#080e18", -59, 14, 119, 9);
-    for (const wheel of [-36, 37]) {
-      rectangle(ctx, "#060c14", wheel - 8, 4, 16, 18);
-      rectangle(ctx, "#6e7c83", wheel - 4, 10, 8, 7);
-    }
-    polygon(ctx, "#101d2b", [
-      [-61, 5],
-      [-56, -8],
-      [-30, -12],
-      [-17, -31],
-      [26, -31],
-      [44, -12],
-      [60, -8],
-      [65, 10],
-      [53, 17],
-      [-53, 17]
-    ]);
-    polygon(ctx, "#264452", [
-      [-27, -12],
-      [-13, -27],
-      [22, -27],
-      [36, -12]
-    ]);
-    rectangle(ctx, "#121d2a", 3, -26, 4, 17);
-    if (occupied) {
-      rectangle(ctx, "#9e795e", 15, -23, 5, 5);
-      rectangle(ctx, "#111b26", 14, -18, 8, 6);
-    }
-    rectangle(ctx, "#4d6572", -55, -6, 112, 2);
-    rectangle(ctx, "#31404e", -54, 12, 112, 3);
-    rectangle(ctx, "#abb8b1", 54, -4, 8, 6);
-    rectangle(ctx, "#e64b61", -59, -3, 6, 7);
-    rectangle(ctx, "#b4b8ac", 16, -4, 7, 2);
-    if (door > 0) {
-      polygon(ctx, "#2c4352", [
-        [-20, -10],
-        [16, -10],
-        [16 - door * 18, 18 + door * 8],
-        [-20 - door * 12, 12 + door * 6]
-      ]);
-      rectangle(ctx, "#718c92", -17 - door * 8, -6, 25, 3);
-    }
+    ctx.rotate(angle);
+    ctx.scale(scale, scale);
+    ctx.drawImage(
+      asset.image,
+      frame * asset.width,
+      0,
+      asset.width,
+      asset.height,
+      -asset.originX,
+      -asset.originY,
+      asset.width,
+      asset.height
+    );
     ctx.restore();
   }
-  function hero(ctx, image, x, y, walking, direction, time, detonator) {
+  function hero(ctx, assets, x, y, walking, direction, time, detonator) {
     ctx.save();
     ctx.translate(Math.round(x), Math.round(y));
     const frame = walking ? Math.floor(time * 8) % 8 : 0;
     const row = direction === "left" ? 2 : 0;
-    ctx.drawImage(image, frame * 60, row * 60, 60, 60, -39, -58, 78, 78);
     if (detonator) {
-      rectangle(ctx, "#b58b70", 9, -18, 9, 4);
-      rectangle(ctx, "#161e2b", 14, -28, 9, 13);
-      rectangle(ctx, "#8b9da3", 16, -25, 5, 5);
-      rectangle(ctx, time >= 7.7 ? "#ffdaa0" : "#ef5166", 17, -28, 4, 3);
-      rectangle(ctx, "#778e98", 18, -35, 1, 7);
-      if (time >= 7.5 && time < 8.2) rectangle(ctx, "#c49d7d", 12, -29, 7, 3);
-    }
+      const pose = detonatorFrame(time);
+      if (walking) {
+        ctx.drawImage(
+          assets.detonator.image,
+          pose * 60,
+          0,
+          60,
+          35,
+          -39,
+          -58,
+          78,
+          45.5
+        );
+        ctx.drawImage(
+          assets.hero.image,
+          frame * 60,
+          row * 60 + 35,
+          60,
+          25,
+          -39,
+          -12.5,
+          78,
+          32.5
+        );
+      } else
+        ctx.drawImage(
+          assets.detonator.image,
+          pose * 60,
+          0,
+          60,
+          60,
+          -39,
+          -58,
+          78,
+          78
+        );
+    } else
+      ctx.drawImage(
+        assets.hero.image,
+        frame * 60,
+        row * 60,
+        60,
+        60,
+        -39,
+        -58,
+        78,
+        78
+      );
     ctx.restore();
   }
-  function street(ctx, time, image, effects) {
+  function street(ctx, time, assets, effects) {
     nightSky(ctx, time);
     rectangle(ctx, "#293747", 0, 251, 640, 23);
     rectangle(ctx, "#43505b", 0, 270, 640, 5);
@@ -2940,7 +3029,7 @@
       ctx.globalAlpha = time < 19.6 ? 1 : 1 - limit((time - 19.6) / 0.6);
       hero(
         ctx,
-        image,
+        assets,
         x,
         y,
         time >= 2 && time < 6 || time >= 15 && time < 19,
@@ -2950,119 +3039,69 @@
       );
       ctx.globalAlpha = 1;
     }
-    sedan(
-      ctx,
-      carX,
-      308,
-      time >= 19 && time < 20.9 ? Math.sin(limit((time - 19) / 1.9) * Math.PI) : 0,
-      time >= 20.2
-    );
+    const carFrame = time >= 19 && time < 20.9 ? Math.min(12, Math.floor((time - 19) * 7)) : 0;
+    sprite(ctx, assets.car, carFrame, carX, 308, 0, 1.08);
     if (time < 2.8) {
       ctx.globalAlpha = Math.min(1, time) * (1 - limit((time - 2) / 0.8));
       text(ctx, "\u041F\u041E\u0421\u041B\u0415\u0414\u041D\u0418\u0419 \u0412\u042B\u0425\u041E\u0414", 320, 315, 19, "#c9dce0");
       ctx.globalAlpha = 1;
     }
   }
-  function rearCar(ctx, x, y, time) {
-    ctx.save();
-    ctx.translate(Math.round(x), Math.round(y + Math.sin(time * 8) * 0.4));
-    ctx.fillStyle = "#07101c88";
+  function highwayCar(ctx, asset, x, y, angle, scale) {
+    ctx.fillStyle = "#0007";
     ctx.beginPath();
-    ctx.ellipse(0, 23, 42, 8, 0, 0, Math.PI * 2);
+    ctx.ellipse(x + 3, y + 5, 21, 42, 0, 0, Math.PI * 2);
     ctx.fill();
-    polygon(ctx, "#152431", [
-      [-31, 13],
-      [-27, -23],
-      [-18, -41],
-      [18, -41],
-      [27, -23],
-      [31, 13]
-    ]);
-    polygon(ctx, "#7495a1", [
-      [-23, -22],
-      [-16, -35],
-      [16, -35],
-      [23, -22]
-    ]);
-    rectangle(ctx, "#263e4b", -25, -17, 50, 22);
-    rectangle(ctx, "#4a626e", -29, 5, 58, 3);
-    rectangle(ctx, "#f15c72", -29, 9, 17, 5);
-    rectangle(ctx, "#f15c72", 12, 9, 17, 5);
-    rectangle(ctx, "#d8d9c7", -8, 12, 16, 4);
-    rectangle(ctx, "#060c15", -31, 16, 7, 8);
-    rectangle(ctx, "#060c15", 24, 16, 7, 8);
-    ctx.restore();
+    const beam = ctx.createLinearGradient(x, y - 100, x, y - 20);
+    beam.addColorStop(0, "#aec8b900");
+    beam.addColorStop(1, "#aec8b92c");
+    ctx.fillStyle = beam;
+    ctx.beginPath();
+    ctx.moveTo(x - 13, y - 25);
+    ctx.lineTo(x - 32, y - 105);
+    ctx.lineTo(x + 32, y - 105);
+    ctx.lineTo(x + 13, y - 25);
+    ctx.fill();
+    sprite(ctx, asset, 0, x, y, angle, scale);
   }
-  function highway(ctx, time) {
+  function highway(ctx, time, assets) {
     const drive = time - ENDING.highway;
-    nightSky(ctx, time);
-    const horizon = 135;
-    const vanishing = 239 + Math.sin(drive * 0.08) * 13;
-    polygon(ctx, "#242d43", [
-      [0, 135],
-      [0, 115],
-      [63, 84],
-      [118, 121],
-      [192, 91],
-      [251, 136],
-      [352, 105],
-      [442, 130],
-      [521, 93],
-      [640, 126],
-      [640, 195],
-      [0, 195]
-    ]);
-    rectangle(ctx, "#131f31", 0, horizon, 640, 225);
-    polygon(ctx, "#292f3f", [
-      [vanishing - 4, horizon],
-      [vanishing + 4, horizon],
-      [500, 360],
-      [-110, 360]
-    ]);
-    polygon(ctx, "#777c82", [
-      [vanishing - 5, horizon],
-      [vanishing - 4, horizon],
-      [-106, 360],
-      [-112, 360]
-    ]);
-    polygon(ctx, "#777c82", [
-      [vanishing + 4, horizon],
-      [vanishing + 5, horizon],
-      [504, 360],
-      [498, 360]
-    ]);
-    for (let i = 0; i < 17; i++) {
-      const depth = ((i / 17 + drive * 0.22) % 1) ** 2;
-      const y = horizon + depth * 238;
-      const center = blend(vanishing, 198, depth);
-      const width = 1 + depth * 4;
-      rectangle(ctx, "#c3b48b", center - width / 2, y, width, 1 + depth * 20);
-      const side = 8 + depth * 294;
-      rectangle(ctx, "#9ca7aa", center - side, y, 1 + depth * 3, 2 + depth * 24);
-      rectangle(ctx, "#9ca7aa", center + side, y, 1 + depth * 3, 2 + depth * 24);
+    const frame = endingDriveFrame(time);
+    rectangle(ctx, "#14262c", 0, 0, 640, 360);
+    for (let i = 0; i < 40; i++) {
+      const x = i % 2 ? 360 + random(i + 700) * 280 : random(i + 700) * 28 - 12;
+      const y = (random(i + 730) * 500 + drive * 260) % 500 - 70;
+      rectangle(ctx, "#1c3639", x, y, 18 + random(i) * 22, 42);
+      rectangle(ctx, "#10242c", x + 3, y + 5, 14 + random(i) * 16, 24);
     }
-    for (let side = -1; side <= 1; side += 2) {
-      for (let i = 0; i < 8; i++) {
-        const depth = ((i / 8 + drive * 0.06) % 1) ** 2;
-        const x = vanishing + side * (22 + depth * 330);
-        const y = horizon + depth * 210;
-        rectangle(ctx, "#536474", x, y - depth * 130, 1 + depth * 3, depth * 130);
-        rectangle(
-          ctx,
-          "#dcb78b",
-          x - (side > 0 ? depth * 14 : 0),
-          y - depth * 130,
-          4 + depth * 11,
-          2
-        );
-      }
+    rectangle(ctx, "#2b343f", 38, 0, 300, 360);
+    rectangle(ctx, "#727b7b", 31, 0, 5, 360);
+    rectangle(ctx, "#727b7b", 340, 0, 5, 360);
+    rectangle(ctx, "#e2d4a2", 41, 0, 2, 360);
+    rectangle(ctx, "#e2d4a2", 333, 0, 2, 360);
+    for (let y = frame.roadOffset - 64; y < 360; y += 64) {
+      rectangle(ctx, "#c2c9c6", 137, y, 2, 29);
+      rectangle(ctx, "#c2c9c6", 237, y, 2, 29);
+      rectangle(ctx, "#a6b2b0", 22, y, 4, 15);
+      rectangle(ctx, "#a6b2b0", 350, y, 4, 15);
+      rectangle(ctx, "#f4c78b", 22, y, 3, 3);
+      rectangle(ctx, "#f4c78b", 351, y, 3, 3);
     }
-    const glow = ctx.createRadialGradient(237, 230, 0, 237, 230, 90);
-    glow.addColorStop(0, "#bad8c22a");
-    glow.addColorStop(1, "#bad8c200");
-    ctx.fillStyle = glow;
-    ctx.fillRect(140, 140, 190, 180);
-    rearCar(ctx, 258 + Math.sin(drive * 0.15) * 5, 289, time);
+    for (let i = 0; i < 28; i++) {
+      const x = 48 + random(i + 900) * 278;
+      const y = (random(i + 901) * 440 + drive * 480) % 440 - 40;
+      rectangle(ctx, "#34414d", x, y, 1, 5 + random(i) * 17);
+    }
+    for (const car of frame.traffic)
+      highwayCar(ctx, assets.traffic[car.type], car.x, car.y, -Math.PI / 2, 0.7);
+    highwayCar(
+      ctx,
+      assets.car,
+      frame.player.x,
+      frame.player.y,
+      frame.player.angle,
+      0.74
+    );
     if (time >= ENDING.credits) {
       const shade = ctx.createLinearGradient(306, 0, 640, 0);
       shade.addColorStop(0, "#0a122000");
@@ -3091,7 +3130,7 @@
       }
     }
   }
-  function drawEnding(ctx, time, image, effects = true) {
+  function drawEnding(ctx, time, assets, effects = true) {
     ctx.save();
     ctx.imageSmoothingEnabled = false;
     ctx.fillStyle = "#080d18";
@@ -3102,9 +3141,9 @@
       ctx.translate(320, 180);
       ctx.scale(closeup, closeup);
       ctx.translate(-320, -(180 + (closeup - 1) * 40));
-      street(ctx, time, image, effects);
+      street(ctx, time, assets, effects);
       ctx.restore();
-    } else highway(ctx, time);
+    } else highway(ctx, time, assets);
     const fadeIn = 1 - limit(time / 1.2);
     const fadeOut = time < ENDING.highway ? limit((time - 24.8) / 1.2) : 1 - limit((time - ENDING.highway) / 1.2);
     ctx.fillStyle = `rgba(4,8,16,${Math.max(fadeIn, fadeOut)})`;
@@ -3113,10 +3152,26 @@
     rectangle(ctx, "#050a12", 0, 341, 640, 19);
     ctx.restore();
   }
+  function endingSprites(images, skins, manifest) {
+    const custom = (name) => ({
+      ...skins[name],
+      image: images.get("custom-" + name)
+    });
+    const original = (name) => ({
+      ...manifest.sprites[name],
+      image: images.get(name)
+    });
+    return {
+      hero: custom("heroDirectional"),
+      detonator: custom("heroDetonator"),
+      car: custom("endingCar"),
+      traffic: ["sprBossCar1", "sprBossCar2", "sprCopCar"].map(original)
+    };
+  }
   var EndingPlayer = class {
-    constructor(root, image, audio, settings, onClose) {
+    constructor(root, sprites, audio, settings, onClose) {
       this.root = root;
-      this.image = image;
+      this.sprites = sprites;
       this.audio = audio;
       this.settings = settings;
       this.onClose = onClose;
@@ -3197,7 +3252,7 @@
     }
     render() {
       const effects = this.settings.effects && !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      drawEnding(this.ctx, this.time, this.image, effects);
+      drawEnding(this.ctx, this.time, this.sprites, effects);
       const phase = endingPhase(this.time);
       if (phase !== this.phase) {
         this.phase = phase;
@@ -3592,7 +3647,7 @@
       $("toast").style.opacity = "0";
       this.ending = new EndingPlayer(
         $("ending"),
-        this.view.images.get("custom-heroDirectional"),
+        endingSprites(this.view.images, this.skins, this.manifest),
         this.audio,
         this.settings,
         () => {

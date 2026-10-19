@@ -45,6 +45,12 @@ export function endingPhase(time) {
   return time < ENDING.finished ? 'credits' : 'finished';
 }
 
+export function detonatorFrame(time) {
+  if (time < ENDING.detonator) return 0;
+  if (time < 7.7) return 1;
+  return time < 8.1 ? 2 : 3;
+}
+
 export function endingCaption(time) {
   const phase = endingPhase(time);
   if (phase === 'establish') return 'Полицейский участок. Последняя ночь.';
@@ -57,5 +63,5 @@ export function endingCaption(time) {
   if (phase === 'departure') return 'Машина уезжает от разрушенного участка.';
   return phase === 'finished'
     ? 'Конец. Спасибо за игру.'
-    : 'Ночная трасса. Музыка и финальные титры.';
+    : 'Вид сверху: машина обгоняет трафик на ночной трассе. Музыка и финальные титры.';
 }
