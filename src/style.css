@@ -679,3 +679,67 @@ input[type='text'] {
   letter-spacing: 1px;
   margin-top: 18px;
 }
+
+[hidden] {
+  display: none !important;
+}
+
+#ending {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #050a12;
+}
+
+#ending canvas {
+  display: block;
+  width: min(100vw, 177.7778vh);
+  height: auto;
+  max-height: 100vh;
+  aspect-ratio: 16 / 9;
+  image-rendering: pixelated;
+}
+
+.ending-active #game,
+.ending-active .scanlines,
+.ending-active .vignette {
+  visibility: hidden;
+}
+
+.ending-controls {
+  position: absolute;
+  top: max(12px, env(safe-area-inset-top));
+  right: max(12px, env(safe-area-inset-right));
+  display: flex;
+  gap: 8px;
+}
+
+.ending-controls button {
+  width: auto;
+  padding: 8px 12px;
+  margin: 0;
+  border: 1px solid #749db66b;
+  border-radius: 3px;
+  color: #d8e8ec;
+  background: #091320db;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+}
+
+.ending-controls button:focus-visible {
+  outline: 2px solid #8dd5ee;
+  outline-offset: 3px;
+}
+
+.ending-description {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

@@ -25,10 +25,33 @@
           <nav>
             <button id="continue" class="primary">НАЧАТЬ ПОБЕГ</button
             ><button id="chapters-button">ВЫБРАТЬ ГЛАВУ</button
+            ><button id="ending-button" hidden>СМОТРЕТЬ ФИНАЛ</button
             ><button id="settings-button">НАСТРОЙКИ / УПРАВЛЕНИЕ</button>
           </nav>
           <p class="menu-controls">W / S — выбор · Enter — подтвердить</p>
         </div>
+      </section>
+      <section
+        id="ending"
+        class="hidden"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Финальная катсцена"
+      >
+        <canvas
+          width="640"
+          height="360"
+          aria-label="Финал: участок, взрыв, отъезд и ночная трасса"
+        ></canvas>
+        <div class="ending-controls">
+          <button data-ending-skip>К ТИТРАМ</button>
+          <button data-ending-close>В МЕНЮ</button>
+        </div>
+        <p
+          class="ending-description"
+          data-ending-caption
+          aria-live="polite"
+        ></p>
       </section>
       <header id="hud" class="hidden">
         <div class="hud-chapter">

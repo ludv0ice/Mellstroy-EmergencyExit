@@ -315,7 +315,7 @@ export class GameView extends Phaser.Scene {
     };
   }
   update(time, delta) {
-    if (!this.sim || this.loading) return;
+    if (!this.sim || this.loading || this.app.mode === 'ending') return;
     const dt = Math.min(delta / 1000, 0.05),
       input = this.inputState();
     if (this.app.mode === 'playing') {

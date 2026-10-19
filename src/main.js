@@ -8,6 +8,8 @@ import { CHAPTERS, PROFILES } from './campaign.js';
 import { AudioEngine } from './audio.js';
 import { connectsTo } from './rooms.js';
 import { readJson } from './assets.js';
+import { EndingPlayer } from './ending.js';
+import { endingUnlocked } from './ending-sequence.js';
 
 const $ = (id) => document.getElementById(id);
 const overlays = [
@@ -71,13 +73,7 @@ const app = {
         this.mode,
       );
     this.view?.input.keyboard?.resetKeys();
-    const playing = [
-      'playing',
-      'paused',
-      'dead',
-      'result',
-      'escaping',
-    ].includes(this.mode);
+    const playing = ['playing', 'paused', 'dead', 'result'].includes(this.mode);
     $('hud').classList.toggle('hidden', !playing);
     if (id || this.mode !== 'playing') $('tutorial').classList.add('hidden');
     $('weapon-hud').classList.toggle('hidden', !playing);
@@ -93,8 +89,7 @@ const app = {
       const sim = new Simulation(this.manifest, raw, PROFILES[0]);
       await view.setWorld(sim, true);
       $('loading').classList.add('hidden');
-      this.mode = 'menu';
-      this.overlay('menu');
+      this.menu();
     } catch (error) {
       this.fail(error);
     }
@@ -197,9 +192,29 @@ const app = {
       this.audio.active = true;
     }
   },
+  showEnding() {
+    if (!endingUnlocked(this.progress) || this.ending) return false;
+    this.mode = 'ending';
+    this.overlay(null);
+    $('combo').classList.add('hidden');
+    clearTimeout(this.toastTimer);
+    $('toast').style.opacity = '0';
+    this.ending = new EndingPlayer(
+      $('ending'),
+      this.view.images.get('custom-heroDirectional'),
+      this.audio,
+      this.settings,
+      () => {
+        this.ending = null;
+        this.menu();
+      },
+    );
+    return true;
+  },
   menu() {
     this.mode = 'menu';
     this.overlay('menu');
+    $('ending-button').hidden = !endingUnlocked(this.progress);
     $('continue').textContent = this.progress.unlocked
       ? 'ПРОДОЛЖИТЬ ПОБЕГ'
       : 'НАЧАТЬ ПОБЕГ';
@@ -289,6 +304,11 @@ const app = {
       this.chapter.index === CHAPTERS.length - 1
         ? 'ЗАВЕРШИТЬ ПОБЕГ'
         : 'СЛЕДУЮЩАЯ ГЛАВА';
+    if (
+      this.chapter.index === CHAPTERS.length - 1 &&
+      endingUnlocked(this.progress)
+    )
+      this.showEnding();
   },
   updateHUD() {
     const tutorial = this.sim?.tutorial;
@@ -445,6 +465,7 @@ function bindUI() {
     app.briefing(app.progress.last ?? 0);
   };
   $('deploy').onclick = () => app.start();
+  $('ending-button').onclick = () => app.showEnding();
   $('chapters-button').onclick = () => {
     app.mode = 'chapters';
     app.renderChapters();

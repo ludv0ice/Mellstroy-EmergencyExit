@@ -73,7 +73,7 @@ test('Sound effects play local WAV files and follow the volume setting', async (
     { sound: 50, music: 0 },
   );
   audio.ctx = {};
-  audio.master = { gain: {} };
+  audio.effects = { gain: {} };
   audio.music = { gain: {} };
   await audio.play('sndHit');
   assert.equal(voices[0].src, '/assets/audio/sndHit.wav');
@@ -82,4 +82,5 @@ test('Sound effects play local WAV files and follow the volume setting', async (
   audio.settings.sound = 25;
   audio.updateVolumes();
   assert.equal(voices[0].volume, 0.25);
+  assert.equal(audio.effects.gain.value, 0.25);
 });
