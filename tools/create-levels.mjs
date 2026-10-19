@@ -1,28 +1,29 @@
 import { readFileSync, writeFileSync, readdirSync, unlinkSync } from 'node:fs';
 import { CHAPTERS } from '../src/campaign.js';
 import { LEVEL_DESIGNS } from './level-designs.mjs';
+import { INTERIORS } from './level-interiors.mjs';
 
 const directory = new URL('../assets/rooms/', import.meta.url);
 const manifestFile = new URL('../assets/manifest.json', import.meta.url);
 const manifest = JSON.parse(readFileSync(manifestFile));
 const cell = 32;
 const themes = {
-  studio: ['#172c3d', '#24475c', '#6fd6fa', 'grid'],
+  studio: ['#324958', '#4f7486', '#7bd7ea', 'grid'],
   station: ['#263343', '#394d5b', '#f0c87a', 'stripe'],
-  residential: ['#3b2938', '#564153', '#ff8eae', 'wood'],
+  residential: ['#75544d', '#a17f68', '#ffb1a2', 'wood'],
   industrial: ['#273834', '#3b5045', '#c6d77a', 'stripe'],
   hotel: ['#26363f', '#3d5662', '#c49beb', 'carpet'],
   office: ['#25323c', '#3b4a53', '#8cc8bb', 'grid'],
   security: ['#24323f', '#3a4755', '#77bfe0', 'grid'],
-  club: ['#29203d', '#462c52', '#f381cf', 'dance'],
+  club: ['#593756', '#86516c', '#f381cf', 'dance'],
   garden: ['#263c38', '#3c5342', '#8bd5a7', 'stone'],
-  food: ['#3b3031', '#554442', '#f2b87b', 'checker'],
+  food: ['#5e7570', '#afbb9b', '#f2b87b', 'checker'],
   arcade: ['#252a46', '#3d4164', '#a19af6', 'dance'],
 };
 const rooms = [];
 for (let number = 0; number < LEVEL_DESIGNS.length; number++) {
-  const [id, title, theme, coordinates, connections, landmark] =
-    LEVEL_DESIGNS[number];
+  const [id, title, theme, coordinates, landmark] = LEVEL_DESIGNS[number];
+  const interiors = INTERIORS[id].split(';').map((area) => area.split(':'));
   const zones = coordinates.split(';').map((record, i) => {
     const [x, y, w, h] = record.split(',').map(Number);
     return {
@@ -30,12 +31,9 @@ for (let number = 0; number < LEVEL_DESIGNS.length; number++) {
       y,
       w,
       h,
-      name:
-        i === 0
-          ? 'ВХОД'
-          : i === coordinates.split(';').length - 1
-            ? landmark
-            : 'СЕКТОР ' + String(i).padStart(2, '0'),
+      name: interiors[i][0].replaceAll('_', ' '),
+      style: interiors[i][1],
+      furnishing: 'spr' + interiors[i][2],
     };
   });
   const cols = Math.max(...zones.map((z) => z.x + z.w)) + 2;
@@ -45,45 +43,60 @@ for (let number = 0; number < LEVEL_DESIGNS.length; number++) {
     x: Math.floor(z.x + z.w / 2),
     y: Math.floor(z.y + z.h / 2),
   }));
-  const edges = connections
-    .split(' ')
-    .map((pair) => [Number(pair[0]), Number(pair[1])]);
   const doors = [];
-  function connect(a, b, index) {
-    const from = centers[a],
-      to = centers[b];
-    let x = from.x,
-      y = from.y;
-    const horizontalFirst = (index + number) % 2 === 0;
-    const carve = () => {
-      if (grid[y][x] < 0) grid[y][x] = zones.length;
-    };
-    carve();
-    const walkX = () => {
-      while (x !== to.x) {
-        x += Math.sign(to.x - x);
-        carve();
-      }
-    };
-    const walkY = () => {
-      while (y !== to.y) {
-        y += Math.sign(to.y - y);
-        carve();
-      }
-    };
-    if (horizontalFirst) {
-      walkX();
-      walkY();
-    } else {
-      walkY();
-      walkX();
-    }
-  }
   zones.forEach((zone, i) => {
     for (let y = zone.y; y < zone.y + zone.h; y++)
       for (let x = zone.x; x < zone.x + zone.w; x++) grid[y][x] = i;
   });
-  edges.forEach(([a, b], i) => connect(a, b, i));
+  const candidates = [];
+  for (let a = 0; a < zones.length; a++)
+    for (let b = a + 1; b < zones.length; b++) {
+      const first = zones[a],
+        second = zones[b];
+      const overlapX =
+        Math.min(first.x + first.w, second.x + second.w) -
+        Math.max(first.x, second.x);
+      const overlapY =
+        Math.min(first.y + first.h, second.y + second.h) -
+        Math.max(first.y, second.y);
+      if (overlapY > 0) {
+        const left = first.x < second.x ? first : second;
+        const right = left === first ? second : first;
+        const y = Math.floor(Math.max(first.y, second.y) + overlapY / 2);
+        candidates.push({
+          a,
+          b,
+          gap: right.x - left.x - left.w,
+          from: { x: left.x + left.w - 1, y },
+          to: { x: right.x, y },
+        });
+      } else if (overlapX > 0) {
+        const top = first.y < second.y ? first : second;
+        const bottom = top === first ? second : first;
+        const x = Math.floor(Math.max(first.x, second.x) + overlapX / 2);
+        candidates.push({
+          a,
+          b,
+          gap: bottom.y - top.y - top.h,
+          from: { x, y: top.y + top.h - 1 },
+          to: { x, y: bottom.y },
+        });
+      }
+    }
+  const groups = zones.map((_, i) => i);
+  const root = (i) => (groups[i] === i ? i : (groups[i] = root(groups[i])));
+  for (const edge of candidates.sort((a, b) => a.gap - b.gap)) {
+    if (edge.gap > 1 && root(edge.a) === root(edge.b)) continue;
+    groups[root(edge.a)] = root(edge.b);
+    let { x, y } = edge.from;
+    while (x !== edge.to.x || y !== edge.to.y) {
+      x += Math.sign(edge.to.x - x);
+      y += Math.sign(edge.to.y - y);
+      if (grid[y][x] < 0) grid[y][x] = zones.length;
+    }
+  }
+  if (new Set(zones.map((_, i) => root(i))).size !== 1)
+    throw Error('Disconnected design: ' + id);
   const palette = themes[theme];
   const entities = [];
   const wall = (x, y, w, h) =>
@@ -106,8 +119,20 @@ for (let number = 0; number < LEVEL_DESIGNS.length; number++) {
       if (grid[y]?.[x + 1] === -1) wall((x + 1) * cell, y * cell, 6, cell);
     }
   const point = (zone, dx = 0, dy = 0) => ({
-    x: (centers[zone].x + 0.5) * cell + dx,
-    y: (centers[zone].y + 0.5) * cell + dy,
+    x: Math.max(
+      zones[zone].x * cell + 20,
+      Math.min(
+        (zones[zone].x + zones[zone].w) * cell - 20,
+        (centers[zone].x + 0.5) * cell + dx,
+      ),
+    ),
+    y: Math.max(
+      zones[zone].y * cell + 20,
+      Math.min(
+        (zones[zone].y + zones[zone].h) * cell - 20,
+        (centers[zone].y + 0.5) * cell + dy,
+      ),
+    ),
   });
   const spawn = point(0, 0, 16);
   entities.push({
@@ -233,60 +258,33 @@ for (let number = 0; number < LEVEL_DESIGNS.length; number++) {
       entities.push({
         name: 'eeStairsBack',
         kind: 'exit',
+        transition: 'stairs',
         ...point(0, 0, -24),
         backward: true,
         targets: [previous],
-        visible: false,
+        visible: true,
         init: { nextroom: previous },
       });
-    if (next)
-      entities.push({
-        name: 'eeStairsForward',
-        kind: 'exit',
-        ...point(zones.length - 1, 32, 16),
-        forward: true,
-        targets: [next],
-        visible: false,
-        init: { nextroom: next },
-      });
-    if (floor === 0) {
-      if (training)
-        entities.push({
-          name: 'eeTrainingExit',
-          kind: 'exit',
-          ...point(3, 32, 16),
-          forward: true,
-          visible: false,
-          init: {},
-        });
-      else
-        entities.push({
-          name: 'objPlayerCarEnter',
-          kind: 'exit',
-          sprite: 'sprPlayerCar',
-          x: spawn.x,
-          y: zones[0].y * cell + 48,
-          depth: -3,
-          visible: true,
-          init: { nextroom: 'eeHideout' },
-        });
-    }
+    entities.push({
+      name: next ? 'eeStairsForward' : 'eeChapterDoor',
+      kind: 'exit',
+      transition: next ? 'stairs' : 'door',
+      ...(next
+        ? point(zones.length - 1, 32, 16)
+        : {
+            x: point(zones.length - 1).x,
+            y: (zones.at(-1).y + zones.at(-1).h) * cell - 24,
+          }),
+      forward: true,
+      visible: true,
+      targets: next ? [next] : [],
+      init: next ? { nextroom: next } : {},
+    });
   }
   const important = entities.filter((e) =>
     ['player', 'enemy', 'weapon', 'exit'].includes(e.kind),
   );
-  const props =
-    theme === 'food'
-      ? ['sprBarTable', 'sprRestaurantChair']
-      : theme === 'garden'
-        ? ['sprCyanPlant', 'sprPlant3']
-        : theme === 'office' || theme === 'studio' || theme === 'security'
-          ? ['sprComputer', 'sprAndersTable']
-          : theme === 'club'
-            ? ['sprBarTable', 'sprSofaH48']
-            : theme === 'industrial'
-              ? ['sprCocaineCrate', 'sprAndersTable']
-              : ['sprSofaH48', 'sprCyanPlant'];
+  const placed = [];
   zones.forEach((zone, i) => {
     const openings = [];
     for (let y = 1; y < rows - 1; y++)
@@ -302,12 +300,51 @@ for (let number = 0; number < LEVEL_DESIGNS.length; number++) {
         )
           openings.push({ x: (x + 0.5) * cell, y: (y + 0.5) * cell });
       }
-    for (const [dx, dy] of [
-      [28, 28],
-      [zone.w * cell - 28, 28],
-      [28, zone.h * cell - 28],
-      [zone.w * cell - 28, zone.h * cell - 28],
-    ]) {
+    const sprite = zone.furnishing;
+    const meta = manifest.sprites[sprite];
+    if (!meta) throw Error('Unknown furnishing: ' + sprite);
+    const marginX = Math.ceil(meta.width / 2) + 12;
+    const marginY = Math.ceil(meta.height / 2) + 14;
+    const spots = [];
+    for (let dx = marginX; dx <= zone.w * cell - marginX; dx += meta.width + 32)
+      spots.push([dx, marginY], [dx, zone.h * cell - marginY]);
+    for (
+      let dy = marginY + meta.height + 32;
+      dy < zone.h * cell - marginY - 30;
+      dy += meta.height + 32
+    )
+      spots.push([marginX, dy], [zone.w * cell - marginX, dy]);
+    if (zone.w >= 9 && zone.h >= 7)
+      spots.push(
+        [(zone.w * cell) / 3, (zone.h * cell) / 3],
+        [(zone.w * cell * 2) / 3, (zone.h * cell * 2) / 3],
+      );
+    const alternatives = /Bed/.test(sprite)
+      ? ['sprSmallTable', 'sprFileCabinet']
+      : /Stove/.test(sprite)
+        ? ['sprDoubleFridge', 'sprKitchenSinkDown', 'sprPlayerKitchenShelf']
+        : /Couch|Sofa/.test(sprite)
+          ? ['sprPlayerLivingRoomTable', 'sprTVBlack', 'sprCyanPlant']
+          : /Toilet/.test(sprite)
+            ? ['sprSink', 'sprFileCabinet']
+            : /DiscoBar|FancyBar/.test(sprite)
+              ? ['sprBarStool', 'sprBarTable']
+              : /DJTable/.test(sprite)
+                ? ['sprSpeaker', 'sprComputer']
+                : /ReceptionDesk|OwnerDesk|AndersDesk/.test(sprite)
+                  ? ['sprComputer', 'sprOfficeCouch', 'sprCyanPlant']
+                  : [sprite];
+    let furnishingCount = 0;
+    for (const [dx, dy] of spots) {
+      if (
+        furnishingCount >= (['residential', 'hotel'].includes(theme) ? 5 : 10)
+      )
+        break;
+      const furnishing =
+        furnishingCount === 0
+          ? sprite
+          : alternatives[(furnishingCount - 1) % alternatives.length];
+      const itemMeta = manifest.sprites[furnishing];
       const at = { x: zone.x * cell + dx, y: zone.y * cell + dy };
       const center = point(i);
       if (
@@ -316,17 +353,37 @@ for (let number = 0; number < LEVEL_DESIGNS.length; number++) {
         )
       )
         continue;
-      if (Math.abs(at.x - center.x) < 40 || Math.abs(at.y - center.y) < 40)
-        continue;
+      if (Math.hypot(at.x - center.x, at.y - center.y) < 36) continue;
       if (important.some((e) => Math.hypot(e.x - at.x, e.y - at.y) < 58))
         continue;
-      const sprite = props[(i + number) % props.length];
-      if (!manifest.sprites[sprite]) continue;
+      const bounds = {
+        x: at.x - itemMeta.width / 2,
+        y: at.y - itemMeta.height / 2,
+        w: itemMeta.width,
+        h: itemMeta.height,
+      };
+      if (
+        bounds.x < zone.x * cell + 8 ||
+        bounds.y < zone.y * cell + 8 ||
+        bounds.x + bounds.w > (zone.x + zone.w) * cell - 8 ||
+        bounds.y + bounds.h > (zone.y + zone.h) * cell - 8 ||
+        placed.some(
+          (r) =>
+            bounds.x < r.x + r.w + 8 &&
+            bounds.x + bounds.w + 8 > r.x &&
+            bounds.y < r.y + r.h + 8 &&
+            bounds.y + bounds.h + 8 > r.y,
+        )
+      )
+        continue;
+      placed.push(bounds);
+      furnishingCount++;
       entities.push({
         name: 'eeFurnishing',
         kind: 'decor',
-        sprite,
-        ...at,
+        sprite: furnishing,
+        x: bounds.x + itemMeta.originX,
+        y: bounds.y + itemMeta.originY,
         depth: 0,
         solid: true,
         furniture: true,
@@ -367,7 +424,7 @@ for (let number = 0; number < LEVEL_DESIGNS.length; number++) {
     id,
     width: cols * cell,
     height: rows * cell,
-    design: { title, theme, landmark, revision: 1 },
+    design: { title, theme, landmark, revision: 2 },
     floor: {
       cell,
       grid: grid.map((row) =>

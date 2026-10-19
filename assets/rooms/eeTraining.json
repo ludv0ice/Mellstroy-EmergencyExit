@@ -1,81 +1,89 @@
 {
   "id": "eeTraining",
-  "width": 576,
+  "width": 544,
   "height": 480,
   "design": {
     "title": "Учебный ангар",
     "theme": "studio",
     "landmark": "ПОЛИГОН",
-    "revision": 1
+    "revision": 2
   },
   "floor": {
     "cell": 32,
     "grid": [
-      "                  ",
-      "                  ",
-      "  11111   22222   ",
-      "  11111   22222   ",
-      "  1111144422222   ",
-      "    4     22222   ",
-      "    4        4    ",
-      "    4        4    ",
-      "  00000      4    ",
-      "  00000   333333  ",
-      "  00000444333333  ",
-      "  00000   333333  ",
-      "          333333  ",
-      "                  ",
-      "                  "
+      "                 ",
+      " 111111 2222222  ",
+      " 111111 2222222  ",
+      " 111111 2222222  ",
+      " 11111142222222  ",
+      " 111111 2222222  ",
+      " 111111 2222222  ",
+      "    4      4     ",
+      " 000000 3333333  ",
+      " 000000 3333333  ",
+      " 00000043333333  ",
+      " 000000 3333333  ",
+      " 000000 3333333  ",
+      "                 ",
+      "                 "
     ],
     "palette": [
-      "#172c3d",
-      "#24475c",
-      "#6fd6fa",
+      "#324958",
+      "#4f7486",
+      "#7bd7ea",
       "grid"
     ],
     "zoneCount": 4
   },
   "zones": [
     {
-      "x": 64,
+      "x": 32,
       "y": 256,
-      "w": 160,
-      "h": 128,
-      "name": "ВХОД"
-    },
-    {
-      "x": 64,
-      "y": 64,
-      "w": 160,
-      "h": 96,
-      "name": "СЕКТОР 01"
-    },
-    {
-      "x": 320,
-      "y": 64,
-      "w": 160,
-      "h": 128,
-      "name": "СЕКТОР 02"
-    },
-    {
-      "x": 320,
-      "y": 288,
       "w": 192,
-      "h": 128,
-      "name": "ПОЛИГОН"
+      "h": 160,
+      "name": "ПОДГОТОВКА",
+      "style": "tile",
+      "furnishing": "sprVendingMachine"
+    },
+    {
+      "x": 32,
+      "y": 32,
+      "w": 192,
+      "h": 192,
+      "name": "РУКОПАШНЫЙ БОЙ",
+      "style": "concrete",
+      "furnishing": "sprToolTable"
+    },
+    {
+      "x": 256,
+      "y": 32,
+      "w": 224,
+      "h": 192,
+      "name": "ОРУЖЕЙНАЯ",
+      "style": "wood",
+      "furnishing": "sprWorkTable"
+    },
+    {
+      "x": 256,
+      "y": 256,
+      "w": 224,
+      "h": 160,
+      "name": "СТРЕЛЬБИЩЕ",
+      "style": "stripe",
+      "furnishing": "sprCocaineCrate"
     }
   ],
   "entities": [
     {
       "name": "eeWall",
       "kind": "decor",
-      "x": 64,
-      "y": 58,
+      "x": 32,
+      "y": 26,
       "solid": true,
       "isWall": true,
       "bounds": {
-        "x": 64,
-        "y": 58,
+        "x": 32,
+        "y": 26,
         "w": 32,
         "h": 6
       },
@@ -84,13 +92,13 @@
     {
       "name": "eeWall",
       "kind": "decor",
-      "x": 58,
-      "y": 64,
+      "x": 26,
+      "y": 32,
       "solid": true,
       "isWall": true,
       "bounds": {
-        "x": 58,
-        "y": 64,
+        "x": 26,
+        "y": 32,
         "w": 6,
         "h": 32
       },
@@ -99,13 +107,28 @@
     {
       "name": "eeWall",
       "kind": "decor",
+      "x": 64,
+      "y": 26,
+      "solid": true,
+      "isWall": true,
+      "bounds": {
+        "x": 64,
+        "y": 26,
+        "w": 32,
+        "h": 6
+      },
+      "depth": -5
+    },
+    {
+      "name": "eeWall",
+      "kind": "decor",
       "x": 96,
-      "y": 58,
+      "y": 26,
       "solid": true,
       "isWall": true,
       "bounds": {
         "x": 96,
-        "y": 58,
+        "y": 26,
         "w": 32,
         "h": 6
       },
@@ -115,12 +138,12 @@
       "name": "eeWall",
       "kind": "decor",
       "x": 128,
-      "y": 58,
+      "y": 26,
       "solid": true,
       "isWall": true,
       "bounds": {
         "x": 128,
-        "y": 58,
+        "y": 26,
         "w": 32,
         "h": 6
       },
@@ -130,12 +153,12 @@
       "name": "eeWall",
       "kind": "decor",
       "x": 160,
-      "y": 58,
+      "y": 26,
       "solid": true,
       "isWall": true,
       "bounds": {
         "x": 160,
-        "y": 58,
+        "y": 26,
         "w": 32,
         "h": 6
       },
@@ -145,12 +168,12 @@
       "name": "eeWall",
       "kind": "decor",
       "x": 192,
-      "y": 58,
+      "y": 26,
       "solid": true,
       "isWall": true,
       "bounds": {
         "x": 192,
-        "y": 58,
+        "y": 26,
         "w": 32,
         "h": 6
       },
@@ -160,12 +183,12 @@
       "name": "eeWall",
       "kind": "decor",
       "x": 224,
-      "y": 64,
+      "y": 32,
       "solid": true,
       "isWall": true,
       "bounds": {
         "x": 224,
-        "y": 64,
+        "y": 32,
         "w": 6,
         "h": 32
       },
@@ -174,13 +197,13 @@
     {
       "name": "eeWall",
       "kind": "decor",
-      "x": 320,
-      "y": 58,
+      "x": 256,
+      "y": 26,
       "solid": true,
       "isWall": true,
       "bounds": {
-        "x": 320,
-        "y": 58,
+        "x": 256,
+        "y": 26,
         "w": 32,
         "h": 6
       },
@@ -189,13 +212,13 @@
     {
       "name": "eeWall",
       "kind": "decor",
-      "x": 314,
-      "y": 64,
+      "x": 250,
+      "y": 32,
       "solid": true,
       "isWall": true,
       "bounds": {
-        "x": 314,
-        "y": 64,
+        "x": 250,
+        "y": 32,
         "w": 6,
         "h": 32
       },
@@ -204,13 +227,43 @@
     {
       "name": "eeWall",
       "kind": "decor",
+      "x": 288,
+      "y": 26,
+      "solid": true,
+      "isWall": true,
+      "bounds": {
+        "x": 288,
+        "y": 26,
+        "w": 32,
+        "h": 6
+      },
+      "depth": -5
+    },
+    {
+      "name": "eeWall",
+      "kind": "decor",
+      "x": 320,
+      "y": 26,
+      "solid": true,
+      "isWall": true,
+      "bounds": {
+        "x": 320,
+        "y": 26,
+        "w": 32,
+        "h": 6
+      },
+      "depth": -5
+    },
+    {
+      "name": "eeWall",
+      "kind": "decor",
       "x": 352,
-      "y": 58,
+      "y": 26,
       "solid": true,
       "isWall": true,
       "bounds": {
         "x": 352,
-        "y": 58,
+        "y": 26,
         "w": 32,
         "h": 6
       },
@@ -220,12 +273,12 @@
       "name": "eeWall",
       "kind": "decor",
       "x": 384,
-      "y": 58,
+      "y": 26,
       "solid": true,
       "isWall": true,
       "bounds": {
         "x": 384,
-        "y": 58,
+        "y": 26,
         "w": 32,
         "h": 6
       },
@@ -235,12 +288,12 @@
       "name": "eeWall",
       "kind": "decor",
       "x": 416,
-      "y": 58,
+      "y": 26,
       "solid": true,
       "isWall": true,
       "bounds": {
         "x": 416,
-        "y": 58,
+        "y": 26,
         "w": 32,
         "h": 6
       },
@@ -250,14 +303,74 @@
       "name": "eeWall",
       "kind": "decor",
       "x": 448,
-      "y": 58,
+      "y": 26,
       "solid": true,
       "isWall": true,
       "bounds": {
         "x": 448,
-        "y": 58,
+        "y": 26,
         "w": 32,
         "h": 6
+      },
+      "depth": -5
+    },
+    {
+      "name": "eeWall",
+      "kind": "decor",
+      "x": 480,
+      "y": 32,
+      "solid": true,
+      "isWall": true,
+      "bounds": {
+        "x": 480,
+        "y": 32,
+        "w": 6,
+        "h": 32
+      },
+      "depth": -5
+    },
+    {
+      "name": "eeWall",
+      "kind": "decor",
+      "x": 26,
+      "y": 64,
+      "solid": true,
+      "isWall": true,
+      "bounds": {
+        "x": 26,
+        "y": 64,
+        "w": 6,
+        "h": 32
+      },
+      "depth": -5
+    },
+    {
+      "name": "eeWall",
+      "kind": "decor",
+      "x": 224,
+      "y": 64,
+      "solid": true,
+      "isWall": true,
+      "bounds": {
+        "x": 224,
+        "y": 64,
+        "w": 6,
+        "h": 32
+      },
+      "depth": -5
+    },
+    {
+      "name": "eeWall",
+      "kind": "decor",
+      "x": 250,
+      "y": 64,
+      "solid": true,
+      "isWall": true,
+      "bounds": {
+        "x": 250,
+        "y": 64,
+        "w": 6,
+        "h": 32
       },
       "depth": -5
     },
@@ -279,12 +392,12 @@
     {
       "name": "eeWall",
       "kind": "decor",
-      "x": 58,
+      "x": 26,
       "y": 96,
       "solid": true,
       "isWall": true,
       "bounds": {
-        "x": 58,
+        "x": 26,
         "y": 96,
         "w": 6,
         "h": 32
@@ -309,12 +422,12 @@
     {
       "name": "eeWall",
       "kind": "decor",
-      "x": 314,
+      "x": 250,
       "y": 96,
       "solid": true,
       "isWall": true,
       "bounds": {
-        "x": 314,
+        "x": 250,
         "y": 96,
         "w": 6,
         "h": 32
@@ -339,27 +452,12 @@
     {
       "name": "eeWall",
       "kind": "decor",
-      "x": 64,
-      "y": 160,
-      "solid": true,
-      "isWall": true,
-      "bounds": {
-        "x": 64,
-        "y": 160,
-        "w": 32,
-        "h": 6
-      },
-      "depth": -5
-    },
-    {
-      "name": "eeWall",
-      "kind": "decor",
-      "x": 58,
+      "x": 26,
       "y": 128,
       "solid": true,
       "isWall": true,
       "bounds": {
-        "x": 58,
+        "x": 26,
         "y": 128,
         "w": 6,
         "h": 32
@@ -369,51 +467,6 @@
     {
       "name": "eeWall",
       "kind": "decor",
-      "x": 96,
-      "y": 160,
-      "solid": true,
-      "isWall": true,
-      "bounds": {
-        "x": 96,
-        "y": 160,
-        "w": 32,
-        "h": 6
-      },
-      "depth": -5
-    },
-    {
-      "name": "eeWall",
-      "kind": "decor",
-      "x": 160,
-      "y": 160,
-      "solid": true,
-      "isWall": true,
-      "bounds": {
-        "x": 160,
-        "y": 160,
-        "w": 32,
-        "h": 6
-      },
-      "depth": -5
-    },
-    {
-      "name": "eeWall",
-      "kind": "decor",
-      "x": 192,
-      "y": 160,
-      "solid": true,
-      "isWall": true,
-      "bounds": {
-        "x": 192,
-        "y": 160,
-        "w": 32,
-        "h": 6
-      },
-      "depth": -5
-    },
-    {
-      "name": "eeWall",
-      "kind": "decor",
       "x": 224,
       "y": 122,
       "solid": true,
@@ -435,66 +488,6 @@
       "isWall": true,
       "bounds": {
         "x": 224,
-        "y": 160,
-        "w": 32,
-        "h": 6
-      },
-      "depth": -5
-    },
-    {
-      "name": "eeWall",
-      "kind": "decor",
-      "x": 256,
-      "y": 122,
-      "solid": true,
-      "isWall": true,
-      "bounds": {
-        "x": 256,
-        "y": 122,
-        "w": 32,
-        "h": 6
-      },
-      "depth": -5
-    },
-    {
-      "name": "eeWall",
-      "kind": "decor",
-      "x": 256,
-      "y": 160,
-      "solid": true,
-      "isWall": true,
-      "bounds": {
-        "x": 256,
-        "y": 160,
-        "w": 32,
-        "h": 6
-      },
-      "depth": -5
-    },
-    {
-      "name": "eeWall",
-      "kind": "decor",
-      "x": 288,
-      "y": 122,
-      "solid": true,
-      "isWall": true,
-      "bounds": {
-        "x": 288,
-        "y": 122,
-        "w": 32,
-        "h": 6
-      },
-      "depth": -5
-    },
-    {
-      "name": "eeWall",
-      "kind": "decor",
-      "x": 288,
-      "y": 160,
-      "solid": true,
-      "isWall": true,
-      "bounds": {
-        "x": 288,
         "y": 160,
         "w": 32,
         "h": 6
@@ -519,12 +512,12 @@
     {
       "name": "eeWall",
       "kind": "decor",
-      "x": 122,
+      "x": 26,
       "y": 160,
       "solid": true,
       "isWall": true,
       "bounds": {
-        "x": 122,
+        "x": 26,
         "y": 160,
         "w": 6,
         "h": 32
@@ -534,12 +527,12 @@
     {
       "name": "eeWall",
       "kind": "decor",
-      "x": 160,
+      "x": 224,
       "y": 160,
       "solid": true,
       "isWall": true,
       "bounds": {
-        "x": 160,
+        "x": 224,
         "y": 160,
         "w": 6,
         "h": 32
@@ -549,75 +542,15 @@
     {
       "name": "eeWall",
       "kind": "decor",
-      "x": 320,
-      "y": 192,
-      "solid": true,
-      "isWall": true,
-      "bounds": {
-        "x": 320,
-        "y": 192,
-        "w": 32,
-        "h": 6
-      },
-      "depth": -5
-    },
-    {
-      "name": "eeWall",
-      "kind": "decor",
-      "x": 314,
+      "x": 250,
       "y": 160,
       "solid": true,
       "isWall": true,
       "bounds": {
-        "x": 314,
+        "x": 250,
         "y": 160,
         "w": 6,
         "h": 32
-      },
-      "depth": -5
-    },
-    {
-      "name": "eeWall",
-      "kind": "decor",
-      "x": 352,
-      "y": 192,
-      "solid": true,
-      "isWall": true,
-      "bounds": {
-        "x": 352,
-        "y": 192,
-        "w": 32,
-        "h": 6
-      },
-      "depth": -5
-    },
-    {
-      "name": "eeWall",
-      "kind": "decor",
-      "x": 384,
-      "y": 192,
-      "solid": true,
-      "isWall": true,
-      "bounds": {
-        "x": 384,
-        "y": 192,
-        "w": 32,
-        "h": 6
-      },
-      "depth": -5
-    },
-    {
-      "name": "eeWall",
-      "kind": "decor",
-      "x": 448,
-      "y": 192,
-      "solid": true,
-      "isWall": true,
-      "bounds": {
-        "x": 448,
-        "y": 192,
-        "w": 32,
-        "h": 6
       },
       "depth": -5
     },
@@ -639,75 +572,60 @@
     {
       "name": "eeWall",
       "kind": "decor",
-      "x": 122,
-      "y": 192,
-      "solid": true,
-      "isWall": true,
-      "bounds": {
-        "x": 122,
-        "y": 192,
-        "w": 6,
-        "h": 32
-      },
-      "depth": -5
-    },
-    {
-      "name": "eeWall",
-      "kind": "decor",
-      "x": 160,
-      "y": 192,
-      "solid": true,
-      "isWall": true,
-      "bounds": {
-        "x": 160,
-        "y": 192,
-        "w": 6,
-        "h": 32
-      },
-      "depth": -5
-    },
-    {
-      "name": "eeWall",
-      "kind": "decor",
-      "x": 410,
-      "y": 192,
-      "solid": true,
-      "isWall": true,
-      "bounds": {
-        "x": 410,
-        "y": 192,
-        "w": 6,
-        "h": 32
-      },
-      "depth": -5
-    },
-    {
-      "name": "eeWall",
-      "kind": "decor",
-      "x": 448,
-      "y": 192,
-      "solid": true,
-      "isWall": true,
-      "bounds": {
-        "x": 448,
-        "y": 192,
-        "w": 6,
-        "h": 32
-      },
-      "depth": -5
-    },
-    {
-      "name": "eeWall",
-      "kind": "decor",
-      "x": 122,
+      "x": 32,
       "y": 224,
       "solid": true,
       "isWall": true,
       "bounds": {
-        "x": 122,
+        "x": 32,
         "y": 224,
+        "w": 32,
+        "h": 6
+      },
+      "depth": -5
+    },
+    {
+      "name": "eeWall",
+      "kind": "decor",
+      "x": 26,
+      "y": 192,
+      "solid": true,
+      "isWall": true,
+      "bounds": {
+        "x": 26,
+        "y": 192,
         "w": 6,
         "h": 32
+      },
+      "depth": -5
+    },
+    {
+      "name": "eeWall",
+      "kind": "decor",
+      "x": 64,
+      "y": 224,
+      "solid": true,
+      "isWall": true,
+      "bounds": {
+        "x": 64,
+        "y": 224,
+        "w": 32,
+        "h": 6
+      },
+      "depth": -5
+    },
+    {
+      "name": "eeWall",
+      "kind": "decor",
+      "x": 96,
+      "y": 224,
+      "solid": true,
+      "isWall": true,
+      "bounds": {
+        "x": 96,
+        "y": 224,
+        "w": 32,
+        "h": 6
       },
       "depth": -5
     },
@@ -721,6 +639,36 @@
       "bounds": {
         "x": 160,
         "y": 224,
+        "w": 32,
+        "h": 6
+      },
+      "depth": -5
+    },
+    {
+      "name": "eeWall",
+      "kind": "decor",
+      "x": 192,
+      "y": 224,
+      "solid": true,
+      "isWall": true,
+      "bounds": {
+        "x": 192,
+        "y": 224,
+        "w": 32,
+        "h": 6
+      },
+      "depth": -5
+    },
+    {
+      "name": "eeWall",
+      "kind": "decor",
+      "x": 224,
+      "y": 192,
+      "solid": true,
+      "isWall": true,
+      "bounds": {
+        "x": 224,
+        "y": 192,
         "w": 6,
         "h": 32
       },
@@ -729,15 +677,90 @@
     {
       "name": "eeWall",
       "kind": "decor",
-      "x": 410,
+      "x": 256,
       "y": 224,
       "solid": true,
       "isWall": true,
       "bounds": {
-        "x": 410,
+        "x": 256,
         "y": 224,
+        "w": 32,
+        "h": 6
+      },
+      "depth": -5
+    },
+    {
+      "name": "eeWall",
+      "kind": "decor",
+      "x": 250,
+      "y": 192,
+      "solid": true,
+      "isWall": true,
+      "bounds": {
+        "x": 250,
+        "y": 192,
         "w": 6,
         "h": 32
+      },
+      "depth": -5
+    },
+    {
+      "name": "eeWall",
+      "kind": "decor",
+      "x": 288,
+      "y": 224,
+      "solid": true,
+      "isWall": true,
+      "bounds": {
+        "x": 288,
+        "y": 224,
+        "w": 32,
+        "h": 6
+      },
+      "depth": -5
+    },
+    {
+      "name": "eeWall",
+      "kind": "decor",
+      "x": 320,
+      "y": 224,
+      "solid": true,
+      "isWall": true,
+      "bounds": {
+        "x": 320,
+        "y": 224,
+        "w": 32,
+        "h": 6
+      },
+      "depth": -5
+    },
+    {
+      "name": "eeWall",
+      "kind": "decor",
+      "x": 384,
+      "y": 224,
+      "solid": true,
+      "isWall": true,
+      "bounds": {
+        "x": 384,
+        "y": 224,
+        "w": 32,
+        "h": 6
+      },
+      "depth": -5
+    },
+    {
+      "name": "eeWall",
+      "kind": "decor",
+      "x": 416,
+      "y": 224,
+      "solid": true,
+      "isWall": true,
+      "bounds": {
+        "x": 416,
+        "y": 224,
+        "w": 32,
+        "h": 6
       },
       "depth": -5
     },
@@ -751,6 +774,111 @@
       "bounds": {
         "x": 448,
         "y": 224,
+        "w": 32,
+        "h": 6
+      },
+      "depth": -5
+    },
+    {
+      "name": "eeWall",
+      "kind": "decor",
+      "x": 480,
+      "y": 192,
+      "solid": true,
+      "isWall": true,
+      "bounds": {
+        "x": 480,
+        "y": 192,
+        "w": 6,
+        "h": 32
+      },
+      "depth": -5
+    },
+    {
+      "name": "eeWall",
+      "kind": "decor",
+      "x": 122,
+      "y": 224,
+      "solid": true,
+      "isWall": true,
+      "bounds": {
+        "x": 122,
+        "y": 224,
+        "w": 6,
+        "h": 32
+      },
+      "depth": -5
+    },
+    {
+      "name": "eeWall",
+      "kind": "decor",
+      "x": 160,
+      "y": 224,
+      "solid": true,
+      "isWall": true,
+      "bounds": {
+        "x": 160,
+        "y": 224,
+        "w": 6,
+        "h": 32
+      },
+      "depth": -5
+    },
+    {
+      "name": "eeWall",
+      "kind": "decor",
+      "x": 346,
+      "y": 224,
+      "solid": true,
+      "isWall": true,
+      "bounds": {
+        "x": 346,
+        "y": 224,
+        "w": 6,
+        "h": 32
+      },
+      "depth": -5
+    },
+    {
+      "name": "eeWall",
+      "kind": "decor",
+      "x": 384,
+      "y": 224,
+      "solid": true,
+      "isWall": true,
+      "bounds": {
+        "x": 384,
+        "y": 224,
+        "w": 6,
+        "h": 32
+      },
+      "depth": -5
+    },
+    {
+      "name": "eeWall",
+      "kind": "decor",
+      "x": 32,
+      "y": 250,
+      "solid": true,
+      "isWall": true,
+      "bounds": {
+        "x": 32,
+        "y": 250,
+        "w": 32,
+        "h": 6
+      },
+      "depth": -5
+    },
+    {
+      "name": "eeWall",
+      "kind": "decor",
+      "x": 26,
+      "y": 256,
+      "solid": true,
+      "isWall": true,
+      "bounds": {
+        "x": 26,
+        "y": 256,
         "w": 6,
         "h": 32
       },
@@ -768,21 +896,6 @@
         "y": 250,
         "w": 32,
         "h": 6
-      },
-      "depth": -5
-    },
-    {
-      "name": "eeWall",
-      "kind": "decor",
-      "x": 58,
-      "y": 256,
-      "solid": true,
-      "isWall": true,
-      "bounds": {
-        "x": 58,
-        "y": 256,
-        "w": 6,
-        "h": 32
       },
       "depth": -5
     },
@@ -849,15 +962,90 @@
     {
       "name": "eeWall",
       "kind": "decor",
-      "x": 410,
+      "x": 256,
+      "y": 250,
+      "solid": true,
+      "isWall": true,
+      "bounds": {
+        "x": 256,
+        "y": 250,
+        "w": 32,
+        "h": 6
+      },
+      "depth": -5
+    },
+    {
+      "name": "eeWall",
+      "kind": "decor",
+      "x": 250,
       "y": 256,
       "solid": true,
       "isWall": true,
       "bounds": {
-        "x": 410,
+        "x": 250,
         "y": 256,
         "w": 6,
         "h": 32
+      },
+      "depth": -5
+    },
+    {
+      "name": "eeWall",
+      "kind": "decor",
+      "x": 288,
+      "y": 250,
+      "solid": true,
+      "isWall": true,
+      "bounds": {
+        "x": 288,
+        "y": 250,
+        "w": 32,
+        "h": 6
+      },
+      "depth": -5
+    },
+    {
+      "name": "eeWall",
+      "kind": "decor",
+      "x": 320,
+      "y": 250,
+      "solid": true,
+      "isWall": true,
+      "bounds": {
+        "x": 320,
+        "y": 250,
+        "w": 32,
+        "h": 6
+      },
+      "depth": -5
+    },
+    {
+      "name": "eeWall",
+      "kind": "decor",
+      "x": 384,
+      "y": 250,
+      "solid": true,
+      "isWall": true,
+      "bounds": {
+        "x": 384,
+        "y": 250,
+        "w": 32,
+        "h": 6
+      },
+      "depth": -5
+    },
+    {
+      "name": "eeWall",
+      "kind": "decor",
+      "x": 416,
+      "y": 250,
+      "solid": true,
+      "isWall": true,
+      "bounds": {
+        "x": 416,
+        "y": 250,
+        "w": 32,
+        "h": 6
       },
       "depth": -5
     },
@@ -865,11 +1053,26 @@
       "name": "eeWall",
       "kind": "decor",
       "x": 448,
-      "y": 256,
+      "y": 250,
       "solid": true,
       "isWall": true,
       "bounds": {
         "x": 448,
+        "y": 250,
+        "w": 32,
+        "h": 6
+      },
+      "depth": -5
+    },
+    {
+      "name": "eeWall",
+      "kind": "decor",
+      "x": 480,
+      "y": 256,
+      "solid": true,
+      "isWall": true,
+      "bounds": {
+        "x": 480,
         "y": 256,
         "w": 6,
         "h": 32
@@ -879,12 +1082,12 @@
     {
       "name": "eeWall",
       "kind": "decor",
-      "x": 58,
+      "x": 26,
       "y": 288,
       "solid": true,
       "isWall": true,
       "bounds": {
-        "x": 58,
+        "x": 26,
         "y": 288,
         "w": 6,
         "h": 32
@@ -909,75 +1112,15 @@
     {
       "name": "eeWall",
       "kind": "decor",
-      "x": 320,
-      "y": 282,
-      "solid": true,
-      "isWall": true,
-      "bounds": {
-        "x": 320,
-        "y": 282,
-        "w": 32,
-        "h": 6
-      },
-      "depth": -5
-    },
-    {
-      "name": "eeWall",
-      "kind": "decor",
-      "x": 314,
+      "x": 250,
       "y": 288,
       "solid": true,
       "isWall": true,
       "bounds": {
-        "x": 314,
+        "x": 250,
         "y": 288,
         "w": 6,
         "h": 32
-      },
-      "depth": -5
-    },
-    {
-      "name": "eeWall",
-      "kind": "decor",
-      "x": 352,
-      "y": 282,
-      "solid": true,
-      "isWall": true,
-      "bounds": {
-        "x": 352,
-        "y": 282,
-        "w": 32,
-        "h": 6
-      },
-      "depth": -5
-    },
-    {
-      "name": "eeWall",
-      "kind": "decor",
-      "x": 384,
-      "y": 282,
-      "solid": true,
-      "isWall": true,
-      "bounds": {
-        "x": 384,
-        "y": 282,
-        "w": 32,
-        "h": 6
-      },
-      "depth": -5
-    },
-    {
-      "name": "eeWall",
-      "kind": "decor",
-      "x": 448,
-      "y": 282,
-      "solid": true,
-      "isWall": true,
-      "bounds": {
-        "x": 448,
-        "y": 282,
-        "w": 32,
-        "h": 6
       },
       "depth": -5
     },
@@ -985,26 +1128,11 @@
       "name": "eeWall",
       "kind": "decor",
       "x": 480,
-      "y": 282,
-      "solid": true,
-      "isWall": true,
-      "bounds": {
-        "x": 480,
-        "y": 282,
-        "w": 32,
-        "h": 6
-      },
-      "depth": -5
-    },
-    {
-      "name": "eeWall",
-      "kind": "decor",
-      "x": 512,
       "y": 288,
       "solid": true,
       "isWall": true,
       "bounds": {
-        "x": 512,
+        "x": 480,
         "y": 288,
         "w": 6,
         "h": 32
@@ -1014,12 +1142,12 @@
     {
       "name": "eeWall",
       "kind": "decor",
-      "x": 58,
+      "x": 26,
       "y": 320,
       "solid": true,
       "isWall": true,
       "bounds": {
-        "x": 58,
+        "x": 26,
         "y": 320,
         "w": 6,
         "h": 32
@@ -1059,72 +1187,12 @@
     {
       "name": "eeWall",
       "kind": "decor",
-      "x": 256,
-      "y": 314,
-      "solid": true,
-      "isWall": true,
-      "bounds": {
-        "x": 256,
-        "y": 314,
-        "w": 32,
-        "h": 6
-      },
-      "depth": -5
-    },
-    {
-      "name": "eeWall",
-      "kind": "decor",
-      "x": 256,
-      "y": 352,
-      "solid": true,
-      "isWall": true,
-      "bounds": {
-        "x": 256,
-        "y": 352,
-        "w": 32,
-        "h": 6
-      },
-      "depth": -5
-    },
-    {
-      "name": "eeWall",
-      "kind": "decor",
-      "x": 288,
-      "y": 314,
-      "solid": true,
-      "isWall": true,
-      "bounds": {
-        "x": 288,
-        "y": 314,
-        "w": 32,
-        "h": 6
-      },
-      "depth": -5
-    },
-    {
-      "name": "eeWall",
-      "kind": "decor",
-      "x": 288,
-      "y": 352,
-      "solid": true,
-      "isWall": true,
-      "bounds": {
-        "x": 288,
-        "y": 352,
-        "w": 32,
-        "h": 6
-      },
-      "depth": -5
-    },
-    {
-      "name": "eeWall",
-      "kind": "decor",
-      "x": 512,
+      "x": 480,
       "y": 320,
       "solid": true,
       "isWall": true,
       "bounds": {
-        "x": 512,
+        "x": 480,
         "y": 320,
         "w": 6,
         "h": 32
@@ -1134,90 +1202,15 @@
     {
       "name": "eeWall",
       "kind": "decor",
-      "x": 64,
-      "y": 384,
-      "solid": true,
-      "isWall": true,
-      "bounds": {
-        "x": 64,
-        "y": 384,
-        "w": 32,
-        "h": 6
-      },
-      "depth": -5
-    },
-    {
-      "name": "eeWall",
-      "kind": "decor",
-      "x": 58,
+      "x": 26,
       "y": 352,
       "solid": true,
       "isWall": true,
       "bounds": {
-        "x": 58,
+        "x": 26,
         "y": 352,
         "w": 6,
         "h": 32
-      },
-      "depth": -5
-    },
-    {
-      "name": "eeWall",
-      "kind": "decor",
-      "x": 96,
-      "y": 384,
-      "solid": true,
-      "isWall": true,
-      "bounds": {
-        "x": 96,
-        "y": 384,
-        "w": 32,
-        "h": 6
-      },
-      "depth": -5
-    },
-    {
-      "name": "eeWall",
-      "kind": "decor",
-      "x": 128,
-      "y": 384,
-      "solid": true,
-      "isWall": true,
-      "bounds": {
-        "x": 128,
-        "y": 384,
-        "w": 32,
-        "h": 6
-      },
-      "depth": -5
-    },
-    {
-      "name": "eeWall",
-      "kind": "decor",
-      "x": 160,
-      "y": 384,
-      "solid": true,
-      "isWall": true,
-      "bounds": {
-        "x": 160,
-        "y": 384,
-        "w": 32,
-        "h": 6
-      },
-      "depth": -5
-    },
-    {
-      "name": "eeWall",
-      "kind": "decor",
-      "x": 192,
-      "y": 384,
-      "solid": true,
-      "isWall": true,
-      "bounds": {
-        "x": 192,
-        "y": 384,
-        "w": 32,
-        "h": 6
       },
       "depth": -5
     },
@@ -1239,12 +1232,12 @@
     {
       "name": "eeWall",
       "kind": "decor",
-      "x": 314,
+      "x": 250,
       "y": 352,
       "solid": true,
       "isWall": true,
       "bounds": {
-        "x": 314,
+        "x": 250,
         "y": 352,
         "w": 6,
         "h": 32
@@ -1254,15 +1247,180 @@
     {
       "name": "eeWall",
       "kind": "decor",
-      "x": 512,
+      "x": 480,
       "y": 352,
       "solid": true,
       "isWall": true,
       "bounds": {
-        "x": 512,
+        "x": 480,
         "y": 352,
         "w": 6,
         "h": 32
+      },
+      "depth": -5
+    },
+    {
+      "name": "eeWall",
+      "kind": "decor",
+      "x": 32,
+      "y": 416,
+      "solid": true,
+      "isWall": true,
+      "bounds": {
+        "x": 32,
+        "y": 416,
+        "w": 32,
+        "h": 6
+      },
+      "depth": -5
+    },
+    {
+      "name": "eeWall",
+      "kind": "decor",
+      "x": 26,
+      "y": 384,
+      "solid": true,
+      "isWall": true,
+      "bounds": {
+        "x": 26,
+        "y": 384,
+        "w": 6,
+        "h": 32
+      },
+      "depth": -5
+    },
+    {
+      "name": "eeWall",
+      "kind": "decor",
+      "x": 64,
+      "y": 416,
+      "solid": true,
+      "isWall": true,
+      "bounds": {
+        "x": 64,
+        "y": 416,
+        "w": 32,
+        "h": 6
+      },
+      "depth": -5
+    },
+    {
+      "name": "eeWall",
+      "kind": "decor",
+      "x": 96,
+      "y": 416,
+      "solid": true,
+      "isWall": true,
+      "bounds": {
+        "x": 96,
+        "y": 416,
+        "w": 32,
+        "h": 6
+      },
+      "depth": -5
+    },
+    {
+      "name": "eeWall",
+      "kind": "decor",
+      "x": 128,
+      "y": 416,
+      "solid": true,
+      "isWall": true,
+      "bounds": {
+        "x": 128,
+        "y": 416,
+        "w": 32,
+        "h": 6
+      },
+      "depth": -5
+    },
+    {
+      "name": "eeWall",
+      "kind": "decor",
+      "x": 160,
+      "y": 416,
+      "solid": true,
+      "isWall": true,
+      "bounds": {
+        "x": 160,
+        "y": 416,
+        "w": 32,
+        "h": 6
+      },
+      "depth": -5
+    },
+    {
+      "name": "eeWall",
+      "kind": "decor",
+      "x": 192,
+      "y": 416,
+      "solid": true,
+      "isWall": true,
+      "bounds": {
+        "x": 192,
+        "y": 416,
+        "w": 32,
+        "h": 6
+      },
+      "depth": -5
+    },
+    {
+      "name": "eeWall",
+      "kind": "decor",
+      "x": 224,
+      "y": 384,
+      "solid": true,
+      "isWall": true,
+      "bounds": {
+        "x": 224,
+        "y": 384,
+        "w": 6,
+        "h": 32
+      },
+      "depth": -5
+    },
+    {
+      "name": "eeWall",
+      "kind": "decor",
+      "x": 256,
+      "y": 416,
+      "solid": true,
+      "isWall": true,
+      "bounds": {
+        "x": 256,
+        "y": 416,
+        "w": 32,
+        "h": 6
+      },
+      "depth": -5
+    },
+    {
+      "name": "eeWall",
+      "kind": "decor",
+      "x": 250,
+      "y": 384,
+      "solid": true,
+      "isWall": true,
+      "bounds": {
+        "x": 250,
+        "y": 384,
+        "w": 6,
+        "h": 32
+      },
+      "depth": -5
+    },
+    {
+      "name": "eeWall",
+      "kind": "decor",
+      "x": 288,
+      "y": 416,
+      "solid": true,
+      "isWall": true,
+      "bounds": {
+        "x": 288,
+        "y": 416,
+        "w": 32,
+        "h": 6
       },
       "depth": -5
     },
@@ -1278,21 +1436,6 @@
         "y": 416,
         "w": 32,
         "h": 6
-      },
-      "depth": -5
-    },
-    {
-      "name": "eeWall",
-      "kind": "decor",
-      "x": 314,
-      "y": 384,
-      "solid": true,
-      "isWall": true,
-      "bounds": {
-        "x": 314,
-        "y": 384,
-        "w": 6,
-        "h": 32
       },
       "depth": -5
     },
@@ -1360,26 +1503,11 @@
       "name": "eeWall",
       "kind": "decor",
       "x": 480,
-      "y": 416,
-      "solid": true,
-      "isWall": true,
-      "bounds": {
-        "x": 480,
-        "y": 416,
-        "w": 32,
-        "h": 6
-      },
-      "depth": -5
-    },
-    {
-      "name": "eeWall",
-      "kind": "decor",
-      "x": 512,
       "y": 384,
       "solid": true,
       "isWall": true,
       "bounds": {
-        "x": 512,
+        "x": 480,
         "y": 384,
         "w": 6,
         "h": 32
@@ -1399,7 +1527,7 @@
       "kind": "enemy",
       "sprite": "sprEWalkUnarmed",
       "x": 144,
-      "y": 112,
+      "y": 144,
       "depth": -1,
       "init": {
         "direction": 90
@@ -1409,22 +1537,22 @@
       "name": "eeGuard",
       "kind": "enemy",
       "sprite": "sprEWalkClub",
-      "x": 400,
+      "x": 368,
       "y": 144,
       "depth": -1,
       "init": {
-        "direction": 39.093858886229505
+        "direction": 42.87890360333855
       }
     },
     {
       "name": "eePatrol",
       "kind": "enemy",
       "sprite": "sprEWalkUnarmed",
-      "x": 432,
-      "y": 368,
+      "x": 368,
+      "y": 336,
       "depth": -1,
       "init": {
-        "direction": -3.179830119864234
+        "direction": 4.085616779974877
       }
     },
     {
@@ -1443,7 +1571,7 @@
       "name": "eeWeapon",
       "kind": "weapon",
       "sprite": "sprWeapons",
-      "x": 360,
+      "x": 328,
       "y": 160,
       "frame": 4,
       "init": {
@@ -1452,20 +1580,22 @@
       }
     },
     {
-      "name": "eeTrainingExit",
+      "name": "eeChapterDoor",
       "kind": "exit",
-      "x": 464,
-      "y": 384,
+      "transition": "door",
+      "x": 368,
+      "y": 392,
       "forward": true,
-      "visible": false,
+      "visible": true,
+      "targets": [],
       "init": {}
     },
     {
       "name": "eeFurnishing",
       "kind": "decor",
-      "sprite": "sprComputer",
-      "x": 196,
-      "y": 284,
+      "sprite": "sprVendingMachine",
+      "x": 56,
+      "y": 286,
       "depth": 0,
       "solid": true,
       "furniture": true
@@ -1473,9 +1603,9 @@
     {
       "name": "eeFurnishing",
       "kind": "decor",
-      "sprite": "sprComputer",
-      "x": 348,
-      "y": 92,
+      "sprite": "sprVendingMachine",
+      "x": 56,
+      "y": 386,
       "depth": 0,
       "solid": true,
       "furniture": true
@@ -1483,9 +1613,9 @@
     {
       "name": "eeFurnishing",
       "kind": "decor",
-      "sprite": "sprComputer",
-      "x": 452,
-      "y": 92,
+      "sprite": "sprToolTable",
+      "x": 64,
+      "y": 61,
       "depth": 0,
       "solid": true,
       "furniture": true
@@ -1493,20 +1623,92 @@
     {
       "name": "eeFurnishing",
       "kind": "decor",
-      "sprite": "sprAndersTable",
-      "x": 484,
-      "y": 316,
+      "sprite": "sprToolTable",
+      "x": 64,
+      "y": 195,
       "depth": 0,
       "solid": true,
       "furniture": true
     },
     {
-      "name": "eeDoor",
-      "kind": "door",
-      "sprite": "sprDoorH",
-      "x": 416,
-      "y": 272,
-      "depth": -1
+      "name": "eeFurnishing",
+      "kind": "decor",
+      "sprite": "sprToolTable",
+      "x": 136,
+      "y": 61,
+      "depth": 0,
+      "solid": true,
+      "furniture": true
+    },
+    {
+      "name": "eeFurnishing",
+      "kind": "decor",
+      "sprite": "sprToolTable",
+      "x": 64,
+      "y": 123,
+      "depth": 0,
+      "solid": true,
+      "furniture": true
+    },
+    {
+      "name": "eeFurnishing",
+      "kind": "decor",
+      "sprite": "sprWorkTable",
+      "x": 293,
+      "y": 56.5,
+      "depth": 0,
+      "solid": true,
+      "furniture": true
+    },
+    {
+      "name": "eeFurnishing",
+      "kind": "decor",
+      "sprite": "sprWorkTable",
+      "x": 375,
+      "y": 56.5,
+      "depth": 0,
+      "solid": true,
+      "furniture": true
+    },
+    {
+      "name": "eeFurnishing",
+      "kind": "decor",
+      "sprite": "sprWorkTable",
+      "x": 443,
+      "y": 113.5,
+      "depth": 0,
+      "solid": true,
+      "furniture": true
+    },
+    {
+      "name": "eeFurnishing",
+      "kind": "decor",
+      "sprite": "sprCocaineCrate",
+      "x": 283,
+      "y": 282,
+      "depth": 0,
+      "solid": true,
+      "furniture": true
+    },
+    {
+      "name": "eeFurnishing",
+      "kind": "decor",
+      "sprite": "sprCocaineCrate",
+      "x": 283,
+      "y": 390,
+      "depth": 0,
+      "solid": true,
+      "furniture": true
+    },
+    {
+      "name": "eeFurnishing",
+      "kind": "decor",
+      "sprite": "sprCocaineCrate",
+      "x": 453,
+      "y": 338,
+      "depth": 0,
+      "solid": true,
+      "furniture": true
     }
   ],
   "tiles": []

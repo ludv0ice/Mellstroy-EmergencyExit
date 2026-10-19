@@ -104,6 +104,7 @@ try {
     mobile: false,
   });
   await send('Page.navigate', { url: server.url });
+  await send('Page.bringToFront');
   await until("window.__GAME__?.mode==='menu'");
   await evaluate('window.__QA_APP__.game.loop.stop(); document.fonts.ready');
   await evaluate(

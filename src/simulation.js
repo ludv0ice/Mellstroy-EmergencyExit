@@ -192,6 +192,22 @@ export class Simulation {
         rayRect(a.x, a.y, b.x, b.y, box) !== null,
     );
   }
+  pathBlocked(from, to) {
+    const steps = Math.max(1, Math.ceil(distance(from, to) / 4));
+    for (let i = 0; i <= steps; i++) {
+      const fraction = i / steps;
+      if (
+        this.blocked(
+          from.x + (to.x - from.x) * fraction,
+          from.y + (to.y - from.y) * fraction,
+          7,
+          false,
+        )
+      )
+        return true;
+    }
+    return false;
+  }
   safeSpawn(at) {
     if (!this.blocked(at.x, at.y, 7, false)) return { x: at.x, y: at.y };
     for (let radius = 8; radius < 400; radius += 8)
@@ -212,18 +228,12 @@ export class Simulation {
     return { x: at.x, y: at.y };
   }
   findExit() {
-    const candidates = this.exits.filter((e) => /PlayerCarEnter/.test(e.name));
-    if (candidates.length) return candidates[0];
-    const stairs = this.exits.filter((e) => !e.init.solid);
-    if (stairs.length) {
-      let result = stairs[0];
-      for (const e of stairs)
-        if (distance(e, this.player) > distance(result, this.player))
-          result = e;
-      return result;
-    }
-    return { x: this.player.x, y: this.player.y };
+    return (
+      this.exits.find((exit) => exit.forward) ??
+      this.exits[0] ?? { x: this.player.x, y: this.player.y }
+    );
   }
+
   canMoveTo(actor, x, y) {
     if (this.blocked(x, y, 7)) return false;
     const others =
@@ -363,7 +373,9 @@ export class Simulation {
         ? (p.weapon === UNARMED ? 'E / ПКМ · ' : 'E · ') +
           nearest.weapon.name.toUpperCase()
         : this.cleared
-          ? 'К ВЫХОДУ → E'
+          ? this.exit.transition === 'stairs'
+            ? 'К ЛЕСТНИЦЕ → E'
+            : 'К ДВЕРИ → E'
           : '';
     if (
       input.interact &&
@@ -551,7 +563,7 @@ export class Simulation {
       vx: Math.cos(p.angle) * 390,
       vy: Math.sin(p.angle) * 390,
       angle: p.angle,
-      life: this.profile.longThrows ? 0.95 : 0.65,
+      life: this.profile.longThrows ? 0.78 : 0.65,
       team: 'player',
       owner: p,
       weapon: p.weapon,
@@ -735,7 +747,7 @@ export class Simulation {
         }
       } else {
         const target = e.lastSeen;
-        if (!this.lineBlocked(e, target, true)) {
+        if (!this.pathBlocked(e, target)) {
           this.moveEnemy(e, target, (e.dog ? 180 : 120) * dt, dt);
         } else {
           if (e.routeTimer <= 0) {

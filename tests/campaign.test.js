@@ -48,7 +48,7 @@ test('Every retained room remains deterministic and finite with the corrected me
   }
 });
 
-test('All 24 gameplay modifiers construct valid simulations with consistent weapon and armor setup', () => {
+test('All five balanced profiles construct valid simulations with consistent weapon and armor setup', () => {
   for (const profile of PROFILES) {
     const sim = new Simulation(manifest, raw('eeTraining'), profile);
     assert.equal(sim.player.weapon.id, profile.startWeapon ?? -1, profile.id);
@@ -73,5 +73,25 @@ test('Each chapter has at most seven enemies across all of its floors', async ()
       const sim = new Simulation(manifest, raw(id), PROFILES[0]);
       assert.ok(sim.enemies.length <= 7, id);
     }
+  }
+});
+
+test('The five retained profiles grant modest bonuses without combat immunity or free weapons', () => {
+  assert.equal(PROFILES.length, 5);
+  assert.equal(new Set(PROFILES.map((profile) => profile.id)).size, 5);
+  for (const profile of PROFILES) {
+    assert.ok(profile.speed >= 180 && profile.speed <= 194, profile.id);
+    assert.ok((profile.ammoBonus ?? 1) <= 1.2, profile.id);
+    for (const removed of [
+      'armor',
+      'punchKill',
+      'startWeapon',
+      'friendlyDogs',
+      'lethalDoors',
+      'silentShots',
+      'stealth',
+      'disarm',
+    ])
+      assert.ok(!profile[removed], profile.id + ' ' + removed);
   }
 });

@@ -144,3 +144,42 @@ test('The redesigned campaign still provides all 35 weapon types', () => {
   for (let id = 0; id < 35; id++)
     assert.ok(ids.has(id), 'missing weapon ' + id);
 });
+
+test('Each stage has visible stairs and only its final floor has the chapter exit door', () => {
+  for (const chapter of CHAPTERS)
+    chapter.rooms.forEach((id, index) => {
+      const room = raw(id);
+      const sim = new Simulation(manifest, room, PROFILES[0]);
+      assert.equal(sim.exit.forward, true, id);
+      assert.ok(
+        sim.exits.every((exit) => exit.visible && exit.transition),
+        id,
+      );
+      assert.ok(
+        !room.entities.some((entity) =>
+          /Car/.test(entity.name + entity.sprite),
+        ),
+        id,
+      );
+      if (index < chapter.rooms.length - 1) {
+        assert.equal(sim.exit.transition, 'stairs', id);
+        assert.equal(sim.exit.init.nextroom, chapter.rooms[index + 1], id);
+        assert.equal(
+          sim.exits.filter((exit) => exit.transition === 'door').length,
+          0,
+          id,
+        );
+      } else {
+        assert.equal(sim.exit.transition, 'door', id);
+        assert.equal(sim.exit.init.nextroom, undefined, id);
+      }
+      sim.player.x = sim.exit.x;
+      sim.player.y = sim.exit.y;
+      sim.grace = 100;
+      sim.update(1 / 60, { interact: true });
+      assert.notEqual(sim.status, 'complete', id + ' exit before clear');
+      for (const enemy of sim.enemies) sim.kill(enemy, 'shot');
+      sim.update(1 / 60, { interact: true });
+      assert.equal(sim.status, 'complete', id + ' exit after clear');
+    });
+});

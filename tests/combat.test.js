@@ -146,7 +146,7 @@ test('Drop, swap and pickup preserve ammunition without reapplying the ammo modi
     PROFILES.find((p) => p.id === 'marksman'),
   );
   sim.pickup();
-  assert.equal(sim.player.ammo, 12);
+  assert.equal(sim.player.ammo, 7);
   sim.player.ammo = 9;
   for (let i = 0; i < 5; i++) {
     sim.dropWeapon();
@@ -160,7 +160,7 @@ test('Drop, swap and pickup preserve ammunition without reapplying the ammo modi
   sim.items.push({ x: 40, y: 40, weapon: WEAPONS[1], ammo: 2 });
   sim.pickup();
   assert.equal(sim.player.weapon.id, 1);
-  assert.equal(sim.player.ammo, 4);
+  assert.equal(sim.player.ammo, 2);
   const swapped = sim.items.find((i) => !i.taken);
   assert.equal(swapped.weapon.id, 0);
   assert.equal(swapped.ammo, 9);
@@ -390,4 +390,27 @@ test('A hero touching an enemy can slide around him and still attack at melee di
   const contact = duel(14);
   contact.attack();
   assert.equal(contact.enemies[0].stun, STUN_DURATION);
+});
+
+test('Path checks account for actor width when a sight ray narrowly clears a wall corner', () => {
+  const sim = fixture([
+    actor('player', 60, 55),
+    {
+      name: 'eeWall',
+      kind: 'decor',
+      solid: true,
+      isWall: true,
+      x: 80,
+      y: 60,
+      bounds: { x: 80, y: 60, w: 32, h: 6 },
+    },
+  ]);
+  const target = { x: 140, y: 55 };
+  assert.equal(sim.lineBlocked(sim.player, target, true), false);
+  assert.equal(sim.pathBlocked(sim.player, target), true);
+  const route = sim.navigation.path(sim.player, target);
+  assert.ok(route.length > 0);
+  assert.ok(route.some((point) => point.y <= 52));
+  for (const point of route)
+    assert.equal(sim.blocked(point.x, point.y, 7, false), false);
 });

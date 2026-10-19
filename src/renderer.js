@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { clamp } from './physics.js';
-import { drawLevel } from './level-art.js';
+import { drawLevel, drawTransition } from './level-art.js';
 import { assetUrl } from './assets.js';
 import { playerPose, heldWeaponPose } from './player-animation.js';
 
@@ -242,13 +242,6 @@ export class GameView extends Phaser.Scene {
   }
   drawEntity(ctx, e) {
     if (e.broken) return;
-    if (e.sprite === 'sprPlayerCar') {
-      const frame = this.app.escape
-        ? Math.min(12, Math.floor(this.app.escape.elapsed * 16))
-        : e.frame;
-      this.drawCustom(ctx, 'car', frame, e.x, e.y, e.angle);
-      return;
-    }
     if (e.sprite === 'sprAndersDesk') {
       const img = this.images.get('custom-desk'),
         m = e.meta,
@@ -335,7 +328,6 @@ export class GameView extends Phaser.Scene {
       }
       this.app.updateHUD();
     }
-    if (this.app.mode === 'escaping') this.app.advanceExit(dt);
     const p = this.sim.player,
       look =
         input.look && this.app.mode === 'playing'
@@ -403,6 +395,14 @@ export class GameView extends Phaser.Scene {
           body.angle,
         );
     }
+    for (const exit of sim.exits)
+      if (exit.transition)
+        drawTransition(
+          ctx,
+          exit,
+          exit === sim.exit,
+          sim.cleared && (!sim.tutorial || sim.tutorial.canExit),
+        );
     for (const item of sim.items)
       if (!item.taken) {
         ctx.strokeStyle = '#5decce55';
@@ -577,15 +577,6 @@ export class GameView extends Phaser.Scene {
     }
     if (sim.cleared && !this.preview) {
       const e = sim.exit;
-      const blink = 0.5 + 0.5 * Math.sin(time * 0.006);
-      ctx.strokeStyle = '#6bffe3';
-      ctx.lineWidth = 1.5;
-      ctx.strokeRect(e.x - 13, e.y - 13, 26, 26);
-      ctx.fillStyle = `rgba(70,250,200,${0.1 + blink * 0.14})`;
-      ctx.fillRect(e.x - 12, e.y - 12, 24, 24);
-      ctx.fillStyle = '#91ffe1';
-      ctx.font = 'bold 8px monospace';
-      ctx.fillText('EXIT', e.x - 10, e.y - 20);
       const d = Math.hypot(e.x - p.x, e.y - p.y);
       if (d > 100) {
         const angle = Math.atan2(e.y - p.y, e.x - p.x);

@@ -9,7 +9,6 @@
 | `police-walk.png` | `sprPoliceWalkM16` | 256×24 | 8 | 32×24 | 8,10 |
 | `police-unarmed.png` | `sprPoliceWalkUnarmed` | 256×32 | 8 | 32×32 | 16,16 |
 | `police-corpse.png` | `sprPoliceBackMachinegun` | 240×60 | 4 | 60×60 | 30,30 |
-| `escape-car.png` | `sprPlayerCar` | 1391×70 | 13 | 107×70 | 53,46 |
 | `streamer-desk.png` | `sprAndersDesk` | 318×25 | 6 | 53×25 | 26,14 |
 | `floor-atlas.png` | `tlFloorTiles` | 816×368 | Атлас | Исходная сетка | Исходные координаты тайлов |
 
@@ -56,7 +55,6 @@ Use case precise-object-edit. Image1 edit target: four top-down police corpse an
 
 ### Машина побега
 
-Use case precise-object-edit. Edit the supplied 13-frame overhead escape car sprite strip. Replace the silver retro car with a black modern sports sedan with subtle violet reflections, cyan tinted windows and red tail lights. Preserve EXACT thirteen source frame poses, including the SAME door opening/closing poses and orientation, body dimensions, frame order, transparent canvas and source overhead orthographic viewpoint. Every frame is the SAME car, facing RIGHT in a horizontal row, doors open and close as in reference. Thirteen equal107x70 slots, entire1391x70 strip if possible. Car visible body107x52 low resolution pixels; do not alter scale or add people or smoke. Crisp limited-palette pixel art suitable for Hotline Miami style. Fully transparent outside car silhouette, no labels, logos, shadows, environment or extra frames. Keep all THIRTEEN sequential frames, not fewer.
 
 ### Стол стримера
 

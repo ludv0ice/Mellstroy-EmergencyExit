@@ -132,7 +132,7 @@ const app = {
       sim.status = 'playing';
       sim.player.alive = true;
       sim.grace = 0.6;
-      if (!reuse)
+      if (!reuse || !this.checkpoints.has(id))
         this.checkpoints.set(id, {
           weapon: sim.player.weapon,
           ammo: sim.player.ammo,
@@ -220,73 +220,25 @@ const app = {
     }
     if (event.type === 'clear' && !this.sim.tutorial)
       this.toast('ПЕРИМЕТР ЧИСТ · К ВЫХОДУ');
-    if (event.type === 'complete') this.beginExit();
-  },
-  beginExit() {
-    if (/PlayerCarEnter/.test(this.sim.exit.name ?? '')) {
-      this.mode = 'escaping';
-      this.escape = {
-        elapsed: 0,
-        start: { x: this.sim.player.x, y: this.sim.player.y },
-        target: this.sim.exit,
-      };
-      this.overlay(null);
-      this.audio.play('sndCarOpen');
-    } else this.complete();
-  },
-  advanceExit(dt) {
-    const e = this.escape;
-    e.elapsed += dt;
-    const t = Math.min(1, e.elapsed / 0.45);
-    this.sim.player.x = e.start.x + (e.target.x - e.start.x) * t;
-    this.sim.player.y = e.start.y + (e.target.y - e.start.y) * t;
-    this.sim.player.visible = e.elapsed < 0.42;
-    if (e.elapsed > 0.85) {
-      this.audio.play('sndCarEngine');
-      this.escape = null;
-      this.complete();
-    }
+    if (event.type === 'complete') this.complete();
   },
   configureExit(sim) {
-    const forward = this.chapter.rooms
-      .slice(this.floorIndex + 1)
-      .some((id) => !this.floorStates.get(id)?.cleared);
-    this.returning = !forward && this.floorIndex > 0;
-    const target = forward
-      ? this.chapter.rooms[this.floorIndex + 1]
-      : this.returning
-        ? this.chapter.rooms[this.floorIndex - 1]
-        : null;
-    if (target) {
-      const candidates = sim.exits.filter(
-        (e) => !/PlayerCarEnter/.test(e.name),
-      );
-      sim.exit =
-        candidates.find((e) => connectsTo(e, target)) ??
-        candidates.find((e) => (forward ? e.forward : e.backward)) ??
-        candidates.sort(
-          (a, b) =>
-            Math.hypot(b.x - sim.player.x, b.y - sim.player.y) -
-            Math.hypot(a.x - sim.player.x, a.y - sim.player.y),
-        )[0] ??
-        sim.exit;
-    } else
-      sim.exit =
-        sim.exits.find((e) => /PlayerCarEnter/.test(e.name)) ?? sim.exit;
+    const next = this.chapter.rooms[this.floorIndex + 1];
+    sim.exit =
+      sim.exits.find((exit) =>
+        next ? connectsTo(exit, next) : exit.transition === 'door',
+      ) ?? sim.exit;
   },
   complete() {
     this.floorStates.set(this.sim.room.id, this.sim);
-    const unfinished = this.chapter.rooms
-      .slice(this.floorIndex + 1)
-      .some((id) => !this.floorStates.get(id)?.cleared);
-    if (unfinished || this.floorIndex > 0) {
+    if (this.floorIndex + 1 < this.chapter.rooms.length) {
       const carry = {
         weapon: this.sim.player.weapon,
         ammo: this.sim.player.ammo,
         armor: this.sim.player.armor,
         from: this.sim.room.id,
       };
-      this.floorIndex += unfinished ? 1 : -1;
+      this.floorIndex += 1;
       this.runScore = [...this.floorStates.entries()]
         .filter(([id]) => id !== this.chapter.rooms[this.floorIndex])
         .reduce((n, [, s]) => n + s.score, 0);
@@ -360,7 +312,7 @@ const app = {
     $('hud-number').textContent = this.chapter.number + ' /';
     $('hud-title').textContent = this.chapter.title;
     $('hud-floor').textContent =
-      `ЛОКАЦИЯ ${this.floorIndex + 1} / ${this.chapter.rooms.length} · ${this.returning ? 'ОБРАТНО К МАШИНЕ' : (s.room.design?.title ?? this.profile.name)}`;
+      `ЛОКАЦИЯ ${this.floorIndex + 1} / ${this.chapter.rooms.length} · ${s.room.design?.title ?? this.profile.name}`;
     $('hud-enemies').textContent = s.cleared
       ? 'ПЕРИМЕТР ЧИСТ'
       : `${s.total - s.kills} / ${s.total} НА ПЕРИМЕТРЕ`;

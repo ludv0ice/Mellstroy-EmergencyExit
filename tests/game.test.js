@@ -158,7 +158,7 @@ test('Disarm modifier steals a gun without duplicating it on the ground', () => 
   const sim = new Simulation(
     manifest,
     fixture([instance('objPlayerMouse', 40, 40), instance('objEnemy', 60, 40)]),
-    PROFILES.find((p) => p.id === 'steal'),
+    { ...PROFILES[0], disarm: true },
   );
   sim.player.angle = 0;
   sim.player.fireTimer = 0;
@@ -214,7 +214,6 @@ test('Custom sheets preserve source canvas size, frame count, and origin', () =>
     punch: 'sprPAttackPunch',
     corpse: 'sprPoliceBackMachinegun',
     desk: 'sprAndersDesk',
-    car: 'sprPlayerCar',
   };
   for (const [key, sprite] of Object.entries(pairs)) {
     const s = skins[key],
@@ -234,7 +233,14 @@ test('All retained textures, sounds and fonts remain byte-identical to the origi
   const baseline = JSON.parse(
     readFileSync(new URL('./fixtures/campaign-baseline.json', import.meta.url)),
   );
+  const removed = new Set([
+    '/assets/custom/escape-car.png',
+    '/assets/original/sprPlayerCar.png',
+    '/assets/audio/sndCarOpen.wav',
+    '/assets/audio/sndCarEngine.wav',
+  ]);
   for (const [url, expected] of Object.entries(baseline.assets)) {
+    if (removed.has(url)) continue;
     assert.equal(
       createHash('sha256')
         .update(readFileSync(new URL('..' + url, import.meta.url)))

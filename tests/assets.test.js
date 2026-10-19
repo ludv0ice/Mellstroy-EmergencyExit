@@ -21,8 +21,8 @@ test('Local resources use the game folder and preloaded room data without fetch'
   });
   assert.deepEqual(await readJson('/assets/rooms/eeTraining.json'), room);
   assert.equal(
-    assetUrl('/assets/audio/sndCarOpen.wav'),
-    'file:///Games/My%20Game/assets/audio/sndCarOpen.wav',
+    assetUrl('/assets/audio/sndDoorOpen.wav'),
+    'file:///Games/My%20Game/assets/audio/sndDoorOpen.wav',
   );
   await assert.rejects(readJson('/missing.json'), /Missing game data/);
 });

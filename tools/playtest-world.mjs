@@ -91,6 +91,7 @@ try {
     mobile: false,
   });
   await send('Page.navigate', { url: server.url });
+  await send('Page.bringToFront');
   await until("window.__GAME__?.mode==='menu'");
   await evaluate('window.__QA_APP__.game.loop.stop(); document.fonts.ready');
 
@@ -178,6 +179,60 @@ try {
   await press('Enter');
   await until("window.__GAME__.mode==='playing'");
   assert.equal(await evaluate('window.__QA_APP__.sim.tutorial.step'), 'move');
+  let transitions = 0;
+  for (let chapter = 1; chapter < 22; chapter++) {
+    await evaluate(
+      `(()=>{const a=window.__QA_APP__;a.briefing(${chapter});a.start();return true})()`,
+    );
+    await until("window.__GAME__.mode==='playing'");
+    const floors = await evaluate('window.__QA_APP__.chapter.rooms');
+    for (let index = 0; index < floors.length; index++) {
+      assert.equal(
+        await evaluate('window.__QA_APP__.sim.room.id'),
+        floors[index],
+      );
+      assert.equal(
+        await evaluate('window.__QA_APP__.sim.exit.transition'),
+        index < floors.length - 1 ? 'stairs' : 'door',
+      );
+      if (index) {
+        assert.equal(await evaluate('window.__QA_APP__.sim.player.ammo'), 17);
+        assert.equal(await evaluate('window.__QA_APP__.sim.player.armor'), 1);
+        await evaluate(
+          '(()=>{const a=window.__QA_APP__;window.__previousSim=a.sim;a.restart();return true})()',
+        );
+        await until(
+          "window.__GAME__.mode==='playing' && window.__QA_APP__.sim!==window.__previousSim",
+        );
+        assert.equal(await evaluate('window.__QA_APP__.sim.player.ammo'), 17);
+        assert.equal(await evaluate('window.__QA_APP__.sim.player.armor'), 1);
+      }
+      await evaluate(`(()=>{const a=window.__QA_APP__,s=a.sim;s.grace=100;
+        s.player.weapon=s.items.find(item=>item.weapon.gun).weapon;s.player.ammo=17;s.player.armor=1;
+        for(const enemy of s.enemies)s.kill(enemy,'shot');s.checkClear();s.player.x=s.exit.x;s.player.y=s.exit.y;
+        a.view.cameraPoint={x:s.player.x,y:s.player.y};return true})()`);
+      if (chapter === 1 || chapter === 16 || chapter === 14)
+        await screenshot(
+          'chapter-' +
+            chapter +
+            '-floor-' +
+            index +
+            '-' +
+            (index < floors.length - 1 ? 'stairs' : 'door'),
+        );
+      await press('KeyE');
+      transitions++;
+      await until(
+        index < floors.length - 1
+          ? `window.__GAME__.mode==='playing' && window.__QA_APP__.sim.room.id==='${floors[index + 1]}'`
+          : "window.__GAME__.mode==='result'",
+      );
+    }
+    assert.equal(
+      await evaluate('window.__QA_APP__.floorStates.size'),
+      floors.length,
+    );
+  }
   const rooms = await evaluate('window.__QA_APP__.manifest.rooms');
   for (const { id } of rooms) {
     await evaluate(
@@ -207,6 +262,9 @@ try {
     pauseKeyboard: true,
     mousePreserved: true,
     roomsRendered: rooms.length,
+    transitions,
+    chaptersCompleted: 21,
+    floorRestartPreservesInventory: true,
     externalRequests: 0,
     javaScriptErrors: 0,
   };

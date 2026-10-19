@@ -90,6 +90,7 @@ try {
     mobile: false,
   });
   await send('Page.navigate', { url: server.url });
+  await send('Page.bringToFront');
   await until("window.__GAME__?.mode==='menu'");
   await evaluate('window.__QA_APP__.game.loop.stop(); document.fonts.ready');
   await screenshot('menu-desktop');
@@ -138,7 +139,7 @@ try {
       const move =
         await evaluate(`(()=>{const s=window.__QA_APP__.sim,p=s.player,t={x:${x},y:${y}};
         if(Math.hypot(p.x-t.x,p.y-t.y)<${reach})return null;
-        const route=s.navigation.path(p,t),q=s.lineBlocked(p,t,true)?(route.find(q=>Math.hypot(p.x-q.x,p.y-q.y)>5)??t):t;
+        const route=s.navigation.path(p,t),q=s.pathBlocked(p,t)?(route.find(q=>Math.hypot(p.x-q.x,p.y-q.y)>5)??t):t;
         return {x:q.x-p.x,y:q.y-p.y,px:p.x,py:p.y};})()`);
       if (!move) {
         await movement([]);
