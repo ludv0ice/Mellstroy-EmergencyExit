@@ -9,6 +9,7 @@ import { AudioEngine } from './audio.js';
 import { connectsTo } from './rooms.js';
 import { readJson } from './assets.js';
 import { EndingPlayer } from './ending.js';
+import { CheatConsole } from './cheats.js';
 import { endingUnlocked } from './ending-sequence.js';
 
 const $ = (id) => document.getElementById(id);
@@ -111,6 +112,7 @@ const app = {
         reuse && this.floorStates.has(id)
           ? this.floorStates.get(id)
           : new Simulation(this.manifest, raw, this.profile);
+      if (this.cheats) sim.cheats = this.cheats.flags;
       if (carry) {
         sim.player.weapon = carry.weapon;
         sim.player.ammo = carry.ammo;
@@ -456,6 +458,9 @@ async function boot() {
   }
 }
 function bindUI() {
+  app.cheats = new CheatConsole(app, () =>
+    save('emergency-exit-progress', app.progress),
+  );
   app.menuNavigation = new MenuNavigation();
   $('continue').textContent = app.progress.unlocked
     ? 'ПРОДОЛЖИТЬ ПОБЕГ'

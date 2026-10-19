@@ -672,7 +672,7 @@ export class Simulation {
     this.sound(method === 'cut' ? 'sndCut1' : 'sndHit');
   }
   die() {
-    if (!this.player.alive) return;
+    if (!this.player.alive || this.cheats?.god) return;
     this.player.alive = false;
     this.status = 'dead';
     this.emit('death');
@@ -680,6 +680,7 @@ export class Simulation {
     this.emit('shake', { amount: 5 });
   }
   takeBullet() {
+    if (this.cheats?.god) return;
     if (this.player.armor > 0) {
       this.player.armor--;
       this.sound('sndHit');

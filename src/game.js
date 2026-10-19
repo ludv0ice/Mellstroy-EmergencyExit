@@ -1751,7 +1751,8 @@
       this.sound(method === "cut" ? "sndCut1" : "sndHit");
     }
     die() {
-      if (!this.player.alive) return;
+      var _a;
+      if (!this.player.alive || ((_a = this.cheats) == null ? void 0 : _a.god)) return;
       this.player.alive = false;
       this.status = "dead";
       this.emit("death");
@@ -1759,6 +1760,8 @@
       this.emit("shake", { amount: 5 });
     }
     takeBullet() {
+      var _a;
+      if ((_a = this.cheats) == null ? void 0 : _a.god) return;
       if (this.player.armor > 0) {
         this.player.armor--;
         this.sound("sndHit");
@@ -3230,6 +3233,178 @@
       document.body.classList.remove("ending-active");
     }
   };
+  function completeCampaign(progress) {
+    var _a;
+    const best = { ...progress.best };
+    for (const chapter of CHAPTERS)
+      if (!Number.isFinite((_a = best[chapter.index]) == null ? void 0 : _a.score))
+        best[chapter.index] = { score: 0, grade: "C", time: 0 };
+    return {
+      ...progress,
+      best,
+      unlocked: CHAPTERS.length - 1,
+      last: CHAPTERS.length - 1
+    };
+  }
+  function clearLocation(sim) {
+    sim.tutorial = null;
+    for (const enemy of sim.enemies) sim.kill(enemy, "cheat");
+    sim.bullets = sim.bullets.filter((bullet) => bullet.team === "player");
+    sim.checkClear();
+  }
+  var CheatConsole = class {
+    constructor(app2, persist) {
+      this.app = app2;
+      this.persist = persist;
+      this.flags = { god: false };
+      this.root = document.getElementById("cheat-console");
+      this.input = this.root.querySelector("input");
+      this.output = this.root.querySelector("[data-cheat-output]");
+      this.history = [];
+      this.historyIndex = 0;
+      this.lines = ["\u041A\u043E\u043D\u0441\u043E\u043B\u044C. help \u2014 \u0441\u043F\u0438\u0441\u043E\u043A \u043A\u043E\u043C\u0430\u043D\u0434. F2 / \u0401 / Esc \u2014 \u0437\u0430\u043A\u0440\u044B\u0442\u044C."];
+      this.output.textContent = this.lines[0];
+      this.root.querySelector("form").addEventListener("submit", (event) => {
+        event.preventDefault();
+        this.submit();
+      });
+      this.root.querySelector("[data-cheat-close]").onclick = () => this.close();
+      document.addEventListener("keydown", (event) => this.keydown(event), true);
+      document.addEventListener(
+        "keyup",
+        (event) => {
+          if (this.opened) event.stopImmediatePropagation();
+        },
+        true
+      );
+    }
+    keydown(event) {
+      if (["F2", "Backquote"].includes(event.code)) {
+        if (!this.opened && ["loading", "ending"].includes(this.app.mode)) return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        if (!event.repeat) this.opened ? this.close() : this.open();
+        return;
+      }
+      if (!this.opened) return;
+      event.stopImmediatePropagation();
+      if (event.code === "Tab") {
+        event.preventDefault();
+        const controls = [...this.root.querySelectorAll("button, input")];
+        const index = controls.indexOf(document.activeElement);
+        const next = (index + (event.shiftKey ? -1 : 1) + controls.length) % controls.length;
+        controls[next].focus({ preventScroll: true });
+      } else if (event.code === "Escape") {
+        event.preventDefault();
+        this.close();
+      } else if (event.code === "Enter" && event.target === this.input) {
+        event.preventDefault();
+        if (!event.repeat) this.submit();
+      } else if (["ArrowUp", "ArrowDown"].includes(event.code) && event.target === this.input) {
+        event.preventDefault();
+        this.historyIndex = Math.max(
+          0,
+          Math.min(
+            this.history.length,
+            this.historyIndex + (event.code === "ArrowUp" ? -1 : 1)
+          )
+        );
+        this.input.value = this.history[this.historyIndex] ?? "";
+      }
+    }
+    open() {
+      var _a;
+      if (this.opened || !this.app.view) return;
+      this.previousMode = this.app.mode;
+      this.previousPanel = ((_a = document.querySelector(".overlay:not(.hidden)")) == null ? void 0 : _a.id) ?? null;
+      this.app.mode = "console";
+      this.app.menuNavigation.show(null);
+      this.app.view.input.keyboard.enabled = false;
+      this.app.view.input.keyboard.resetKeys();
+      this.app.view.pending = {};
+      Object.assign(this.app.view.controls, {
+        moveX: 0,
+        moveY: 0,
+        attack: false
+      });
+      document.getElementById("touch-controls").classList.add("hidden");
+      this.opened = true;
+      this.root.classList.remove("hidden");
+      this.input.value = "";
+      this.input.focus({ preventScroll: true });
+    }
+    close() {
+      if (!this.opened) return;
+      this.opened = false;
+      this.root.classList.add("hidden");
+      this.input.blur();
+      if (this.returnToMenu) {
+        this.returnToMenu = false;
+        this.app.menu();
+      } else {
+        this.app.mode = this.previousMode;
+        this.app.overlay(this.previousPanel);
+      }
+    }
+    log(text2) {
+      this.lines.push(text2);
+      this.lines = this.lines.slice(-30);
+      this.output.textContent = this.lines.join("\n");
+      this.output.scrollTop = this.output.scrollHeight;
+    }
+    submit() {
+      const line = this.input.value.trim();
+      this.input.value = "";
+      if (!line) return;
+      this.history.push(line);
+      this.history = this.history.slice(-30);
+      this.historyIndex = this.history.length;
+      this.log("> " + line);
+      this.log(this.execute(line));
+      if (this.opened) this.input.focus({ preventScroll: true });
+    }
+    execute(line) {
+      const [command, argument, ...extra] = line.toLowerCase().trim().split(/\s+/);
+      if (command === "help" && !argument)
+        return "god [on/off] \u2014 \u043D\u0435\u0443\u044F\u0437\u0432\u0438\u043C\u043E\u0441\u0442\u044C\nclear \u2014 \u0437\u0430\u0447\u0438\u0441\u0442\u0438\u0442\u044C \u0442\u0435\u043A\u0443\u0449\u0443\u044E \u043B\u043E\u043A\u0430\u0446\u0438\u044E\nwin \u2014 \u043F\u0440\u043E\u0439\u0442\u0438 \u0442\u0435\u043A\u0443\u0449\u0443\u044E \u043B\u043E\u043A\u0430\u0446\u0438\u044E \u0438 \u043F\u0435\u0440\u0435\u0439\u0442\u0438 \u0434\u0430\u043B\u044C\u0448\u0435\nwinall \u2014 \u043F\u0440\u043E\u0439\u0442\u0438 \u0432\u0441\u044E \u043A\u0430\u043C\u043F\u0430\u043D\u0438\u044E \u0438 \u043E\u0442\u043A\u0440\u044B\u0442\u044C \u0444\u0438\u043D\u0430\u043B\nfinale \u2014 \u043F\u043E\u0441\u043C\u043E\u0442\u0440\u0435\u0442\u044C \u043E\u0442\u043A\u0440\u044B\u0442\u044B\u0439 \u0444\u0438\u043D\u0430\u043B";
+      if (command === "god") {
+        if (extra.length || argument && !["on", "off"].includes(argument))
+          return "\u0424\u043E\u0440\u043C\u0430\u0442: god, god on \u0438\u043B\u0438 god off";
+        this.flags.god = argument ? argument === "on" : !this.flags.god;
+        if (this.app.sim) this.app.sim.cheats = this.flags;
+        return "\u041D\u0435\u0443\u044F\u0437\u0432\u0438\u043C\u043E\u0441\u0442\u044C: " + (this.flags.god ? "\u0412\u041A\u041B" : "\u0412\u042B\u041A\u041B");
+      }
+      if (argument) return "\u041B\u0438\u0448\u043D\u0438\u0435 \u0430\u0440\u0433\u0443\u043C\u0435\u043D\u0442\u044B. help \u2014 \u0441\u043F\u0438\u0441\u043E\u043A \u043A\u043E\u043C\u0430\u043D\u0434.";
+      if (command === "winall") {
+        this.app.progress = completeCampaign(this.app.progress);
+        this.persist();
+        this.returnToMenu = true;
+        return "\u0412\u0441\u0435 22 \u0443\u0440\u043E\u0432\u043D\u044F \u043F\u0440\u043E\u0439\u0434\u0435\u043D\u044B. \u041F\u0440\u043E\u0433\u0440\u0435\u0441\u0441 \u0441\u043E\u0445\u0440\u0430\u043D\u0451\u043D. \u0417\u0430\u043A\u0440\u043E\u0439 \u043A\u043E\u043D\u0441\u043E\u043B\u044C \u2014 \u0444\u0438\u043D\u0430\u043B \u0434\u043E\u0441\u0442\u0443\u043F\u0435\u043D \u0432 \u043C\u0435\u043D\u044E.";
+      }
+      if (command === "finale") {
+        if (!endingUnlocked(this.app.progress))
+          return "\u0424\u0438\u043D\u0430\u043B \u0435\u0449\u0451 \u0437\u0430\u043A\u0440\u044B\u0442. \u0421\u043D\u0430\u0447\u0430\u043B\u0430 \u043F\u0440\u043E\u0439\u0434\u0438 \u0432\u0441\u0435 \u0443\u0440\u043E\u0432\u043D\u0438 \u0438\u043B\u0438 \u0432\u0432\u0435\u0434\u0438 winall.";
+        this.close();
+        this.app.showEnding();
+        return "\u0424\u0438\u043D\u0430\u043B\u044C\u043D\u0430\u044F \u043A\u0430\u0442\u0441\u0446\u0435\u043D\u0430.";
+      }
+      if (["clear", "win"].includes(command)) {
+        const sim = this.app.sim;
+        if (!["playing", "paused"].includes(this.previousMode) || !(sim == null ? void 0 : sim.player.alive))
+          return "\u0421\u043D\u0430\u0447\u0430\u043B\u0430 \u0437\u0430\u043F\u0443\u0441\u0442\u0438 \u0443\u0440\u043E\u0432\u0435\u043D\u044C.";
+        clearLocation(sim);
+        if (command === "win") {
+          this.returnToMenu = false;
+          this.close();
+          sim.status = "complete";
+          this.app.complete();
+          return "\u041B\u043E\u043A\u0430\u0446\u0438\u044F \u043F\u0440\u043E\u0439\u0434\u0435\u043D\u0430.";
+        }
+        return "\u041B\u043E\u043A\u0430\u0446\u0438\u044F \u0437\u0430\u0447\u0438\u0449\u0435\u043D\u0430. \u0412\u044B\u0445\u043E\u0434 \u043E\u0442\u043A\u0440\u044B\u0442.";
+      }
+      return "\u041D\u0435\u0438\u0437\u0432\u0435\u0441\u0442\u043D\u0430\u044F \u043A\u043E\u043C\u0430\u043D\u0434\u0430. help \u2014 \u0441\u043F\u0438\u0441\u043E\u043A \u043A\u043E\u043C\u0430\u043D\u0434.";
+    }
+  };
   var $ = (id) => document.getElementById(id);
   var overlays = [
     "menu",
@@ -3329,6 +3504,7 @@
       try {
         const raw = await this.room(id);
         const sim = reuse && this.floorStates.has(id) ? this.floorStates.get(id) : new Simulation(this.manifest, raw, this.profile);
+        if (this.cheats) sim.cheats = this.cheats.flags;
         if (carry) {
           sim.player.weapon = carry.weapon;
           sim.player.ammo = carry.ammo;
@@ -3637,6 +3813,10 @@
     }
   }
   function bindUI() {
+    app.cheats = new CheatConsole(
+      app,
+      () => save("emergency-exit-progress", app.progress)
+    );
     app.menuNavigation = new MenuNavigation();
     $("continue").textContent = app.progress.unlocked ? "\u041F\u0420\u041E\u0414\u041E\u041B\u0416\u0418\u0422\u042C \u041F\u041E\u0411\u0415\u0413" : "\u041D\u0410\u0427\u0410\u0422\u042C \u041F\u041E\u0411\u0415\u0413";
     $("continue").onclick = () => {

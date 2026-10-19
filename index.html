@@ -54,6 +54,40 @@
           aria-live="polite"
         ></p>
       </section>
+      <section
+        id="cheat-console"
+        class="hidden"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Консоль"
+      >
+        <div class="cheat-window">
+          <header>
+            <strong>КОНСОЛЬ</strong
+            ><button
+              type="button"
+              data-cheat-close
+              aria-label="Закрыть консоль"
+            >
+              ×
+            </button>
+          </header>
+          <pre data-cheat-output role="log" aria-live="polite"></pre>
+          <form autocomplete="off">
+            <label for="cheat-input">&gt;</label>
+            <input
+              id="cheat-input"
+              name="command"
+              type="text"
+              maxlength="80"
+              spellcheck="false"
+              autocapitalize="off"
+              aria-label="Чит-команда"
+            />
+            <button type="submit">ENTER</button>
+          </form>
+        </div>
+      </section>
       <header id="hud" class="hidden">
         <div class="hud-chapter">
           <span id="hud-number">01 /</span><strong id="hud-title"></strong
