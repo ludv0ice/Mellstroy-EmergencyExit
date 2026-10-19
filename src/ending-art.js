@@ -381,7 +381,7 @@ function highway(ctx, time, assets) {
     frame.player.x,
     frame.player.y,
     frame.player.angle,
-    0.74,
+    1.08,
   );
   if (time >= ENDING.credits) {
     const shade = ctx.createLinearGradient(306, 0, 640, 0);
