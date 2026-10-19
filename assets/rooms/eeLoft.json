@@ -2446,6 +2446,28 @@
       }
     },
     {
+      "name": "eeGuard",
+      "kind": "enemy",
+      "sprite": "sprEWalkClub",
+      "x": 464,
+      "y": 320,
+      "depth": -1,
+      "init": {
+        "direction": -28.610459665965216
+      }
+    },
+    {
+      "name": "eePatrol",
+      "kind": "enemy",
+      "sprite": "sprEWalkUnarmed",
+      "x": 688,
+      "y": 416,
+      "depth": -1,
+      "init": {
+        "direction": -26.56505117707799
+      }
+    },
+    {
       "name": "eeWeapon",
       "kind": "weapon",
       "sprite": "sprWeapons",
@@ -2498,7 +2520,7 @@
       "kind": "exit",
       "transition": "door",
       "x": 688,
-      "y": 456,
+      "y": 462,
       "forward": true,
       "visible": true,
       "targets": [],
@@ -2508,18 +2530,8 @@
       "name": "eeFurnishing",
       "kind": "decor",
       "sprite": "sprAndersCouch",
-      "x": 364,
-      "y": 78,
-      "depth": 0,
-      "solid": true,
-      "furniture": true
-    },
-    {
-      "name": "eeFurnishing",
-      "kind": "decor",
-      "sprite": "sprPlayerLivingRoomTable",
       "x": 460,
-      "y": 77.5,
+      "y": 78,
       "depth": 0,
       "solid": true,
       "furniture": true
@@ -2630,16 +2642,6 @@
       "sprite": "sprComputer",
       "x": 607,
       "y": 450,
-      "depth": 0,
-      "solid": true,
-      "furniture": true
-    },
-    {
-      "name": "eeFurnishing",
-      "kind": "decor",
-      "sprite": "sprComputer",
-      "x": 743,
-      "y": 414,
       "depth": 0,
       "solid": true,
       "furniture": true

@@ -131,9 +131,9 @@ export function drawTransition(ctx, exit, active, unlocked) {
   ctx.save();
   ctx.translate(Math.round(exit.x), Math.round(exit.y));
   const color = active && unlocked ? '#8de2c3' : '#cbac88';
-  ctx.fillStyle = '#17232e';
-  ctx.fillRect(-23, -25, 46, 50);
   if (exit.transition === 'stairs') {
+    ctx.fillStyle = '#17232e';
+    ctx.fillRect(-23, -25, 46, 50);
     for (let i = 0; i < 7; i++) {
       ctx.fillStyle = i % 2 ? '#7d8991' : '#a4aaa5';
       ctx.fillRect(-17, -21 + i * 6, 34, 4);
@@ -149,25 +149,31 @@ export function drawTransition(ctx, exit, active, unlocked) {
     ctx.font = 'bold 14px sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText(exit.backward ? '↓' : '↑', 0, 5);
+    ctx.fillStyle = color;
+    ctx.fillRect(-19, -33, 38, 7);
+    ctx.fillStyle = '#14232a';
+    ctx.font = 'bold 6px Exo2, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('ЛЕСТНИЦА', 0, -27);
   } else {
-    ctx.fillStyle = '#b5bbb4';
-    ctx.fillRect(-23, -25, 46, 5);
-    ctx.fillRect(-23, -25, 5, 50);
-    ctx.fillRect(18, -25, 5, 50);
-    ctx.fillStyle = unlocked ? '#25483e' : '#70524c';
-    ctx.fillRect(-17, -19, 34, 42);
-    ctx.strokeStyle = '#182a30';
-    ctx.strokeRect(-13, -15, 26, 32);
-    ctx.fillStyle = '#e1ca8c';
-    ctx.fillRect(9, 0, 3, 5);
+    ctx.translate(0, 18);
+    ctx.fillStyle = '#10232e';
+    ctx.fillRect(-23, -7, 46, 14);
+    ctx.fillStyle = '#82a9b7';
+    ctx.fillRect(-24, -8, 6, 16);
+    ctx.fillRect(18, -8, 6, 16);
+    ctx.fillStyle = '#235b7d';
+    ctx.fillRect(-18, -5, 36, 10);
+    ctx.fillStyle = '#4ec4ed';
+    ctx.fillRect(-18, -5, 36, 2);
+    ctx.fillStyle = '#357eaa';
+    ctx.fillRect(-18, 3, 36, 2);
+    ctx.fillStyle = '#d8e8df';
+    ctx.fillRect(11, -3, 2, 6);
+    ctx.fillStyle = unlocked ? '#9be7a4' : '#ecb86c';
+    ctx.fillRect(-22, -3, 2, 6);
   }
-  ctx.fillStyle = color;
-  ctx.fillRect(-19, -33, 38, 7);
-  ctx.fillStyle = '#14232a';
-  ctx.font = 'bold 6px Exo2, sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText(exit.transition === 'stairs' ? 'ЛЕСТНИЦА' : 'ВЫХОД', 0, -27);
-  if (active && unlocked) {
+  if (active && unlocked && exit.transition === 'stairs') {
     ctx.fillStyle = '#9bf2d1';
     ctx.font = 'bold 8px Exo2, sans-serif';
     ctx.fillText('E', 0, 36);

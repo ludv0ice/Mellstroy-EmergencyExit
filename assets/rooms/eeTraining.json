@@ -1584,7 +1584,7 @@
       "kind": "exit",
       "transition": "door",
       "x": 368,
-      "y": 392,
+      "y": 398,
       "forward": true,
       "visible": true,
       "targets": [],

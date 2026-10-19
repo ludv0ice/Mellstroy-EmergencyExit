@@ -414,3 +414,32 @@ test('Path checks account for actor width when a sight ray narrowly clears a wal
   for (const point of route)
     assert.equal(sim.blocked(point.x, point.y, 7, false), false);
 });
+
+test('Using an unlocked exit keeps the held weapon even when another weapon lies under the door', () => {
+  const sim = fixture([
+    actor('player', 100, 100),
+    {
+      kind: 'exit',
+      name: 'eeChapterDoor',
+      transition: 'door',
+      x: 100,
+      y: 100,
+      forward: true,
+    },
+    {
+      kind: 'weapon',
+      name: 'eeWeapon',
+      sprite: 'sprWeapons',
+      x: 100,
+      y: 100,
+      init: { image_index: 1, ammo: 6 },
+    },
+  ]);
+  sim.player.weapon = WEAPONS[0];
+  sim.player.ammo = 17;
+  sim.update(1 / 60, { moveX: 0, moveY: 0, pickup: true, interact: true });
+  assert.equal(sim.status, 'complete');
+  assert.equal(sim.player.weapon, WEAPONS[0]);
+  assert.equal(sim.player.ammo, 17);
+  assert.equal(sim.items.filter((item) => !item.taken).length, 1);
+});

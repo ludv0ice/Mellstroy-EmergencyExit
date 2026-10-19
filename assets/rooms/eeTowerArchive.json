@@ -2756,12 +2756,34 @@
     {
       "name": "eeGuard",
       "kind": "enemy",
-      "sprite": "sprEWalkSilencer",
+      "sprite": "sprEWalkClub",
       "x": 304,
       "y": 160,
       "depth": -1,
       "init": {
         "direction": -9.462322208025617
+      }
+    },
+    {
+      "name": "eePatrol",
+      "kind": "enemy",
+      "sprite": "sprEWalkUnarmed",
+      "x": 592,
+      "y": 128,
+      "depth": -1,
+      "init": {
+        "direction": 0
+      }
+    },
+    {
+      "name": "eeGuard",
+      "kind": "enemy",
+      "sprite": "sprEWalkSilencer",
+      "x": 592,
+      "y": 256,
+      "depth": -1,
+      "init": {
+        "direction": -14.93141717813755
       }
     },
     {
@@ -2983,26 +3005,6 @@
       "sprite": "sprFileCabinet",
       "x": 684,
       "y": 136,
-      "depth": 0,
-      "solid": true,
-      "furniture": true
-    },
-    {
-      "name": "eeFurnishing",
-      "kind": "decor",
-      "sprite": "sprConferenceTable",
-      "x": 498,
-      "y": 236,
-      "depth": 0,
-      "solid": true,
-      "furniture": true
-    },
-    {
-      "name": "eeFurnishing",
-      "kind": "decor",
-      "sprite": "sprConferenceTable",
-      "x": 670,
-      "y": 236,
       "depth": 0,
       "solid": true,
       "furniture": true

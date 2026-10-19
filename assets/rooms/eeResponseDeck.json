@@ -2796,14 +2796,47 @@
       }
     },
     {
-      "name": "eeSwat",
+      "name": "eePatrol",
       "kind": "enemy",
-      "sprite": "sprPoliceWalkM16",
+      "sprite": "sprEWalkUnarmed",
       "x": 240,
       "y": 320,
       "depth": -1,
       "init": {
         "direction": -56.309932474020215
+      }
+    },
+    {
+      "name": "eeGuard",
+      "kind": "enemy",
+      "sprite": "sprEWalkClub",
+      "x": 240,
+      "y": 448,
+      "depth": -1,
+      "init": {
+        "direction": -68.19859051364818
+      }
+    },
+    {
+      "name": "eePatrol",
+      "kind": "enemy",
+      "sprite": "sprEWalkUnarmed",
+      "x": 624,
+      "y": 384,
+      "depth": -1,
+      "init": {
+        "direction": -26.56505117707799
+      }
+    },
+    {
+      "name": "eeSwat",
+      "kind": "enemy",
+      "sprite": "sprPoliceWalkM16",
+      "x": 376,
+      "y": 96,
+      "depth": -1,
+      "init": {
+        "direction": 6.911227119024681
       }
     },
     {
@@ -2859,7 +2892,7 @@
       "kind": "exit",
       "transition": "door",
       "x": 624,
-      "y": 488,
+      "y": 494,
       "forward": true,
       "visible": true,
       "targets": [],
@@ -2910,16 +2943,6 @@
       "kind": "decor",
       "sprite": "sprComputer",
       "x": 319,
-      "y": 62,
-      "depth": 0,
-      "solid": true,
-      "furniture": true
-    },
-    {
-      "name": "eeFurnishing",
-      "kind": "decor",
-      "sprite": "sprComputer",
-      "x": 383,
       "y": 62,
       "depth": 0,
       "solid": true,
@@ -3171,16 +3194,6 @@
       "sprite": "sprBigPoliceTable",
       "x": 565.3333333333334,
       "y": 320,
-      "depth": 0,
-      "solid": true,
-      "furniture": true
-    },
-    {
-      "name": "eeFurnishing",
-      "kind": "decor",
-      "sprite": "sprBigPoliceTable",
-      "x": 682.6666666666666,
-      "y": 416,
       "depth": 0,
       "solid": true,
       "furniture": true

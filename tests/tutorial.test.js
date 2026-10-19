@@ -11,6 +11,14 @@ const manifest = JSON.parse(
 function create() {
   const entities = [
     {
+      kind: 'exit',
+      name: 'eeChapterDoor',
+      transition: 'door',
+      forward: true,
+      x: 100,
+      y: 100,
+    },
+    {
       kind: 'player',
       name: 'objPlayerMouse',
       sprite: 'sprPWalkUnarmed',

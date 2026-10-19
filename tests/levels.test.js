@@ -110,7 +110,7 @@ test('Every spawn, enemy, weapon and exit is on reachable floor with clearance f
   }
 });
 
-test('Original floors retain reciprocal chapter transitions and the seven-enemy budget', () => {
+test('All floors retain reciprocal chapter transitions and the updated encounter budget', () => {
   for (const chapter of CHAPTERS) {
     let total = 0;
     chapter.rooms.forEach((id, i) => {
@@ -123,7 +123,7 @@ test('Original floors retain reciprocal chapter transitions and the seven-enemy 
       if (i < chapter.rooms.length - 1)
         assert.ok(targets.includes(chapter.rooms[i + 1]), id + ' forward');
     });
-    assert.ok(total <= 7, chapter.number);
+    assert.ok(total <= chapter.rooms.length * 10, chapter.number);
   }
   assert.equal(
     raw('eeTraining').entities.filter((e) => e.kind === 'enemy').length,

@@ -2837,6 +2837,39 @@
       }
     },
     {
+      "name": "eeGuard",
+      "kind": "enemy",
+      "sprite": "sprEWalkClub",
+      "x": 784,
+      "y": 160,
+      "depth": -1,
+      "init": {
+        "direction": 23.19859051364819
+      }
+    },
+    {
+      "name": "eePatrol",
+      "kind": "enemy",
+      "sprite": "sprEWalkUnarmed",
+      "x": 784,
+      "y": 448,
+      "depth": -1,
+      "init": {
+        "direction": 0
+      }
+    },
+    {
+      "name": "eeGuard",
+      "kind": "enemy",
+      "sprite": "sprEWalkClub",
+      "x": 152,
+      "y": 160,
+      "depth": -1,
+      "init": {
+        "direction": 82.09283729704156
+      }
+    },
+    {
       "name": "eeWeapon",
       "kind": "weapon",
       "sprite": "sprWeapons",
@@ -3059,26 +3092,6 @@
       "sprite": "sprWorkTable",
       "x": 827,
       "y": 113.5,
-      "depth": 0,
-      "solid": true,
-      "furniture": true
-    },
-    {
-      "name": "eeFurnishing",
-      "kind": "decor",
-      "sprite": "sprWorkTable",
-      "x": 741,
-      "y": 170.5,
-      "depth": 0,
-      "solid": true,
-      "furniture": true
-    },
-    {
-      "name": "eeFurnishing",
-      "kind": "decor",
-      "sprite": "sprWorkTable",
-      "x": 827,
-      "y": 170.5,
       "depth": 0,
       "solid": true,
       "furniture": true

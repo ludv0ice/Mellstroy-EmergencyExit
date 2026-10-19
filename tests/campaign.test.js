@@ -62,18 +62,40 @@ test('All five balanced profiles construct valid simulations with consistent wea
   }
 });
 
-test('Each chapter has at most seven enemies across all of its floors', async () => {
+test('Each combat floor receives two or three extra enemies without truncation at runtime', async () => {
   const { CHAPTERS } = await import('../src/campaign.js');
+  const additions = new Set();
   for (const chapter of CHAPTERS) {
-    const enemies = chapter.rooms.flatMap((id) =>
-      raw(id).entities.filter((e) => e.kind === 'enemy'),
-    );
-    assert.ok(enemies.length <= 7, chapter.number + ': ' + enemies.length);
-    for (const id of chapter.rooms) {
-      const sim = new Simulation(manifest, raw(id), PROFILES[0]);
-      assert.ok(sim.enemies.length <= 7, id);
-    }
+    chapter.rooms.forEach((id, index) => {
+      const room = raw(id);
+      const declared = room.entities.filter(
+        (entity) => entity.kind === 'enemy',
+      ).length;
+      const sim = new Simulation(manifest, room, PROFILES[0]);
+      assert.equal(sim.enemies.length, declared, id + ' silently truncated');
+      assert.ok(declared <= 10, id);
+      if (chapter.index === 0) assert.equal(declared, 3);
+      else {
+        const previousTotal = [14, 15].includes(chapter.index) ? 7 : 6;
+        const previous =
+          Math.floor(previousTotal / chapter.rooms.length) +
+          (index < previousTotal % chapter.rooms.length ? 1 : 0);
+        const extra = declared - previous;
+        assert.ok(extra === 2 || extra === 3, id + ': +' + extra);
+        additions.add(extra);
+      }
+      for (let a = 0; a < sim.enemies.length; a++)
+        for (let b = a + 1; b < sim.enemies.length; b++)
+          assert.ok(
+            Math.hypot(
+              sim.enemies[a].x - sim.enemies[b].x,
+              sim.enemies[a].y - sim.enemies[b].y,
+            ) >= 14,
+            id + ' overlapping spawns',
+          );
+    });
   }
+  assert.deepEqual([...additions].sort(), [2, 3]);
 });
 
 test('The five retained profiles grant modest bonuses without combat immunity or free weapons', () => {

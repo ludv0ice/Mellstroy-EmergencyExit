@@ -153,12 +153,16 @@ for (let number = 0; number < LEVEL_DESIGNS.length; number++) {
       : chapter.index === 14 || chapter.index === 15
         ? 7
         : 6;
+  const area = zones.reduce((sum, zone) => sum + zone.w * zone.h, 0);
+  const openHall = Math.max(...zones.map((zone) => zone.w * zone.h));
+  const reinforcements = area >= 300 && openHall >= 75 ? 3 : 2;
   const count = training
     ? 3
     : menu
       ? 0
       : Math.floor(total / chapter.rooms.length) +
-        (floor < total % chapter.rooms.length ? 1 : 0);
+        (floor < total % chapter.rooms.length ? 1 : 0) +
+        reinforcements;
   for (let i = 0; i < count; i++) {
     const boss =
       !training &&
@@ -273,7 +277,7 @@ for (let number = 0; number < LEVEL_DESIGNS.length; number++) {
         ? point(zones.length - 1, 32, 16)
         : {
             x: point(zones.length - 1).x,
-            y: (zones.at(-1).y + zones.at(-1).h) * cell - 24,
+            y: (zones.at(-1).y + zones.at(-1).h) * cell - 18,
           }),
       forward: true,
       visible: true,
@@ -362,6 +366,20 @@ for (let number = 0; number < LEVEL_DESIGNS.length; number++) {
         w: itemMeta.width,
         h: itemMeta.height,
       };
+      if (
+        important.some((entity) => {
+          const nearestX = Math.max(
+            bounds.x,
+            Math.min(bounds.x + bounds.w, entity.x),
+          );
+          const nearestY = Math.max(
+            bounds.y,
+            Math.min(bounds.y + bounds.h, entity.y),
+          );
+          return Math.hypot(entity.x - nearestX, entity.y - nearestY) < 28;
+        })
+      )
+        continue;
       if (
         bounds.x < zone.x * cell + 8 ||
         bounds.y < zone.y * cell + 8 ||

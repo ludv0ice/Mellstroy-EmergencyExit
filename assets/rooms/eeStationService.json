@@ -2806,6 +2806,28 @@
       }
     },
     {
+      "name": "eeGuard",
+      "kind": "enemy",
+      "sprite": "sprEWalkClub",
+      "x": 624,
+      "y": 256,
+      "depth": -1,
+      "init": {
+        "direction": 20.556045219583464
+      }
+    },
+    {
+      "name": "eePatrol",
+      "kind": "enemy",
+      "sprite": "sprEWalkUnarmed",
+      "x": 496,
+      "y": 448,
+      "depth": -1,
+      "init": {
+        "direction": 0
+      }
+    },
+    {
       "name": "eeWeapon",
       "kind": "weapon",
       "sprite": "sprWeapons",
@@ -2858,7 +2880,7 @@
       "kind": "exit",
       "transition": "door",
       "x": 496,
-      "y": 456,
+      "y": 462,
       "forward": true,
       "visible": true,
       "targets": [],

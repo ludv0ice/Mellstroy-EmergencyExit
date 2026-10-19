@@ -264,9 +264,9 @@
     ctx.save();
     ctx.translate(Math.round(exit.x), Math.round(exit.y));
     const color = active && unlocked ? "#8de2c3" : "#cbac88";
-    ctx.fillStyle = "#17232e";
-    ctx.fillRect(-23, -25, 46, 50);
     if (exit.transition === "stairs") {
+      ctx.fillStyle = "#17232e";
+      ctx.fillRect(-23, -25, 46, 50);
       for (let i = 0; i < 7; i++) {
         ctx.fillStyle = i % 2 ? "#7d8991" : "#a4aaa5";
         ctx.fillRect(-17, -21 + i * 6, 34, 4);
@@ -282,25 +282,31 @@
       ctx.font = "bold 14px sans-serif";
       ctx.textAlign = "center";
       ctx.fillText(exit.backward ? "\u2193" : "\u2191", 0, 5);
+      ctx.fillStyle = color;
+      ctx.fillRect(-19, -33, 38, 7);
+      ctx.fillStyle = "#14232a";
+      ctx.font = "bold 6px Exo2, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("\u041B\u0415\u0421\u0422\u041D\u0418\u0426\u0410", 0, -27);
     } else {
-      ctx.fillStyle = "#b5bbb4";
-      ctx.fillRect(-23, -25, 46, 5);
-      ctx.fillRect(-23, -25, 5, 50);
-      ctx.fillRect(18, -25, 5, 50);
-      ctx.fillStyle = unlocked ? "#25483e" : "#70524c";
-      ctx.fillRect(-17, -19, 34, 42);
-      ctx.strokeStyle = "#182a30";
-      ctx.strokeRect(-13, -15, 26, 32);
-      ctx.fillStyle = "#e1ca8c";
-      ctx.fillRect(9, 0, 3, 5);
+      ctx.translate(0, 18);
+      ctx.fillStyle = "#10232e";
+      ctx.fillRect(-23, -7, 46, 14);
+      ctx.fillStyle = "#82a9b7";
+      ctx.fillRect(-24, -8, 6, 16);
+      ctx.fillRect(18, -8, 6, 16);
+      ctx.fillStyle = "#235b7d";
+      ctx.fillRect(-18, -5, 36, 10);
+      ctx.fillStyle = "#4ec4ed";
+      ctx.fillRect(-18, -5, 36, 2);
+      ctx.fillStyle = "#357eaa";
+      ctx.fillRect(-18, 3, 36, 2);
+      ctx.fillStyle = "#d8e8df";
+      ctx.fillRect(11, -3, 2, 6);
+      ctx.fillStyle = unlocked ? "#9be7a4" : "#ecb86c";
+      ctx.fillRect(-22, -3, 2, 6);
     }
-    ctx.fillStyle = color;
-    ctx.fillRect(-19, -33, 38, 7);
-    ctx.fillStyle = "#14232a";
-    ctx.font = "bold 6px Exo2, sans-serif";
-    ctx.textAlign = "center";
-    ctx.fillText(exit.transition === "stairs" ? "\u041B\u0415\u0421\u0422\u041D\u0418\u0426\u0410" : "\u0412\u042B\u0425\u041E\u0414", 0, -27);
-    if (active && unlocked) {
+    if (active && unlocked && exit.transition === "stairs") {
       ctx.fillStyle = "#9bf2d1";
       ctx.font = "bold 8px Exo2, sans-serif";
       ctx.fillText("E", 0, 36);
@@ -1215,7 +1221,7 @@
     };
   }
   var STUN_DURATION = 3.1;
-  var MAX_ENEMIES = 7;
+  var MAX_ENEMIES = 10;
   var Simulation = class {
     constructor(manifest, raw, profile, seed = 1) {
       this.manifest = manifest;
@@ -1470,7 +1476,9 @@
         p.facing = directionForVector(p.vx, p.vy, p.facing);
         p.frame = (p.frame + dt * p.moving * 0.05) % 8;
       } else p.frame = 0;
-      this.updateInventory(input);
+      this.updateInventory(
+        input.interact && this.exitReady ? { ...input, pickup: false } : input
+      );
       if (input.execute) this.execute();
       const changingWeapon = input.weaponAction || input.pickup || input.drop || input.throw;
       if (input.attack && !changingWeapon && p.fireTimer <= 0 && p.execution <= 0)
@@ -1492,12 +1500,15 @@
       const down = this.enemies.find(
         (e) => e.alive && e.stun > 0 && distance(p, e) < 31
       );
-      this.context = down ? "SPACE \xB7 \u0414\u041E\u0411\u0418\u0422\u042C" : nearest && distance(nearest, p) < 30 ? (p.weapon === UNARMED ? "E / \u041F\u041A\u041C \xB7 " : "E \xB7 ") + nearest.weapon.name.toUpperCase() : this.cleared ? this.exit.transition === "stairs" ? "\u041A \u041B\u0415\u0421\u0422\u041D\u0418\u0426\u0415 \u2192 E" : "\u041A \u0414\u0412\u0415\u0420\u0418 \u2192 E" : "";
-      if (input.interact && this.cleared && (!this.tutorial || this.tutorial.canExit) && distance(p, this.exit) < 48) {
+      this.context = this.exitReady ? this.exit.transition === "stairs" ? "E \xB7 \u0421\u041B\u0415\u0414\u0423\u042E\u0429\u0418\u0419 \u042D\u0422\u0410\u0416" : "E \xB7 \u0412\u042B\u0419\u0422\u0418" : down ? "SPACE \xB7 \u0414\u041E\u0411\u0418\u0422\u042C" : nearest && distance(nearest, p) < 30 ? (p.weapon === UNARMED ? "E / \u041F\u041A\u041C \xB7 " : "E \xB7 ") + nearest.weapon.name.toUpperCase() : this.cleared ? this.exit.transition === "stairs" ? "\u041A \u041B\u0415\u0421\u0422\u041D\u0418\u0426\u0415 \u2192 E" : "\u041A \u0414\u0412\u0415\u0420\u0418 \u2192 E" : "";
+      if (input.interact && this.exitReady) {
         this.status = "complete";
         this.sound("sndComplete");
         this.emit("complete");
       }
+    }
+    get exitReady() {
+      return this.exits.includes(this.exit) && this.cleared && (!this.tutorial || this.tutorial.canExit) && distance(this.player, this.exit) < 48;
     }
     updateInventory(input) {
       if (input.weaponAction) {

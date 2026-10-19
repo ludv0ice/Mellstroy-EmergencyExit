@@ -243,7 +243,7 @@ try {
       "window.__QA_APP__.view.floor.toDataURL('image/png').split(',')[1]",
     );
     fs.writeFileSync(output + '/' + id + '.png', Buffer.from(png, 'base64'));
-    assert.ok(await evaluate('window.__QA_APP__.sim.enemies.length<=7'));
+    assert.ok(await evaluate('window.__QA_APP__.sim.enemies.length<=10'));
   }
   await send('Emulation.setDeviceMetricsOverride', {
     width: 390,

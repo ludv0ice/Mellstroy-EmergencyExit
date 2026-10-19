@@ -13,7 +13,7 @@ import {
 } from './physics.js';
 
 export const STUN_DURATION = 3.1;
-export const MAX_ENEMIES = 7;
+export const MAX_ENEMIES = 10;
 
 export class Simulation {
   constructor(manifest, raw, profile, seed = 1) {
@@ -342,7 +342,9 @@ export class Simulation {
       p.facing = directionForVector(p.vx, p.vy, p.facing);
       p.frame = (p.frame + dt * p.moving * 0.05) % 8;
     } else p.frame = 0;
-    this.updateInventory(input);
+    this.updateInventory(
+      input.interact && this.exitReady ? { ...input, pickup: false } : input,
+    );
     if (input.execute) this.execute();
     const changingWeapon =
       input.weaponAction || input.pickup || input.drop || input.throw;
@@ -367,26 +369,33 @@ export class Simulation {
     const down = this.enemies.find(
       (e) => e.alive && e.stun > 0 && distance(p, e) < 31,
     );
-    this.context = down
-      ? 'SPACE · ДОБИТЬ'
-      : nearest && distance(nearest, p) < 30
-        ? (p.weapon === UNARMED ? 'E / ПКМ · ' : 'E · ') +
-          nearest.weapon.name.toUpperCase()
-        : this.cleared
-          ? this.exit.transition === 'stairs'
-            ? 'К ЛЕСТНИЦЕ → E'
-            : 'К ДВЕРИ → E'
-          : '';
-    if (
-      input.interact &&
-      this.cleared &&
-      (!this.tutorial || this.tutorial.canExit) &&
-      distance(p, this.exit) < 48
-    ) {
+    this.context = this.exitReady
+      ? this.exit.transition === 'stairs'
+        ? 'E · СЛЕДУЮЩИЙ ЭТАЖ'
+        : 'E · ВЫЙТИ'
+      : down
+        ? 'SPACE · ДОБИТЬ'
+        : nearest && distance(nearest, p) < 30
+          ? (p.weapon === UNARMED ? 'E / ПКМ · ' : 'E · ') +
+            nearest.weapon.name.toUpperCase()
+          : this.cleared
+            ? this.exit.transition === 'stairs'
+              ? 'К ЛЕСТНИЦЕ → E'
+              : 'К ДВЕРИ → E'
+            : '';
+    if (input.interact && this.exitReady) {
       this.status = 'complete';
       this.sound('sndComplete');
       this.emit('complete');
     }
+  }
+  get exitReady() {
+    return (
+      this.exits.includes(this.exit) &&
+      this.cleared &&
+      (!this.tutorial || this.tutorial.canExit) &&
+      distance(this.player, this.exit) < 48
+    );
   }
   updateInventory(input) {
     if (input.weaponAction) {

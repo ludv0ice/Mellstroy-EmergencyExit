@@ -2966,14 +2966,47 @@
       }
     },
     {
-      "name": "eeSwat",
+      "name": "eeGuard",
       "kind": "enemy",
-      "sprite": "sprPoliceWalkM16",
+      "sprite": "sprEWalkClub",
       "x": 464,
       "y": 96,
       "depth": -1,
       "init": {
         "direction": 47.48955292199915
+      }
+    },
+    {
+      "name": "eePatrol",
+      "kind": "enemy",
+      "sprite": "sprEWalkUnarmed",
+      "x": 464,
+      "y": 384,
+      "depth": -1,
+      "init": {
+        "direction": 15.255118703057775
+      }
+    },
+    {
+      "name": "eeGuard",
+      "kind": "enemy",
+      "sprite": "sprEWalkClub",
+      "x": 816,
+      "y": 160,
+      "depth": -1,
+      "init": {
+        "direction": 24.443954780416536
+      }
+    },
+    {
+      "name": "eeSwat",
+      "kind": "enemy",
+      "sprite": "sprPoliceWalkM16",
+      "x": 816,
+      "y": 448,
+      "depth": -1,
+      "init": {
+        "direction": 2.6025622024998065
       }
     },
     {
@@ -3270,16 +3303,6 @@
       "sprite": "sprPoliceDeskPuter",
       "x": 811,
       "y": 66,
-      "depth": 0,
-      "solid": true,
-      "furniture": true
-    },
-    {
-      "name": "eeFurnishing",
-      "kind": "decor",
-      "sprite": "sprPoliceDeskPuter",
-      "x": 867,
-      "y": 148,
       "depth": 0,
       "solid": true,
       "furniture": true

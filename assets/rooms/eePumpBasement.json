@@ -2826,6 +2826,39 @@
       }
     },
     {
+      "name": "eePatrol",
+      "kind": "enemy",
+      "sprite": "sprEWalkUnarmed",
+      "x": 336,
+      "y": 384,
+      "depth": -1,
+      "init": {
+        "direction": -53.13010235415598
+      }
+    },
+    {
+      "name": "eeGuard",
+      "kind": "enemy",
+      "sprite": "sprEWalkClub",
+      "x": 528,
+      "y": 352,
+      "depth": -1,
+      "init": {
+        "direction": -30.256437163529274
+      }
+    },
+    {
+      "name": "eePatrol",
+      "kind": "enemy",
+      "sprite": "sprEWalkSilencer",
+      "x": 720,
+      "y": 288,
+      "depth": -1,
+      "init": {
+        "direction": -15.524110996754256
+      }
+    },
+    {
       "name": "eeWeapon",
       "kind": "weapon",
       "sprite": "sprWeapons",
@@ -2887,7 +2920,7 @@
       "kind": "exit",
       "transition": "door",
       "x": 720,
-      "y": 488,
+      "y": 494,
       "forward": true,
       "visible": true,
       "targets": [],
@@ -3069,26 +3102,6 @@
       "sprite": "sprDoubleFridge",
       "x": 380,
       "y": 304,
-      "depth": 0,
-      "solid": true,
-      "furniture": true
-    },
-    {
-      "name": "eeFurnishing",
-      "kind": "decor",
-      "sprite": "sprDoubleFridge",
-      "x": 292,
-      "y": 416,
-      "depth": 0,
-      "solid": true,
-      "furniture": true
-    },
-    {
-      "name": "eeFurnishing",
-      "kind": "decor",
-      "sprite": "sprDoubleFridge",
-      "x": 380,
-      "y": 416,
       "depth": 0,
       "solid": true,
       "furniture": true

@@ -6456,7 +6456,7 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "id": "eeStationHall",
           "width": 864,
           "height": 512,
-          "enemies": 3,
+          "enemies": 5,
           "entities": 190,
           "tiles": 0
         },
@@ -6464,23 +6464,23 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "id": "eeStationService",
           "width": 832,
           "height": 544,
-          "enemies": 3,
-          "entities": 215,
+          "enemies": 5,
+          "entities": 217,
           "tiles": 0
         },
         {
           "id": "eeCourtyard",
           "width": 928,
           "height": 576,
-          "enemies": 3,
-          "entities": 210,
+          "enemies": 6,
+          "entities": 211,
           "tiles": 0
         },
         {
           "id": "eeLoft",
           "width": 832,
           "height": 544,
-          "enemies": 3,
+          "enemies": 5,
           "entities": 177,
           "tiles": 0
         },
@@ -6488,15 +6488,15 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "id": "eeCanalEntry",
           "width": 864,
           "height": 672,
-          "enemies": 3,
-          "entities": 237,
+          "enemies": 5,
+          "entities": 238,
           "tiles": 0
         },
         {
           "id": "eeRelayRoom",
           "width": 864,
           "height": 512,
-          "enemies": 3,
+          "enemies": 5,
           "entities": 185,
           "tiles": 0
         },
@@ -6504,79 +6504,79 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "id": "eeQuietReception",
           "width": 800,
           "height": 480,
-          "enemies": 3,
-          "entities": 154,
+          "enemies": 5,
+          "entities": 156,
           "tiles": 0
         },
         {
           "id": "eeRoofFlat",
           "width": 864,
           "height": 512,
-          "enemies": 3,
-          "entities": 188,
+          "enemies": 5,
+          "entities": 189,
           "tiles": 0
         },
         {
           "id": "eeWorkshop",
           "width": 864,
           "height": 544,
-          "enemies": 3,
-          "entities": 196,
+          "enemies": 5,
+          "entities": 198,
           "tiles": 0
         },
         {
           "id": "eeMezzanine",
           "width": 800,
           "height": 576,
-          "enemies": 3,
-          "entities": 203,
+          "enemies": 5,
+          "entities": 202,
           "tiles": 0
         },
         {
           "id": "eeDuplexEntry",
           "width": 864,
           "height": 544,
-          "enemies": 3,
-          "entities": 195,
+          "enemies": 5,
+          "entities": 197,
           "tiles": 0
         },
         {
           "id": "eeDuplexBridge",
           "width": 800,
           "height": 608,
-          "enemies": 3,
-          "entities": 200,
+          "enemies": 5,
+          "entities": 202,
           "tiles": 0
         },
         {
           "id": "eeHotelLobby",
           "width": 864,
           "height": 544,
-          "enemies": 3,
-          "entities": 193,
+          "enemies": 5,
+          "entities": 195,
           "tiles": 0
         },
         {
           "id": "eeHotelGarden",
           "width": 832,
           "height": 576,
-          "enemies": 3,
-          "entities": 196,
+          "enemies": 5,
+          "entities": 198,
           "tiles": 0
         },
         {
           "id": "eeTowerLoading",
           "width": 768,
           "height": 576,
-          "enemies": 2,
-          "entities": 176,
+          "enemies": 4,
+          "entities": 177,
           "tiles": 0
         },
         {
           "id": "eeTowerArchive",
           "width": 832,
           "height": 544,
-          "enemies": 2,
+          "enemies": 4,
           "entities": 214,
           "tiles": 0
         },
@@ -6584,47 +6584,47 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "id": "eeTowerServers",
           "width": 864,
           "height": 544,
-          "enemies": 1,
-          "entities": 223,
+          "enemies": 3,
+          "entities": 225,
           "tiles": 0
         },
         {
           "id": "eeTowerRoof",
           "width": 896,
           "height": 576,
-          "enemies": 1,
-          "entities": 200,
+          "enemies": 3,
+          "entities": 198,
           "tiles": 0
         },
         {
           "id": "eeLaundry",
           "width": 864,
           "height": 512,
-          "enemies": 2,
-          "entities": 194,
+          "enemies": 4,
+          "entities": 196,
           "tiles": 0
         },
         {
           "id": "eeUtilityFlat",
           "width": 832,
           "height": 544,
-          "enemies": 2,
-          "entities": 191,
+          "enemies": 4,
+          "entities": 192,
           "tiles": 0
         },
         {
           "id": "eePumpBasement",
           "width": 864,
           "height": 576,
-          "enemies": 2,
-          "entities": 226,
+          "enemies": 5,
+          "entities": 227,
           "tiles": 0
         },
         {
           "id": "eeCheckpoint",
           "width": 864,
           "height": 544,
-          "enemies": 3,
+          "enemies": 5,
           "entities": 200,
           "tiles": 0
         },
@@ -6632,200 +6632,200 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "id": "eeResponseDeck",
           "width": 864,
           "height": 576,
-          "enemies": 3,
-          "entities": 219,
+          "enemies": 6,
+          "entities": 220,
           "tiles": 0
         },
         {
           "id": "eeMarketHub",
           "width": 1024,
           "height": 576,
-          "enemies": 2,
-          "entities": 250,
+          "enemies": 5,
+          "entities": 253,
           "tiles": 0
         },
         {
           "id": "eeMarketLeft",
           "width": 736,
           "height": 544,
-          "enemies": 2,
-          "entities": 198,
+          "enemies": 4,
+          "entities": 200,
           "tiles": 0
         },
         {
           "id": "eeMarketRight",
           "width": 896,
           "height": 544,
-          "enemies": 1,
-          "entities": 206,
+          "enemies": 3,
+          "entities": 205,
           "tiles": 0
         },
         {
           "id": "eeMarketOffice",
           "width": 864,
           "height": 576,
-          "enemies": 1,
-          "entities": 219,
+          "enemies": 3,
+          "entities": 221,
           "tiles": 0
         },
         {
           "id": "eeBroadcastLobby",
           "width": 896,
           "height": 544,
-          "enemies": 2,
-          "entities": 201,
+          "enemies": 4,
+          "entities": 202,
           "tiles": 0
         },
         {
           "id": "eeEditing",
           "width": 832,
           "height": 544,
-          "enemies": 2,
-          "entities": 198,
+          "enemies": 4,
+          "entities": 200,
           "tiles": 0
         },
         {
           "id": "eeUplink",
           "width": 864,
           "height": 576,
-          "enemies": 2,
-          "entities": 212,
+          "enemies": 5,
+          "entities": 214,
           "tiles": 0
         },
         {
           "id": "eePrecinctGate",
           "width": 960,
           "height": 608,
-          "enemies": 2,
-          "entities": 227,
+          "enemies": 5,
+          "entities": 229,
           "tiles": 0
         },
         {
           "id": "eeEvidence",
           "width": 864,
           "height": 608,
-          "enemies": 2,
-          "entities": 214,
+          "enemies": 5,
+          "entities": 216,
           "tiles": 0
         },
         {
           "id": "eeControlRoom",
           "width": 864,
           "height": 576,
-          "enemies": 2,
-          "entities": 213,
+          "enemies": 5,
+          "entities": 216,
           "tiles": 0
         },
         {
           "id": "eeClubQueue",
           "width": 864,
           "height": 576,
-          "enemies": 2,
-          "entities": 212,
+          "enemies": 5,
+          "entities": 215,
           "tiles": 0
         },
         {
           "id": "eeClubBalcony",
           "width": 928,
           "height": 576,
-          "enemies": 2,
-          "entities": 216,
+          "enemies": 5,
+          "entities": 218,
           "tiles": 0
         },
         {
           "id": "eeClubBooth",
           "width": 864,
           "height": 608,
-          "enemies": 2,
-          "entities": 216,
+          "enemies": 5,
+          "entities": 219,
           "tiles": 0
         },
         {
           "id": "eeClubVault",
           "width": 864,
           "height": 576,
-          "enemies": 1,
-          "entities": 209,
+          "enemies": 4,
+          "entities": 210,
           "tiles": 0
         },
         {
           "id": "eeEstateGate",
           "width": 1024,
           "height": 608,
-          "enemies": 3,
-          "entities": 230,
+          "enemies": 6,
+          "entities": 231,
           "tiles": 0
         },
         {
           "id": "eeEstateGallery",
           "width": 896,
           "height": 576,
-          "enemies": 2,
-          "entities": 215,
+          "enemies": 5,
+          "entities": 217,
           "tiles": 0
         },
         {
           "id": "eeEstateLanding",
           "width": 864,
           "height": 608,
-          "enemies": 2,
-          "entities": 213,
+          "enemies": 5,
+          "entities": 215,
           "tiles": 0
         },
         {
           "id": "eeNightKitchen",
           "width": 992,
           "height": 544,
-          "enemies": 6,
-          "entities": 203,
+          "enemies": 9,
+          "entities": 206,
           "tiles": 0
         },
         {
           "id": "eeArcadeLobby",
           "width": 1024,
           "height": 576,
-          "enemies": 3,
-          "entities": 243,
+          "enemies": 6,
+          "entities": 244,
           "tiles": 0
         },
         {
           "id": "eeArcadeLab",
           "width": 896,
           "height": 576,
-          "enemies": 3,
-          "entities": 241,
+          "enemies": 5,
+          "entities": 242,
           "tiles": 0
         },
         {
           "id": "eeSkyLounge",
           "width": 864,
           "height": 608,
-          "enemies": 6,
-          "entities": 192,
+          "enemies": 8,
+          "entities": 191,
           "tiles": 0
         },
         {
           "id": "eeAfterHours",
           "width": 928,
           "height": 576,
-          "enemies": 6,
-          "entities": 215,
+          "enemies": 9,
+          "entities": 216,
           "tiles": 0
         },
         {
           "id": "eeRoadhouse",
           "width": 832,
           "height": 608,
-          "enemies": 6,
-          "entities": 226,
+          "enemies": 9,
+          "entities": 227,
           "tiles": 0
         },
         {
           "id": "eeOldAtrium",
           "width": 1056,
           "height": 608,
-          "enemies": 6,
-          "entities": 251,
+          "enemies": 9,
+          "entities": 254,
           "tiles": 0
         },
         {
@@ -9707,12 +9707,45 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
         {
           "name": "eeGuard",
           "kind": "enemy",
-          "sprite": "sprEWalkSilencer",
+          "sprite": "sprEWalkClub",
           "x": 152,
           "y": 160,
           "depth": -1,
           "init": {
             "direction": 82.09283729704156
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkUnarmed",
+          "x": 504,
+          "y": 128,
+          "depth": -1,
+          "init": {
+            "direction": 39.22567409733672
+          }
+        },
+        {
+          "name": "eeGuard",
+          "kind": "enemy",
+          "sprite": "sprEWalkClub",
+          "x": 504,
+          "y": 352,
+          "depth": -1,
+          "init": {
+            "direction": 13.76078511179124
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkSilencer",
+          "x": 824,
+          "y": 160,
+          "depth": -1,
+          "init": {
+            "direction": 22.02305549681125
           }
         },
         {
@@ -9762,7 +9795,7 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "kind": "exit",
           "transition": "door",
           "x": 784,
-          "y": 488,
+          "y": 494,
           "forward": true,
           "visible": true,
           "targets": [],
@@ -9941,16 +9974,6 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
         {
           "name": "eeFurnishing",
           "kind": "decor",
-          "sprite": "sprConferenceTable",
-          "x": 590,
-          "y": 360,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
           "sprite": "sprFileCabinetOffice",
           "x": 736,
           "y": 56,
@@ -9973,16 +9996,6 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "kind": "decor",
           "sprite": "sprFileCabinetOffice",
           "x": 736,
-          "y": 160,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
-          "sprite": "sprFileCabinetOffice",
-          "x": 842,
           "y": 160,
           "depth": 0,
           "solid": true,
@@ -13039,12 +13052,34 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
         {
           "name": "eePatrol",
           "kind": "enemy",
-          "sprite": "sprEWalkSilencer",
+          "sprite": "sprEWalkUnarmed",
           "x": 656,
           "y": 128,
           "depth": -1,
           "init": {
             "direction": 32.005383208083494
+          }
+        },
+        {
+          "name": "eeGuard",
+          "kind": "enemy",
+          "sprite": "sprEWalkClub",
+          "x": 560,
+          "y": 288,
+          "depth": -1,
+          "init": {
+            "direction": 21.037511025421818
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkSilencer",
+          "x": 560,
+          "y": 480,
+          "depth": -1,
+          "init": {
+            "direction": -4.398705354995532
           }
         },
         {
@@ -13100,7 +13135,7 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "kind": "exit",
           "transition": "door",
           "x": 560,
-          "y": 488,
+          "y": 494,
           "forward": true,
           "visible": true,
           "targets": [],
@@ -13322,16 +13357,6 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "sprite": "sprWorkTable",
           "x": 457,
           "y": 322.5,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
-          "sprite": "sprWorkTable",
-          "x": 539,
-          "y": 248.5,
           "depth": 0,
           "solid": true,
           "furniture": true
@@ -16527,12 +16552,45 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
         {
           "name": "eePatrol",
           "kind": "enemy",
-          "sprite": "sprEWalkSilencer",
+          "sprite": "sprEWalkUnarmed",
           "x": 400,
           "y": 384,
           "depth": -1,
           "init": {
             "direction": 18.43494882292201
+          }
+        },
+        {
+          "name": "eeGuard",
+          "kind": "enemy",
+          "sprite": "sprEWalkClub",
+          "x": 688,
+          "y": 352,
+          "depth": -1,
+          "init": {
+            "direction": 12.528807709151511
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkUnarmed",
+          "x": 880,
+          "y": 352,
+          "depth": -1,
+          "init": {
+            "direction": 9.462322208025617
+          }
+        },
+        {
+          "name": "eeGuard",
+          "kind": "enemy",
+          "sprite": "sprEWalkSilencer",
+          "x": 152,
+          "y": 192,
+          "depth": -1,
+          "init": {
+            "direction": 82.09283729704156
           }
         },
         {
@@ -16648,16 +16706,6 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "sprite": "sprArcadeCabinet1",
           "x": 60,
           "y": 126,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
-          "sprite": "sprArcadeCabinet1",
-          "x": 164,
-          "y": 190,
           "depth": 0,
           "solid": true,
           "furniture": true
@@ -16876,16 +16924,6 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "name": "eeFurnishing",
           "kind": "decor",
           "sprite": "sprBarStool",
-          "x": 709,
-          "y": 311.5,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
-          "sprite": "sprBarTable",
           "x": 635,
           "y": 431.5,
           "depth": 0,
@@ -16895,7 +16933,7 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
         {
           "name": "eeFurnishing",
           "kind": "decor",
-          "sprite": "sprBarStool",
+          "sprite": "sprBarTable",
           "x": 709,
           "y": 431.5,
           "depth": 0,
@@ -19657,12 +19695,34 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
         {
           "name": "eeGuard",
           "kind": "enemy",
-          "sprite": "sprEWalkSilencer",
+          "sprite": "sprEWalkClub",
           "x": 432,
           "y": 96,
           "depth": -1,
           "init": {
             "direction": 45
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkUnarmed",
+          "x": 432,
+          "y": 352,
+          "depth": -1,
+          "init": {
+            "direction": 11.309932474020213
+          }
+        },
+        {
+          "name": "eeGuard",
+          "kind": "enemy",
+          "sprite": "sprEWalkSilencer",
+          "x": 752,
+          "y": 128,
+          "depth": -1,
+          "init": {
+            "direction": 24.22774531795417
           }
         },
         {
@@ -19929,16 +19989,6 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "sprite": "sprComputer",
           "x": 767,
           "y": 62,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
-          "sprite": "sprComputer",
-          "x": 807,
-          "y": 126,
           "depth": 0,
           "solid": true,
           "furniture": true
@@ -22849,12 +22899,34 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
         {
           "name": "eePatrol",
           "kind": "enemy",
-          "sprite": "sprEWalkSilencer",
+          "sprite": "sprEWalkUnarmed",
           "x": 368,
           "y": 128,
           "depth": -1,
           "init": {
             "direction": 0
+          }
+        },
+        {
+          "name": "eeGuard",
+          "kind": "enemy",
+          "sprite": "sprEWalkClub",
+          "x": 656,
+          "y": 96,
+          "depth": -1,
+          "init": {
+            "direction": 3.3664606634298013
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkSilencer",
+          "x": 656,
+          "y": 352,
+          "depth": -1,
+          "init": {
+            "direction": -22.380135051959574
           }
         },
         {
@@ -23181,16 +23253,6 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "sprite": "sprDoubleFridge",
           "x": 548,
           "y": 164,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
-          "sprite": "sprDoubleFridge",
-          "x": 628,
-          "y": 56,
           "depth": 0,
           "solid": true,
           "furniture": true
@@ -25969,14 +26031,36 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           }
         },
         {
-          "name": "eeSwat",
+          "name": "eePatrol",
           "kind": "enemy",
-          "sprite": "sprPoliceWalkM16",
+          "sprite": "sprEWalkUnarmed",
           "x": 368,
           "y": 384,
           "depth": -1,
           "init": {
             "direction": 7.125016348901798
+          }
+        },
+        {
+          "name": "eeGuard",
+          "kind": "enemy",
+          "sprite": "sprEWalkClub",
+          "x": 688,
+          "y": 96,
+          "depth": -1,
+          "init": {
+            "direction": 29.054604099077146
+          }
+        },
+        {
+          "name": "eeSwat",
+          "kind": "enemy",
+          "sprite": "sprPoliceWalkM16",
+          "x": 688,
+          "y": 384,
+          "depth": -1,
+          "init": {
+            "direction": 3.179830119864234
           }
         },
         {
@@ -26191,16 +26275,6 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "name": "eeFurnishing",
           "kind": "decor",
           "sprite": "sprDrugCabinet",
-          "x": 700,
-          "y": 56,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
-          "sprite": "sprDrugCabinet",
           "x": 762,
           "y": 56,
           "depth": 0,
@@ -26253,16 +26327,6 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "sprite": "sprOfficeCouch",
           "x": 692,
           "y": 444,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
-          "sprite": "sprCyanPlant",
-          "x": 753,
-          "y": 335,
           "depth": 0,
           "solid": true,
           "furniture": true
@@ -29105,12 +29169,45 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
         {
           "name": "eeGuard",
           "kind": "enemy",
-          "sprite": "sprEWalkSilencer",
+          "sprite": "sprEWalkClub",
           "x": 432,
           "y": 320,
           "depth": -1,
           "init": {
             "direction": 26.56505117707799
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkUnarmed",
+          "x": 432,
+          "y": 96,
+          "depth": -1,
+          "init": {
+            "direction": 50.19442890773481
+          }
+        },
+        {
+          "name": "eeGuard",
+          "kind": "enemy",
+          "sprite": "sprEWalkClub",
+          "x": 752,
+          "y": 128,
+          "depth": -1,
+          "init": {
+            "direction": 28.81079374297307
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkSilencer",
+          "x": 752,
+          "y": 416,
+          "depth": -1,
+          "init": {
+            "direction": 5.710593137499643
           }
         },
         {
@@ -29372,16 +29469,6 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "sprite": "sprBarStool",
           "x": 535,
           "y": 99.5,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
-          "sprite": "sprKaraokeCouchPink",
-          "x": 780,
-          "y": 78,
           "depth": 0,
           "solid": true,
           "furniture": true
@@ -32243,12 +32330,45 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
         {
           "name": "eeGuard",
           "kind": "enemy",
-          "sprite": "sprEWalkSilencer",
+          "sprite": "sprEWalkClub",
           "x": 720,
           "y": 96,
           "depth": -1,
           "init": {
             "direction": 3.01278750418334
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkUnarmed",
+          "x": 112,
+          "y": 416,
+          "depth": -1,
+          "init": {
+            "direction": -90
+          }
+        },
+        {
+          "name": "eeGuard",
+          "kind": "enemy",
+          "sprite": "sprEWalkClub",
+          "x": 400,
+          "y": 384,
+          "depth": -1,
+          "init": {
+            "direction": -41.6335393365702
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkSilencer",
+          "x": 720,
+          "y": 416,
+          "depth": -1,
+          "init": {
+            "direction": -25.346175941946694
           }
         },
         {
@@ -32478,7 +32598,7 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "kind": "decor",
           "sprite": "sprComputer",
           "x": 74,
-          "y": 422,
+          "y": 479,
           "depth": 0,
           "solid": true,
           "furniture": true
@@ -35315,12 +35435,45 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
         {
           "name": "eeGuard",
           "kind": "enemy",
-          "sprite": "sprEWalkSilencer",
+          "sprite": "sprEWalkClub",
           "x": 336,
           "y": 96,
           "depth": -1,
           "init": {
             "direction": 8.130102354155978
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkUnarmed",
+          "x": 624,
+          "y": 128,
+          "depth": -1,
+          "init": {
+            "direction": 0
+          }
+        },
+        {
+          "name": "eeGuard",
+          "kind": "enemy",
+          "sprite": "sprEWalkClub",
+          "x": 432,
+          "y": 352,
+          "depth": -1,
+          "init": {
+            "direction": -34.992020198558656
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkSilencer",
+          "x": 720,
+          "y": 384,
+          "depth": -1,
+          "init": {
+            "direction": -22.83365417791754
           }
         },
         {
@@ -38388,14 +38541,47 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "depth": -2
         },
         {
+          "name": "eeFat",
+          "kind": "enemy",
+          "sprite": "sprEWalkUnarmed",
+          "x": 144,
+          "y": 192,
+          "depth": -1,
+          "init": {
+            "direction": 90
+          }
+        },
+        {
+          "name": "eeGuard",
+          "kind": "enemy",
+          "sprite": "sprEWalkClub",
+          "x": 432,
+          "y": 96,
+          "depth": -1,
+          "init": {
+            "direction": 50.71059313749964
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkUnarmed",
+          "x": 432,
+          "y": 384,
+          "depth": -1,
+          "init": {
+            "direction": 12.528807709151511
+          }
+        },
+        {
           "name": "eeBoss",
           "kind": "enemy",
           "sprite": "sprEWalkSilencer",
           "x": 720,
-          "y": 448,
+          "y": 416,
           "depth": -1,
           "init": {
-            "direction": 0
+            "direction": 3.179830119864234
           }
         },
         {
@@ -38451,7 +38637,7 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "kind": "exit",
           "transition": "door",
           "x": 720,
-          "y": 488,
+          "y": 494,
           "forward": true,
           "visible": true,
           "targets": [],
@@ -38620,16 +38806,6 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
         {
           "name": "eeFurnishing",
           "kind": "decor",
-          "sprite": "sprOfficeDesk",
-          "x": 469.33333333333337,
-          "y": 415.5,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
           "sprite": "sprDrugCabinet",
           "x": 640,
           "y": 56,
@@ -38723,16 +38899,6 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "sprite": "sprCocaineCrate",
           "x": 635,
           "y": 486,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
-          "sprite": "sprCocaineCrate",
-          "x": 773,
-          "y": 402,
           "depth": 0,
           "solid": true,
           "furniture": true
@@ -41573,14 +41739,47 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           }
         },
         {
-          "name": "eeSwat",
+          "name": "eeGuard",
           "kind": "enemy",
-          "sprite": "sprPoliceWalkM16",
+          "sprite": "sprEWalkClub",
           "x": 432,
           "y": 96,
           "depth": -1,
           "init": {
             "direction": 47.72631099390627
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkUnarmed",
+          "x": 304,
+          "y": 384,
+          "depth": -1,
+          "init": {
+            "direction": 18.43494882292201
+          }
+        },
+        {
+          "name": "eeGuard",
+          "kind": "enemy",
+          "sprite": "sprEWalkClub",
+          "x": 528,
+          "y": 352,
+          "depth": -1,
+          "init": {
+            "direction": 12.994616791916506
+          }
+        },
+        {
+          "name": "eeSwat",
+          "kind": "enemy",
+          "sprite": "sprPoliceWalkM16",
+          "x": 720,
+          "y": 288,
+          "depth": -1,
+          "init": {
+            "direction": 14.743562836470735
           }
         },
         {
@@ -41645,7 +41844,7 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "kind": "exit",
           "transition": "door",
           "x": 720,
-          "y": 488,
+          "y": 494,
           "forward": true,
           "visible": true,
           "targets": [],
@@ -41765,16 +41964,6 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "name": "eeFurnishing",
           "kind": "decor",
           "sprite": "sprComputer",
-          "x": 255,
-          "y": 382,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
-          "sprite": "sprComputer",
           "x": 359,
           "y": 446,
           "depth": 0,
@@ -41846,7 +42035,7 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "kind": "decor",
           "sprite": "sprCyanPlant",
           "x": 753,
-          "y": 293,
+          "y": 368,
           "depth": 0,
           "solid": true,
           "furniture": true
@@ -41855,8 +42044,18 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "name": "eeFurnishing",
           "kind": "decor",
           "sprite": "sprComputer",
-          "x": 756,
-          "y": 368,
+          "x": 690,
+          "y": 443,
+          "depth": 0,
+          "solid": true,
+          "furniture": true
+        },
+        {
+          "name": "eeFurnishing",
+          "kind": "decor",
+          "sprite": "sprOfficeCouch",
+          "x": 753,
+          "y": 443,
           "depth": 0,
           "solid": true,
           "furniture": true
@@ -44727,6 +44926,39 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           }
         },
         {
+          "name": "eeGuard",
+          "kind": "enemy",
+          "sprite": "sprEWalkClub",
+          "x": 784,
+          "y": 160,
+          "depth": -1,
+          "init": {
+            "direction": 23.19859051364819
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkUnarmed",
+          "x": 784,
+          "y": 448,
+          "depth": -1,
+          "init": {
+            "direction": 0
+          }
+        },
+        {
+          "name": "eeGuard",
+          "kind": "enemy",
+          "sprite": "sprEWalkClub",
+          "x": 152,
+          "y": 160,
+          "depth": -1,
+          "init": {
+            "direction": 82.09283729704156
+          }
+        },
+        {
           "name": "eeWeapon",
           "kind": "weapon",
           "sprite": "sprWeapons",
@@ -44949,26 +45181,6 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "sprite": "sprWorkTable",
           "x": 827,
           "y": 113.5,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
-          "sprite": "sprWorkTable",
-          "x": 741,
-          "y": 170.5,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
-          "sprite": "sprWorkTable",
-          "x": 827,
-          "y": 170.5,
           "depth": 0,
           "solid": true,
           "furniture": true
@@ -47707,12 +47919,34 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
         {
           "name": "eePatrol",
           "kind": "enemy",
-          "sprite": "sprEWalkSilencer",
+          "sprite": "sprEWalkUnarmed",
           "x": 208,
           "y": 320,
           "depth": -1,
           "init": {
             "direction": -63.43494882292201
+          }
+        },
+        {
+          "name": "eeGuard",
+          "kind": "enemy",
+          "sprite": "sprEWalkClub",
+          "x": 208,
+          "y": 448,
+          "depth": -1,
+          "init": {
+            "direction": -73.30075576600638
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkSilencer",
+          "x": 592,
+          "y": 416,
+          "depth": -1,
+          "init": {
+            "direction": -30.96375653207352
           }
         },
         {
@@ -47777,7 +48011,7 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "kind": "exit",
           "transition": "door",
           "x": 592,
-          "y": 520,
+          "y": 526,
           "forward": true,
           "visible": true,
           "targets": [],
@@ -50641,12 +50875,34 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
         {
           "name": "eePatrol",
           "kind": "enemy",
-          "sprite": "sprEWalkSilencer",
+          "sprite": "sprEWalkUnarmed",
           "x": 336,
           "y": 384,
           "depth": -1,
           "init": {
             "direction": 18.43494882292201
+          }
+        },
+        {
+          "name": "eeGuard",
+          "kind": "enemy",
+          "sprite": "sprEWalkClub",
+          "x": 496,
+          "y": 352,
+          "depth": -1,
+          "init": {
+            "direction": 15.255118703057775
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkSilencer",
+          "x": 720,
+          "y": 288,
+          "depth": -1,
+          "init": {
+            "direction": 15.524110996754256
           }
         },
         {
@@ -53416,12 +53672,34 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
         {
           "name": "eeGuard",
           "kind": "enemy",
-          "sprite": "sprEWalkSilencer",
+          "sprite": "sprEWalkClub",
           "x": 336,
           "y": 128,
           "depth": -1,
           "init": {
             "direction": 0
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkUnarmed",
+          "x": 624,
+          "y": 160,
+          "depth": -1,
+          "init": {
+            "direction": -3.5763343749973515
+          }
+        },
+        {
+          "name": "eeGuard",
+          "kind": "enemy",
+          "sprite": "sprEWalkSilencer",
+          "x": 336,
+          "y": 352,
+          "depth": -1,
+          "init": {
+            "direction": -45
           }
         },
         {
@@ -56598,6 +56876,39 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           }
         },
         {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkUnarmed",
+          "x": 304,
+          "y": 416,
+          "depth": -1,
+          "init": {
+            "direction": 9.462322208025617
+          }
+        },
+        {
+          "name": "eeGuard",
+          "kind": "enemy",
+          "sprite": "sprEWalkClub",
+          "x": 528,
+          "y": 384,
+          "depth": -1,
+          "init": {
+            "direction": 8.74616226255521
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkSilencer",
+          "x": 752,
+          "y": 288,
+          "depth": -1,
+          "init": {
+            "direction": 14.036243467926477
+          }
+        },
+        {
           "name": "eeWeapon",
           "kind": "weapon",
           "sprite": "sprWeapons",
@@ -56794,16 +57105,6 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "kind": "decor",
           "sprite": "sprJapaneseTable",
           "x": 462,
-          "y": 347,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
-          "sprite": "sprJapaneseTable",
-          "x": 562,
           "y": 347,
           "depth": 0,
           "solid": true,
@@ -60027,12 +60328,45 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
         {
           "name": "eePatrol",
           "kind": "enemy",
-          "sprite": "sprEWalkSilencer",
+          "sprite": "sprEWalkUnarmed",
           "x": 496,
           "y": 384,
           "depth": -1,
           "init": {
             "direction": 18.43494882292201
+          }
+        },
+        {
+          "name": "eeGuard",
+          "kind": "enemy",
+          "sprite": "sprEWalkClub",
+          "x": 880,
+          "y": 160,
+          "depth": -1,
+          "init": {
+            "direction": 24.623564786163612
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkUnarmed",
+          "x": 880,
+          "y": 448,
+          "depth": -1,
+          "init": {
+            "direction": 4.763641690726177
+          }
+        },
+        {
+          "name": "eeGuard",
+          "kind": "enemy",
+          "sprite": "sprEWalkSilencer",
+          "x": 152,
+          "y": 192,
+          "depth": -1,
+          "init": {
+            "direction": 82.87498365109819
           }
         },
         {
@@ -60139,16 +60473,6 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "sprite": "sprRichTable",
           "x": 294.5,
           "y": 131,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
-          "sprite": "sprRichTable",
-          "x": 443.5,
-          "y": 61,
           "depth": 0,
           "solid": true,
           "furniture": true
@@ -60279,16 +60603,6 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "sprite": "sprPoliceDesk",
           "x": 904,
           "y": 66,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
-          "sprite": "sprPoliceDesk",
-          "x": 928,
-          "y": 148,
           "depth": 0,
           "solid": true,
           "furniture": true
@@ -63125,6 +63439,39 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           }
         },
         {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkUnarmed",
+          "x": 432,
+          "y": 416,
+          "depth": -1,
+          "init": {
+            "direction": -45
+          }
+        },
+        {
+          "name": "eeGuard",
+          "kind": "enemy",
+          "sprite": "sprEWalkClub",
+          "x": 720,
+          "y": 128,
+          "depth": -1,
+          "init": {
+            "direction": 0
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkSilencer",
+          "x": 720,
+          "y": 448,
+          "depth": -1,
+          "init": {
+            "direction": -29.054604099077146
+          }
+        },
+        {
           "name": "eeWeapon",
           "kind": "weapon",
           "sprite": "sprWeapons",
@@ -63177,7 +63524,7 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "kind": "exit",
           "transition": "door",
           "x": 720,
-          "y": 520,
+          "y": 526,
           "forward": true,
           "visible": true,
           "targets": [],
@@ -63409,16 +63756,6 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "sprite": "sprCocaineCrate",
           "x": 773,
           "y": 370,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
-          "sprite": "sprCocaineCrate",
-          "x": 773,
-          "y": 426,
           "depth": 0,
           "solid": true,
           "furniture": true
@@ -66272,14 +66609,47 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           }
         },
         {
-          "name": "eeSwat",
+          "name": "eeGuard",
           "kind": "enemy",
-          "sprite": "sprPoliceWalkM16",
+          "sprite": "sprEWalkClub",
           "x": 624,
           "y": 96,
           "depth": -1,
           "init": {
             "direction": 3.5763343749973515
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkUnarmed",
+          "x": 240,
+          "y": 288,
+          "depth": -1,
+          "init": {
+            "direction": -51.34019174590991
+          }
+        },
+        {
+          "name": "eeGuard",
+          "kind": "enemy",
+          "sprite": "sprEWalkClub",
+          "x": 240,
+          "y": 448,
+          "depth": -1,
+          "init": {
+            "direction": -68.19859051364818
+          }
+        },
+        {
+          "name": "eeSwat",
+          "kind": "enemy",
+          "sprite": "sprPoliceWalkM16",
+          "x": 624,
+          "y": 384,
+          "depth": -1,
+          "init": {
+            "direction": -26.56505117707799
           }
         },
         {
@@ -66420,16 +66790,6 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "kind": "decor",
           "sprite": "sprOfficeDesk",
           "x": 183,
-          "y": 230.5,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
-          "sprite": "sprOfficeDesk",
-          "x": 245,
           "y": 230.5,
           "depth": 0,
           "solid": true,
@@ -71417,12 +71777,34 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
         {
           "name": "eePatrol",
           "kind": "enemy",
-          "sprite": "sprEWalkSilencer",
+          "sprite": "sprEWalkUnarmed",
           "x": 400,
           "y": 384,
           "depth": -1,
           "init": {
             "direction": 18.43494882292201
+          }
+        },
+        {
+          "name": "eeGuard",
+          "kind": "enemy",
+          "sprite": "sprEWalkClub",
+          "x": 688,
+          "y": 256,
+          "depth": -1,
+          "init": {
+            "direction": 21.25050550713324
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkSilencer",
+          "x": 688,
+          "y": 448,
+          "depth": -1,
+          "init": {
+            "direction": 3.179830119864234
           }
         },
         {
@@ -71478,7 +71860,7 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "kind": "exit",
           "transition": "door",
           "x": 688,
-          "y": 488,
+          "y": 494,
           "forward": true,
           "visible": true,
           "targets": [],
@@ -74272,12 +74654,34 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
         {
           "name": "eePatrol",
           "kind": "enemy",
-          "sprite": "sprEWalkSilencer",
+          "sprite": "sprEWalkUnarmed",
           "x": 432,
           "y": 384,
           "depth": -1,
           "init": {
             "direction": 5.710593137499643
+          }
+        },
+        {
+          "name": "eeGuard",
+          "kind": "enemy",
+          "sprite": "sprEWalkClub",
+          "x": 720,
+          "y": 128,
+          "depth": -1,
+          "init": {
+            "direction": 25.346175941946694
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkSilencer",
+          "x": 720,
+          "y": 384,
+          "depth": -1,
+          "init": {
+            "direction": 3.01278750418334
           }
         },
         {
@@ -77064,12 +77468,34 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
         {
           "name": "eeGuard",
           "kind": "enemy",
-          "sprite": "sprEWalkSilencer",
+          "sprite": "sprEWalkClub",
           "x": 432,
           "y": 96,
           "depth": -1,
           "init": {
             "direction": 45
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkUnarmed",
+          "x": 336,
+          "y": 352,
+          "depth": -1,
+          "init": {
+            "direction": 15.945395900922856
+          }
+        },
+        {
+          "name": "eeGuard",
+          "kind": "enemy",
+          "sprite": "sprEWalkSilencer",
+          "x": 560,
+          "y": 320,
+          "depth": -1,
+          "init": {
+            "direction": 12.094757077012103
           }
         },
         {
@@ -79811,6 +80237,28 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           }
         },
         {
+          "name": "eeGuard",
+          "kind": "enemy",
+          "sprite": "sprEWalkClub",
+          "x": 464,
+          "y": 320,
+          "depth": -1,
+          "init": {
+            "direction": -28.610459665965216
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkUnarmed",
+          "x": 688,
+          "y": 416,
+          "depth": -1,
+          "init": {
+            "direction": -26.56505117707799
+          }
+        },
+        {
           "name": "eeWeapon",
           "kind": "weapon",
           "sprite": "sprWeapons",
@@ -79863,7 +80311,7 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "kind": "exit",
           "transition": "door",
           "x": 688,
-          "y": 456,
+          "y": 462,
           "forward": true,
           "visible": true,
           "targets": [],
@@ -79873,18 +80321,8 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "name": "eeFurnishing",
           "kind": "decor",
           "sprite": "sprAndersCouch",
-          "x": 364,
-          "y": 78,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
-          "sprite": "sprPlayerLivingRoomTable",
           "x": 460,
-          "y": 77.5,
+          "y": 78,
           "depth": 0,
           "solid": true,
           "furniture": true
@@ -79995,16 +80433,6 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "sprite": "sprComputer",
           "x": 607,
           "y": 450,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
-          "sprite": "sprComputer",
-          "x": 743,
-          "y": 414,
           "depth": 0,
           "solid": true,
           "furniture": true
@@ -83191,12 +83619,45 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
         {
           "name": "eeGuard",
           "kind": "enemy",
-          "sprite": "sprEWalkSilencer",
+          "sprite": "sprEWalkClub",
           "x": 528,
           "y": 96,
           "depth": -1,
           "init": {
             "direction": 42.70938995736147
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkUnarmed",
+          "x": 304,
+          "y": 384,
+          "depth": -1,
+          "init": {
+            "direction": 26.56505117707799
+          }
+        },
+        {
+          "name": "eeGuard",
+          "kind": "enemy",
+          "sprite": "sprEWalkClub",
+          "x": 624,
+          "y": 352,
+          "depth": -1,
+          "init": {
+            "direction": 14.036243467926477
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkSilencer",
+          "x": 912,
+          "y": 288,
+          "depth": -1,
+          "init": {
+            "direction": 13.495733280795813
           }
         },
         {
@@ -86217,12 +86678,34 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
         {
           "name": "eeGuard",
           "kind": "enemy",
-          "sprite": "sprEWalkSilencer",
+          "sprite": "sprEWalkClub",
           "x": 336,
           "y": 96,
           "depth": -1,
           "init": {
             "direction": 8.130102354155978
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkUnarmed",
+          "x": 560,
+          "y": 128,
+          "depth": -1,
+          "init": {
+            "direction": 0
+          }
+        },
+        {
+          "name": "eeGuard",
+          "kind": "enemy",
+          "sprite": "sprEWalkSilencer",
+          "x": 176,
+          "y": 384,
+          "depth": -1,
+          "init": {
+            "direction": -75.96375653207353
           }
         },
         {
@@ -89329,12 +89812,34 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
         {
           "name": "eePatrol",
           "kind": "enemy",
-          "sprite": "sprEWalkSilencer",
+          "sprite": "sprEWalkUnarmed",
           "x": 432,
           "y": 128,
           "depth": -1,
           "init": {
             "direction": 0
+          }
+        },
+        {
+          "name": "eeGuard",
+          "kind": "enemy",
+          "sprite": "sprEWalkClub",
+          "x": 112,
+          "y": 352,
+          "depth": -1,
+          "init": {
+            "direction": -90
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkSilencer",
+          "x": 304,
+          "y": 384,
+          "depth": -1,
+          "init": {
+            "direction": -53.13010235415598
           }
         },
         {
@@ -89399,7 +89904,7 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "kind": "exit",
           "transition": "door",
           "x": 720,
-          "y": 488,
+          "y": 494,
           "forward": true,
           "visible": true,
           "targets": [],
@@ -92393,12 +92898,34 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
         {
           "name": "eePatrol",
           "kind": "enemy",
-          "sprite": "sprEWalkSilencer",
+          "sprite": "sprEWalkUnarmed",
           "x": 144,
           "y": 192,
           "depth": -1,
           "init": {
             "direction": 90
+          }
+        },
+        {
+          "name": "eeGuard",
+          "kind": "enemy",
+          "sprite": "sprEWalkClub",
+          "x": 432,
+          "y": 96,
+          "depth": -1,
+          "init": {
+            "direction": 48.012787504183336
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkSilencer",
+          "x": 432,
+          "y": 384,
+          "depth": -1,
+          "init": {
+            "direction": 6.340191745909909
           }
         },
         {
@@ -92568,7 +93095,7 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "name": "eeFurnishing",
           "kind": "decor",
           "sprite": "sprPlayerKitchenShelf",
-          "x": 387,
+          "x": 495,
           "y": 61,
           "depth": 0,
           "solid": true,
@@ -92578,8 +93105,8 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "name": "eeFurnishing",
           "kind": "decor",
           "sprite": "sprDoubleFridge",
-          "x": 441,
-          "y": 59,
+          "x": 495,
+          "y": 161,
           "depth": 0,
           "solid": true,
           "furniture": true
@@ -92588,7 +93115,7 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "name": "eeFurnishing",
           "kind": "decor",
           "sprite": "sprKitchenSinkDown",
-          "x": 495,
+          "x": 549,
           "y": 61,
           "depth": 0,
           "solid": true,
@@ -92598,26 +93125,6 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "name": "eeFurnishing",
           "kind": "decor",
           "sprite": "sprPlayerKitchenShelf",
-          "x": 495,
-          "y": 163,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
-          "sprite": "sprDoubleFridge",
-          "x": 549,
-          "y": 59,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
-          "sprite": "sprKitchenSinkDown",
           "x": 549,
           "y": 163,
           "depth": 0,
@@ -92639,16 +93146,6 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "kind": "decor",
           "sprite": "sprPizzaTables",
           "x": 375,
-          "y": 431,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
-          "sprite": "sprPizzaTables",
-          "x": 457,
           "y": 431,
           "depth": 0,
           "solid": true,
@@ -95377,12 +95874,34 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
         {
           "name": "eePatrol",
           "kind": "enemy",
-          "sprite": "sprEWalkSilencer",
+          "sprite": "sprEWalkUnarmed",
           "x": 304,
           "y": 384,
           "depth": -1,
           "init": {
             "direction": 26.56505117707799
+          }
+        },
+        {
+          "name": "eeGuard",
+          "kind": "enemy",
+          "sprite": "sprEWalkClub",
+          "x": 592,
+          "y": 448,
+          "depth": -1,
+          "init": {
+            "direction": 3.8140748342903548
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkSilencer",
+          "x": 656,
+          "y": 288,
+          "depth": -1,
+          "init": {
+            "direction": 19.44003482817619
           }
         },
         {
@@ -95438,7 +95957,7 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "kind": "exit",
           "transition": "door",
           "x": 656,
-          "y": 328,
+          "y": 334,
           "forward": true,
           "visible": true,
           "targets": [],
@@ -95668,16 +96187,6 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "name": "eeFurnishing",
           "kind": "decor",
           "sprite": "sprToolTable",
-          "x": 592,
-          "y": 413,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
-          "sprite": "sprToolTable",
           "x": 664,
           "y": 483,
           "depth": 0,
@@ -95690,26 +96199,6 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "sprite": "sprDrugCabinet",
           "x": 608,
           "y": 216,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
-          "sprite": "sprDrugCabinet",
-          "x": 608,
-          "y": 268,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
-          "sprite": "sprDrugCabinet",
-          "x": 714,
-          "y": 268,
           "depth": 0,
           "solid": true,
           "furniture": true
@@ -98407,12 +98896,45 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
         {
           "name": "eeGuard",
           "kind": "enemy",
-          "sprite": "sprEWalkSilencer",
+          "sprite": "sprEWalkClub",
           "x": 536,
           "y": 352,
           "depth": -1,
           "init": {
             "direction": 8.583621480113948
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkUnarmed",
+          "x": 248,
+          "y": 160,
+          "depth": -1,
+          "init": {
+            "direction": 62.02052561151985
+          }
+        },
+        {
+          "name": "eeGuard",
+          "kind": "enemy",
+          "sprite": "sprEWalkClub",
+          "x": 536,
+          "y": 128,
+          "depth": -1,
+          "init": {
+            "direction": 34.186122486375034
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkSilencer",
+          "x": 728,
+          "y": 160,
+          "depth": -1,
+          "init": {
+            "direction": 22.567009077874612
           }
         },
         {
@@ -98453,7 +98975,7 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "kind": "exit",
           "transition": "door",
           "x": 880,
-          "y": 456,
+          "y": 462,
           "forward": true,
           "visible": true,
           "targets": [],
@@ -102042,12 +102564,45 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
         {
           "name": "eeGuard",
           "kind": "enemy",
-          "sprite": "sprEWalkSilencer",
+          "sprite": "sprEWalkClub",
           "x": 152,
           "y": 192,
           "depth": -1,
           "init": {
             "direction": 82.09283729704156
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkUnarmed",
+          "x": 568,
+          "y": 128,
+          "depth": -1,
+          "init": {
+            "direction": 37.665621198583295
+          }
+        },
+        {
+          "name": "eeGuard",
+          "kind": "enemy",
+          "sprite": "sprEWalkClub",
+          "x": 344,
+          "y": 384,
+          "depth": -1,
+          "init": {
+            "direction": 22.479434397103113
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkSilencer",
+          "x": 664,
+          "y": 416,
+          "depth": -1,
+          "init": {
+            "direction": 6.613460482314758
           }
         },
         {
@@ -102088,7 +102643,7 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "kind": "exit",
           "transition": "door",
           "x": 912,
-          "y": 520,
+          "y": 526,
           "forward": true,
           "visible": true,
           "targets": [],
@@ -105341,14 +105896,47 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           }
         },
         {
-          "name": "eeSwat",
+          "name": "eeGuard",
           "kind": "enemy",
-          "sprite": "sprPoliceWalkM16",
+          "sprite": "sprEWalkClub",
           "x": 464,
           "y": 96,
           "depth": -1,
           "init": {
             "direction": 47.48955292199915
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkUnarmed",
+          "x": 464,
+          "y": 384,
+          "depth": -1,
+          "init": {
+            "direction": 15.255118703057775
+          }
+        },
+        {
+          "name": "eeGuard",
+          "kind": "enemy",
+          "sprite": "sprEWalkClub",
+          "x": 816,
+          "y": 160,
+          "depth": -1,
+          "init": {
+            "direction": 24.443954780416536
+          }
+        },
+        {
+          "name": "eeSwat",
+          "kind": "enemy",
+          "sprite": "sprPoliceWalkM16",
+          "x": 816,
+          "y": 448,
+          "depth": -1,
+          "init": {
+            "direction": 2.6025622024998065
           }
         },
         {
@@ -105645,16 +106233,6 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "sprite": "sprPoliceDeskPuter",
           "x": 811,
           "y": 66,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
-          "sprite": "sprPoliceDeskPuter",
-          "x": 867,
-          "y": 148,
           "depth": 0,
           "solid": true,
           "furniture": true
@@ -108530,6 +109108,39 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           }
         },
         {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkUnarmed",
+          "x": 336,
+          "y": 384,
+          "depth": -1,
+          "init": {
+            "direction": -53.13010235415598
+          }
+        },
+        {
+          "name": "eeGuard",
+          "kind": "enemy",
+          "sprite": "sprEWalkClub",
+          "x": 528,
+          "y": 352,
+          "depth": -1,
+          "init": {
+            "direction": -30.256437163529274
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkSilencer",
+          "x": 720,
+          "y": 288,
+          "depth": -1,
+          "init": {
+            "direction": -15.524110996754256
+          }
+        },
+        {
           "name": "eeWeapon",
           "kind": "weapon",
           "sprite": "sprWeapons",
@@ -108591,7 +109202,7 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "kind": "exit",
           "transition": "door",
           "x": 720,
-          "y": 488,
+          "y": 494,
           "forward": true,
           "visible": true,
           "targets": [],
@@ -108773,26 +109384,6 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "sprite": "sprDoubleFridge",
           "x": 380,
           "y": 304,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
-          "sprite": "sprDoubleFridge",
-          "x": 292,
-          "y": 416,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
-          "sprite": "sprDoubleFridge",
-          "x": 380,
-          "y": 416,
           "depth": 0,
           "solid": true,
           "furniture": true
@@ -111098,12 +111689,34 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
         {
           "name": "eePatrol",
           "kind": "enemy",
-          "sprite": "sprEWalkSilencer",
+          "sprite": "sprEWalkUnarmed",
           "x": 624,
           "y": 160,
           "depth": -1,
           "init": {
             "direction": -3.5763343749973515
+          }
+        },
+        {
+          "name": "eeGuard",
+          "kind": "enemy",
+          "sprite": "sprEWalkClub",
+          "x": 624,
+          "y": 352,
+          "depth": -1,
+          "init": {
+            "direction": -23.62937773065682
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkSilencer",
+          "x": 312,
+          "y": 320,
+          "depth": -1,
+          "init": {
+            "direction": -43.830860672092584
           }
         },
         {
@@ -113775,12 +114388,34 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
         {
           "name": "eePatrol",
           "kind": "enemy",
-          "sprite": "sprEWalkSilencer",
+          "sprite": "sprEWalkUnarmed",
           "x": 336,
           "y": 352,
           "depth": -1,
           "init": {
             "direction": 18.43494882292201
+          }
+        },
+        {
+          "name": "eeGuard",
+          "kind": "enemy",
+          "sprite": "sprEWalkClub",
+          "x": 528,
+          "y": 320,
+          "depth": -1,
+          "init": {
+            "direction": 14.036243467926477
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkSilencer",
+          "x": 720,
+          "y": 320,
+          "depth": -1,
+          "init": {
+            "direction": 9.462322208025617
           }
         },
         {
@@ -113845,7 +114480,7 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "kind": "exit",
           "transition": "door",
           "x": 720,
-          "y": 424,
+          "y": 430,
           "forward": true,
           "visible": true,
           "targets": [],
@@ -113967,26 +114602,6 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "sprite": "sprCopyMachine",
           "x": 764,
           "y": 218,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
-          "sprite": "sprCopyMachine",
-          "x": 764,
-          "y": 282,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
-          "sprite": "sprCopyMachine",
-          "x": 764,
-          "y": 346,
           "depth": 0,
           "solid": true,
           "furniture": true
@@ -116816,14 +117431,47 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           }
         },
         {
-          "name": "eeSwat",
+          "name": "eePatrol",
           "kind": "enemy",
-          "sprite": "sprPoliceWalkM16",
+          "sprite": "sprEWalkUnarmed",
           "x": 240,
           "y": 320,
           "depth": -1,
           "init": {
             "direction": -56.309932474020215
+          }
+        },
+        {
+          "name": "eeGuard",
+          "kind": "enemy",
+          "sprite": "sprEWalkClub",
+          "x": 240,
+          "y": 448,
+          "depth": -1,
+          "init": {
+            "direction": -68.19859051364818
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkUnarmed",
+          "x": 624,
+          "y": 384,
+          "depth": -1,
+          "init": {
+            "direction": -26.56505117707799
+          }
+        },
+        {
+          "name": "eeSwat",
+          "kind": "enemy",
+          "sprite": "sprPoliceWalkM16",
+          "x": 376,
+          "y": 96,
+          "depth": -1,
+          "init": {
+            "direction": 6.911227119024681
           }
         },
         {
@@ -116879,7 +117527,7 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "kind": "exit",
           "transition": "door",
           "x": 624,
-          "y": 488,
+          "y": 494,
           "forward": true,
           "visible": true,
           "targets": [],
@@ -116930,16 +117578,6 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "kind": "decor",
           "sprite": "sprComputer",
           "x": 319,
-          "y": 62,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
-          "sprite": "sprComputer",
-          "x": 383,
           "y": 62,
           "depth": 0,
           "solid": true,
@@ -117191,16 +117829,6 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "sprite": "sprBigPoliceTable",
           "x": 565.3333333333334,
           "y": 320,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
-          "sprite": "sprBigPoliceTable",
-          "x": 682.6666666666666,
-          "y": 416,
           "depth": 0,
           "solid": true,
           "furniture": true
@@ -120102,12 +120730,45 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
         {
           "name": "eeGuard",
           "kind": "enemy",
-          "sprite": "sprEWalkSilencer",
+          "sprite": "sprEWalkClub",
           "x": 152,
           "y": 384,
           "depth": -1,
           "init": {
             "direction": -81.11934084947976
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkUnarmed",
+          "x": 536,
+          "y": 480,
+          "depth": -1,
+          "init": {
+            "direction": -39.699073483474315
+          }
+        },
+        {
+          "name": "eeGuard",
+          "kind": "enemy",
+          "sprite": "sprEWalkClub",
+          "x": 376,
+          "y": 192,
+          "depth": -1,
+          "init": {
+            "direction": -13.626994859891541
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkSilencer",
+          "x": 664,
+          "y": 128,
+          "depth": -1,
+          "init": {
+            "direction": 0
           }
         },
         {
@@ -120148,7 +120809,7 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "kind": "exit",
           "transition": "door",
           "x": 624,
-          "y": 328,
+          "y": 334,
           "forward": true,
           "visible": true,
           "targets": [],
@@ -120308,16 +120969,6 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "name": "eeFurnishing",
           "kind": "decor",
           "sprite": "sprCocaineCrate",
-          "x": 561,
-          "y": 518,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
-          "sprite": "sprCocaineCrate",
           "x": 623,
           "y": 518,
           "depth": 0,
@@ -120340,6 +120991,16 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "sprite": "sprCocaineCrate",
           "x": 685,
           "y": 518,
+          "depth": 0,
+          "solid": true,
+          "furniture": true
+        },
+        {
+          "name": "eeFurnishing",
+          "kind": "decor",
+          "sprite": "sprCocaineCrate",
+          "x": 741,
+          "y": 466,
           "depth": 0,
           "solid": true,
           "furniture": true
@@ -120388,16 +121049,6 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "name": "eeFurnishing",
           "kind": "decor",
           "sprite": "sprToolTable",
-          "x": 416,
-          "y": 185,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
-          "sprite": "sprToolTable",
           "x": 256,
           "y": 247,
           "depth": 0,
@@ -120440,16 +121091,6 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "sprite": "sprWorkTable",
           "x": 681,
           "y": 56.5,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
-          "sprite": "sprWorkTable",
-          "x": 681,
-          "y": 162.5,
           "depth": 0,
           "solid": true,
           "furniture": true
@@ -123073,12 +123714,34 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
         {
           "name": "eePatrol",
           "kind": "enemy",
-          "sprite": "sprEWalkSilencer",
+          "sprite": "sprEWalkUnarmed",
           "x": 304,
           "y": 352,
           "depth": -1,
           "init": {
             "direction": 9.462322208025617
+          }
+        },
+        {
+          "name": "eeGuard",
+          "kind": "enemy",
+          "sprite": "sprEWalkClub",
+          "x": 528,
+          "y": 320,
+          "depth": -1,
+          "init": {
+            "direction": 8.74616226255521
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkSilencer",
+          "x": 720,
+          "y": 256,
+          "depth": -1,
+          "init": {
+            "direction": 11.888658039627973
           }
         },
         {
@@ -123134,7 +123797,7 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "kind": "exit",
           "transition": "door",
           "x": 720,
-          "y": 424,
+          "y": 430,
           "forward": true,
           "visible": true,
           "targets": [],
@@ -123166,16 +123829,6 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "sprite": "sprDoubleFridge",
           "x": 68,
           "y": 112,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
-          "sprite": "sprAndersCouch",
-          "x": 364,
-          "y": 78,
           "depth": 0,
           "solid": true,
           "furniture": true
@@ -126005,12 +126658,34 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
         {
           "name": "eeGuard",
           "kind": "enemy",
-          "sprite": "sprEWalkSilencer",
+          "sprite": "sprEWalkClub",
           "x": 152,
           "y": 384,
           "depth": -1,
           "init": {
             "direction": -81.11934084947976
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkUnarmed",
+          "x": 568,
+          "y": 480,
+          "depth": -1,
+          "init": {
+            "direction": -37.665621198583295
+          }
+        },
+        {
+          "name": "eeGuard",
+          "kind": "enemy",
+          "sprite": "sprEWalkSilencer",
+          "x": 440,
+          "y": 96,
+          "depth": -1,
+          "init": {
+            "direction": 5.572197803963796
           }
         },
         {
@@ -126051,7 +126726,7 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "kind": "exit",
           "transition": "door",
           "x": 720,
-          "y": 328,
+          "y": 334,
           "forward": true,
           "visible": true,
           "targets": [],
@@ -126113,36 +126788,6 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "sprite": "sprPoolChair",
           "x": 380,
           "y": 413,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
-          "sprite": "sprKaraokeCouchBlack",
-          "x": 364,
-          "y": 78,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
-          "sprite": "sprPlayerLivingRoomTable",
-          "x": 460,
-          "y": 77.5,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
-          "sprite": "sprTVBlack",
-          "x": 460,
-          "y": 146,
           "depth": 0,
           "solid": true,
           "furniture": true
@@ -128645,6 +129290,28 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           }
         },
         {
+          "name": "eeGuard",
+          "kind": "enemy",
+          "sprite": "sprEWalkClub",
+          "x": 720,
+          "y": 224,
+          "depth": -1,
+          "init": {
+            "direction": 17.52556837372287
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkUnarmed",
+          "x": 528,
+          "y": 96,
+          "depth": -1,
+          "init": {
+            "direction": 37.568592028827496
+          }
+        },
+        {
           "name": "eeWeapon",
           "kind": "weapon",
           "sprite": "sprWeapons",
@@ -128886,26 +129553,6 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "name": "eeFurnishing",
           "kind": "decor",
           "sprite": "sprCyanPlant",
-          "x": 676,
-          "y": 226,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
-          "sprite": "sprPlayerLivingRoomTable",
-          "x": 764,
-          "y": 225.5,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
-          "sprite": "sprTVBlack",
           "x": 764,
           "y": 282,
           "depth": 0,
@@ -128915,9 +129562,9 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
         {
           "name": "eeFurnishing",
           "kind": "decor",
-          "sprite": "sprCyanPlant",
+          "sprite": "sprPlayerLivingRoomTable",
           "x": 764,
-          "y": 338,
+          "y": 337.5,
           "depth": 0,
           "solid": true,
           "furniture": true
@@ -131757,6 +132404,28 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           }
         },
         {
+          "name": "eeGuard",
+          "kind": "enemy",
+          "sprite": "sprEWalkClub",
+          "x": 624,
+          "y": 256,
+          "depth": -1,
+          "init": {
+            "direction": 20.556045219583464
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkUnarmed",
+          "x": 496,
+          "y": 448,
+          "depth": -1,
+          "init": {
+            "direction": 0
+          }
+        },
+        {
           "name": "eeWeapon",
           "kind": "weapon",
           "sprite": "sprWeapons",
@@ -131809,7 +132478,7 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "kind": "exit",
           "transition": "door",
           "x": 496,
-          "y": 456,
+          "y": 462,
           "forward": true,
           "visible": true,
           "targets": [],
@@ -134854,12 +135523,34 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
         {
           "name": "eeGuard",
           "kind": "enemy",
-          "sprite": "sprEWalkSilencer",
+          "sprite": "sprEWalkClub",
           "x": 304,
           "y": 160,
           "depth": -1,
           "init": {
             "direction": -9.462322208025617
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkUnarmed",
+          "x": 592,
+          "y": 128,
+          "depth": -1,
+          "init": {
+            "direction": 0
+          }
+        },
+        {
+          "name": "eeGuard",
+          "kind": "enemy",
+          "sprite": "sprEWalkSilencer",
+          "x": 592,
+          "y": 256,
+          "depth": -1,
+          "init": {
+            "direction": -14.93141717813755
           }
         },
         {
@@ -135081,26 +135772,6 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "sprite": "sprFileCabinet",
           "x": 684,
           "y": 136,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
-          "sprite": "sprConferenceTable",
-          "x": 498,
-          "y": 236,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
-          "sprite": "sprConferenceTable",
-          "x": 670,
-          "y": 236,
           "depth": 0,
           "solid": true,
           "furniture": true
@@ -137494,12 +138165,34 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
         {
           "name": "eeGuard",
           "kind": "enemy",
-          "sprite": "sprEWalkSilencer",
+          "sprite": "sprEWalkClub",
           "x": 464,
           "y": 160,
           "depth": -1,
           "init": {
             "direction": -5.194428907734806
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkUnarmed",
+          "x": 336,
+          "y": 448,
+          "depth": -1,
+          "init": {
+            "direction": -55.00797980144134
+          }
+        },
+        {
+          "name": "eeGuard",
+          "kind": "enemy",
+          "sprite": "sprEWalkSilencer",
+          "x": 592,
+          "y": 416,
+          "depth": -1,
+          "init": {
+            "direction": -30.96375653207352
           }
         },
         {
@@ -137744,16 +138437,6 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "kind": "decor",
           "sprite": "sprDoubleFridge",
           "x": 260,
-          "y": 484,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
-          "sprite": "sprDoubleFridge",
-          "x": 340,
           "y": 484,
           "depth": 0,
           "solid": true,
@@ -140366,12 +141049,34 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
         {
           "name": "eePatrol",
           "kind": "enemy",
-          "sprite": "sprEWalkSilencer",
+          "sprite": "sprEWalkUnarmed",
           "x": 112,
           "y": 384,
           "depth": -1,
           "init": {
             "direction": -90
+          }
+        },
+        {
+          "name": "eeGuard",
+          "kind": "enemy",
+          "sprite": "sprEWalkClub",
+          "x": 400,
+          "y": 416,
+          "depth": -1,
+          "init": {
+            "direction": -45
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkSilencer",
+          "x": 496,
+          "y": 192,
+          "depth": -1,
+          "init": {
+            "direction": -9.462322208025617
           }
         },
         {
@@ -140436,7 +141141,7 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "kind": "exit",
           "transition": "door",
           "x": 720,
-          "y": 488,
+          "y": 494,
           "forward": true,
           "visible": true,
           "targets": [],
@@ -140546,26 +141251,6 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "name": "eeFurnishing",
           "kind": "decor",
           "sprite": "sprCocaineCrate",
-          "x": 375,
-          "y": 378,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
-          "sprite": "sprCocaineCrate",
-          "x": 437,
-          "y": 378,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
-          "sprite": "sprCocaineCrate",
           "x": 437,
           "y": 486,
           "depth": 0,
@@ -140618,26 +141303,6 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "sprite": "sprComputer",
           "x": 447,
           "y": 126,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
-          "sprite": "sprComputer",
-          "x": 447,
-          "y": 190,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
-          "sprite": "sprComputer",
-          "x": 551,
-          "y": 190,
           "depth": 0,
           "solid": true,
           "furniture": true
@@ -143530,12 +144195,34 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
         {
           "name": "eePatrol",
           "kind": "enemy",
-          "sprite": "sprEWalkSilencer",
+          "sprite": "sprEWalkUnarmed",
           "x": 112,
           "y": 192,
           "depth": -1,
           "init": {
             "direction": 90
+          }
+        },
+        {
+          "name": "eeGuard",
+          "kind": "enemy",
+          "sprite": "sprEWalkClub",
+          "x": 304,
+          "y": 256,
+          "depth": -1,
+          "init": {
+            "direction": 39.8055710922652
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkSilencer",
+          "x": 624,
+          "y": 128,
+          "depth": -1,
+          "init": {
+            "direction": 29.357753542791272
           }
         },
         {
@@ -145544,7 +146231,7 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "kind": "exit",
           "transition": "door",
           "x": 368,
-          "y": 392,
+          "y": 398,
           "forward": true,
           "visible": true,
           "targets": [],
@@ -148372,12 +149059,45 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
         {
           "name": "eeGuard",
           "kind": "enemy",
-          "sprite": "sprEWalkSilencer",
+          "sprite": "sprEWalkClub",
           "x": 624,
           "y": 96,
           "depth": -1,
           "init": {
             "direction": 3.5763343749973515
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkUnarmed",
+          "x": 240,
+          "y": 384,
+          "depth": -1,
+          "init": {
+            "direction": -63.43494882292201
+          }
+        },
+        {
+          "name": "eeGuard",
+          "kind": "enemy",
+          "sprite": "sprEWalkClub",
+          "x": 528,
+          "y": 352,
+          "depth": -1,
+          "init": {
+            "direction": -28.30075576600638
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkSilencer",
+          "x": 720,
+          "y": 384,
+          "depth": -1,
+          "init": {
+            "direction": -22.83365417791754
           }
         },
         {
@@ -148442,7 +149162,7 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "kind": "exit",
           "transition": "door",
           "x": 720,
-          "y": 488,
+          "y": 494,
           "forward": true,
           "visible": true,
           "targets": [],
@@ -148734,16 +149454,6 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "sprite": "sprCocaineCrate",
           "x": 773,
           "y": 306,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
-          "sprite": "sprCocaineCrate",
-          "x": 773,
-          "y": 362,
           "depth": 0,
           "solid": true,
           "furniture": true
@@ -151309,12 +152019,34 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
         {
           "name": "eeGuard",
           "kind": "enemy",
-          "sprite": "sprEWalkSilencer",
+          "sprite": "sprEWalkClub",
           "x": 688,
           "y": 96,
           "depth": -1,
           "init": {
             "direction": 3.179830119864234
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkUnarmed",
+          "x": 112,
+          "y": 352,
+          "depth": -1,
+          "init": {
+            "direction": -90
+          }
+        },
+        {
+          "name": "eeGuard",
+          "kind": "enemy",
+          "sprite": "sprEWalkSilencer",
+          "x": 400,
+          "y": 352,
+          "depth": -1,
+          "init": {
+            "direction": -37.8749836510982
           }
         },
         {
@@ -151404,7 +152136,7 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "name": "eeFurnishing",
           "kind": "decor",
           "sprite": "sprAndersCouch",
-          "x": 364,
+          "x": 460,
           "y": 78,
           "depth": 0,
           "solid": true,
@@ -151415,17 +152147,7 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
           "kind": "decor",
           "sprite": "sprPlayerLivingRoomTable",
           "x": 460,
-          "y": 77.5,
-          "depth": 0,
-          "solid": true,
-          "furniture": true
-        },
-        {
-          "name": "eeFurnishing",
-          "kind": "decor",
-          "sprite": "sprTVBlack",
-          "x": 460,
-          "y": 146,
+          "y": 145.5,
           "depth": 0,
           "solid": true,
           "furniture": true
@@ -154088,12 +154810,34 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
         {
           "name": "eePatrol",
           "kind": "enemy",
-          "sprite": "sprEWalkSilencer",
+          "sprite": "sprEWalkUnarmed",
           "x": 304,
           "y": 416,
           "depth": -1,
           "init": {
             "direction": -56.309932474020215
+          }
+        },
+        {
+          "name": "eeGuard",
+          "kind": "enemy",
+          "sprite": "sprEWalkClub",
+          "x": 528,
+          "y": 384,
+          "depth": -1,
+          "init": {
+            "direction": -31.607502246248906
+          }
+        },
+        {
+          "name": "eePatrol",
+          "kind": "enemy",
+          "sprite": "sprEWalkSilencer",
+          "x": 720,
+          "y": 352,
+          "depth": -1,
+          "init": {
+            "direction": -20.224859431168078
           }
         },
         {

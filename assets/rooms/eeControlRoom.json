@@ -2815,14 +2815,47 @@
       }
     },
     {
-      "name": "eeSwat",
+      "name": "eeGuard",
       "kind": "enemy",
-      "sprite": "sprPoliceWalkM16",
+      "sprite": "sprEWalkClub",
       "x": 432,
       "y": 96,
       "depth": -1,
       "init": {
         "direction": 47.72631099390627
+      }
+    },
+    {
+      "name": "eePatrol",
+      "kind": "enemy",
+      "sprite": "sprEWalkUnarmed",
+      "x": 304,
+      "y": 384,
+      "depth": -1,
+      "init": {
+        "direction": 18.43494882292201
+      }
+    },
+    {
+      "name": "eeGuard",
+      "kind": "enemy",
+      "sprite": "sprEWalkClub",
+      "x": 528,
+      "y": 352,
+      "depth": -1,
+      "init": {
+        "direction": 12.994616791916506
+      }
+    },
+    {
+      "name": "eeSwat",
+      "kind": "enemy",
+      "sprite": "sprPoliceWalkM16",
+      "x": 720,
+      "y": 288,
+      "depth": -1,
+      "init": {
+        "direction": 14.743562836470735
       }
     },
     {
@@ -2887,7 +2920,7 @@
       "kind": "exit",
       "transition": "door",
       "x": 720,
-      "y": 488,
+      "y": 494,
       "forward": true,
       "visible": true,
       "targets": [],
@@ -3007,16 +3040,6 @@
       "name": "eeFurnishing",
       "kind": "decor",
       "sprite": "sprComputer",
-      "x": 255,
-      "y": 382,
-      "depth": 0,
-      "solid": true,
-      "furniture": true
-    },
-    {
-      "name": "eeFurnishing",
-      "kind": "decor",
-      "sprite": "sprComputer",
       "x": 359,
       "y": 446,
       "depth": 0,
@@ -3088,7 +3111,7 @@
       "kind": "decor",
       "sprite": "sprCyanPlant",
       "x": 753,
-      "y": 293,
+      "y": 368,
       "depth": 0,
       "solid": true,
       "furniture": true
@@ -3097,8 +3120,18 @@
       "name": "eeFurnishing",
       "kind": "decor",
       "sprite": "sprComputer",
-      "x": 756,
-      "y": 368,
+      "x": 690,
+      "y": 443,
+      "depth": 0,
+      "solid": true,
+      "furniture": true
+    },
+    {
+      "name": "eeFurnishing",
+      "kind": "decor",
+      "sprite": "sprOfficeCouch",
+      "x": 753,
+      "y": 443,
       "depth": 0,
       "solid": true,
       "furniture": true

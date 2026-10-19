@@ -2797,6 +2797,39 @@
       }
     },
     {
+      "name": "eePatrol",
+      "kind": "enemy",
+      "sprite": "sprEWalkUnarmed",
+      "x": 432,
+      "y": 416,
+      "depth": -1,
+      "init": {
+        "direction": -45
+      }
+    },
+    {
+      "name": "eeGuard",
+      "kind": "enemy",
+      "sprite": "sprEWalkClub",
+      "x": 720,
+      "y": 128,
+      "depth": -1,
+      "init": {
+        "direction": 0
+      }
+    },
+    {
+      "name": "eePatrol",
+      "kind": "enemy",
+      "sprite": "sprEWalkSilencer",
+      "x": 720,
+      "y": 448,
+      "depth": -1,
+      "init": {
+        "direction": -29.054604099077146
+      }
+    },
+    {
       "name": "eeWeapon",
       "kind": "weapon",
       "sprite": "sprWeapons",
@@ -2849,7 +2882,7 @@
       "kind": "exit",
       "transition": "door",
       "x": 720,
-      "y": 520,
+      "y": 526,
       "forward": true,
       "visible": true,
       "targets": [],
@@ -3081,16 +3114,6 @@
       "sprite": "sprCocaineCrate",
       "x": 773,
       "y": 370,
-      "depth": 0,
-      "solid": true,
-      "furniture": true
-    },
-    {
-      "name": "eeFurnishing",
-      "kind": "decor",
-      "sprite": "sprCocaineCrate",
-      "x": 773,
-      "y": 426,
       "depth": 0,
       "solid": true,
       "furniture": true
