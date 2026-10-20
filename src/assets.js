@@ -20,3 +20,40 @@ export async function readJson(url) {
   }
   return response.json();
 }
+
+export function roomSpriteKeys(metadata, room) {
+  const keys = new Set(
+    room.entities.map((entity) => entity.sprite).filter((k) => metadata.sprites[k]),
+  );
+  for (const entity of room.entities.filter((e) => e.glass)) {
+    const key = entity.sprite.replace(/([HV])$/, '$1Broken');
+    if (metadata.sprites[key]) {
+      keys.add(key);
+    }
+  }
+  for (const key of [
+    'sprWeapons',
+    'sprLegs',
+    'sprPoliceLegs',
+    'sprPWalkUnarmed',
+    'sprEBackBlunt',
+    'sprPoliceBackBlunt',
+    'sprPoliceBackMachinegun',
+    'sprPoliceCrawl',
+    'sprBloodSplat',
+    'sprBullet',
+    'sprDogWalk',
+    'sprBossCar1',
+    'sprBossCar2',
+    'sprCopCar',
+    'sprDogDeadBlunt',
+    'sprDogAttack',
+    'sprPBackMachinegun',
+    'sprPCrawl',
+  ]) {
+    if (metadata.sprites[key]) {
+      keys.add(key);
+    }
+  }
+  return keys;
+}

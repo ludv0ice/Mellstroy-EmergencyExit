@@ -1,6 +1,6 @@
 import { clamp } from './physics.js';
 import { drawLevel, drawTransition } from './levels.js';
-import { assetUrl } from './assets.js';
+import { assetUrl, roomSpriteKeys } from './assets.js';
 import { playerPose, heldWeaponPose } from './player-animation.js';
 const Phaser = globalThis.Phaser;
 export class GameView extends Phaser.Scene {
@@ -103,39 +103,7 @@ export class GameView extends Phaser.Scene {
   async setWorld(sim, preview = false) {
     this.loading = true;
     const metadata = sim.manifest;
-    const keys = new Set(
-      sim.room.entities.map((entity) => entity.sprite).filter((k) => metadata.sprites[k]),
-    );
-    for (const entity of sim.room.entities.filter((e) => e.glass)) {
-      const key = entity.sprite.replace(/([HV])$/, '$1Broken');
-      if (metadata.sprites[key]) {
-        keys.add(key);
-      }
-    }
-    for (const key of [
-      'sprWeapons',
-      'sprLegs',
-      'sprPoliceLegs',
-      'sprPWalkUnarmed',
-      'sprEBackBlunt',
-      'sprPoliceBackBlunt',
-      'sprPoliceBackMachinegun',
-      'sprPoliceCrawl',
-      'sprBloodSplat',
-      'sprBullet',
-      'sprDogWalk',
-      'sprBossCar1',
-      'sprBossCar2',
-      'sprCopCar',
-      'sprDogDeadBlunt',
-      'sprDogAttack',
-      'sprPBackMachinegun',
-      'sprPCrawl',
-    ]) {
-      if (metadata.sprites[key]) {
-        keys.add(key);
-      }
-    }
+    const keys = roomSpriteKeys(metadata, sim.room);
     const backgrounds = new Set(
       sim.room.tiles.map((t) => t.bgName).filter((k) => metadata.backgrounds[k]),
     );

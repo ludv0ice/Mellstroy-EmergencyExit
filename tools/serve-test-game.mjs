@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
 export async function serveTestGame(root) {
+  root = path.resolve(process.env.GAME_ROOT ?? root);
   const types = {
     '.html': 'text/html',
     '.js': 'text/javascript',

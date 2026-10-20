@@ -472,6 +472,42 @@
     }
     return response.json();
   }
+  function roomSpriteKeys(metadata, room) {
+    const keys = new Set(
+      room.entities.map((entity) => entity.sprite).filter((k) => metadata.sprites[k])
+    );
+    for (const entity of room.entities.filter((e) => e.glass)) {
+      const key = entity.sprite.replace(/([HV])$/, "$1Broken");
+      if (metadata.sprites[key]) {
+        keys.add(key);
+      }
+    }
+    for (const key of [
+      "sprWeapons",
+      "sprLegs",
+      "sprPoliceLegs",
+      "sprPWalkUnarmed",
+      "sprEBackBlunt",
+      "sprPoliceBackBlunt",
+      "sprPoliceBackMachinegun",
+      "sprPoliceCrawl",
+      "sprBloodSplat",
+      "sprBullet",
+      "sprDogWalk",
+      "sprBossCar1",
+      "sprBossCar2",
+      "sprCopCar",
+      "sprDogDeadBlunt",
+      "sprDogAttack",
+      "sprPBackMachinegun",
+      "sprPCrawl"
+    ]) {
+      if (metadata.sprites[key]) {
+        keys.add(key);
+      }
+    }
+    return keys;
+  }
   var PLAYER_DIRECTIONS = ["down", "up", "left", "right"];
   function directionForVector(x, y, fallback = "down") {
     if (Math.hypot(x, y) < 1e-3) {
@@ -777,39 +813,7 @@
     async setWorld(sim, preview = false) {
       this.loading = true;
       const metadata = sim.manifest;
-      const keys = new Set(
-        sim.room.entities.map((entity) => entity.sprite).filter((k) => metadata.sprites[k])
-      );
-      for (const entity of sim.room.entities.filter((e) => e.glass)) {
-        const key = entity.sprite.replace(/([HV])$/, "$1Broken");
-        if (metadata.sprites[key]) {
-          keys.add(key);
-        }
-      }
-      for (const key of [
-        "sprWeapons",
-        "sprLegs",
-        "sprPoliceLegs",
-        "sprPWalkUnarmed",
-        "sprEBackBlunt",
-        "sprPoliceBackBlunt",
-        "sprPoliceBackMachinegun",
-        "sprPoliceCrawl",
-        "sprBloodSplat",
-        "sprBullet",
-        "sprDogWalk",
-        "sprBossCar1",
-        "sprBossCar2",
-        "sprCopCar",
-        "sprDogDeadBlunt",
-        "sprDogAttack",
-        "sprPBackMachinegun",
-        "sprPCrawl"
-      ]) {
-        if (metadata.sprites[key]) {
-          keys.add(key);
-        }
-      }
+      const keys = roomSpriteKeys(metadata, sim.room);
       const backgrounds = new Set(
         sim.room.tiles.map((t) => t.bgName).filter((k) => metadata.backgrounds[k])
       );
