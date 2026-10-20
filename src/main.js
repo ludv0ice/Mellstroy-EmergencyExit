@@ -1,17 +1,15 @@
-import Phaser from 'phaser';
-import './style.css';
 import { GameView } from './renderer.js';
 import { Simulation } from './simulation.js';
 import { Tutorial } from './tutorial.js';
 import { CHAPTERS, PROFILES } from './campaign.js';
 import { AudioEngine } from './audio.js';
-import { connectsTo } from './rooms.js';
+import { connectsTo } from './levels.js';
 import { readJson } from './assets.js';
 import { EndingPlayer, endingSprites } from './ending.js';
-import { endingUnlocked } from './ending-sequence.js';
+import { endingUnlocked } from './ending-data.js';
 import { bindUI, updateHUD, renderChapters } from './ui.js';
-
-const $ = (id) => document.getElementById(id);
+const Phaser = globalThis.Phaser;
+const elementById = (id) => document.getElementById(id);
 const overlays = [
   'menu',
   'briefing',
@@ -65,19 +63,23 @@ const app = {
     return this.cache.get(id);
   },
   overlay(id) {
-    for (const name of overlays)
-      $(name).classList.toggle('hidden', name !== id);
+    for (const name of overlays) {
+      elementById(name).classList.toggle('hidden', name !== id);
+    }
     this.menuNavigation?.show(id);
-    if (this.view?.input.keyboard)
+    if (this.view?.input.keyboard) {
       this.view.input.keyboard.enabled = ['playing', 'paused', 'dead'].includes(
         this.mode,
       );
+    }
     this.view?.input.keyboard?.resetKeys();
     const playing = ['playing', 'paused', 'dead', 'result'].includes(this.mode);
-    $('hud').classList.toggle('hidden', !playing);
-    if (id || this.mode !== 'playing') $('tutorial').classList.add('hidden');
-    $('weapon-hud').classList.toggle('hidden', !playing);
-    $('touch-controls').classList.toggle(
+    elementById('hud').classList.toggle('hidden', !playing);
+    if (id || this.mode !== 'playing') {
+      elementById('tutorial').classList.add('hidden');
+    }
+    elementById('weapon-hud').classList.toggle('hidden', !playing);
+    elementById('touch-controls').classList.toggle(
       'hidden',
       this.mode !== 'playing' || !window.matchMedia('(pointer:coarse)').matches,
     );
@@ -88,65 +90,68 @@ const app = {
       const raw = await this.room('eeHideout');
       const sim = new Simulation(this.manifest, raw, PROFILES[0]);
       await view.setWorld(sim, true);
-      $('loading').classList.add('hidden');
+      elementById('loading').classList.add('hidden');
       this.menu();
     } catch (error) {
       this.fail(error);
     }
   },
   fail(error) {
-    $('loading').classList.remove('hidden');
-    $('load-label').textContent = error.message;
+    elementById('loading').classList.remove('hidden');
+    elementById('load-label').textContent = error.message;
     console.error(error);
   },
   async load(id, carry = null, reuse = false) {
     this.mode = 'loading';
     this.overlay(null);
-    $('loading').classList.remove('hidden');
-    $('load-label').textContent = 'Загрузка ' + id + '…';
-    $('load-progress').style.width = '70%';
+    elementById('loading').classList.remove('hidden');
+    elementById('load-label').textContent = 'Загрузка ' + id + '…';
+    elementById('load-progress').style.width = '70%';
     try {
       const raw = await this.room(id);
       const sim =
         reuse && this.floorStates.has(id)
           ? this.floorStates.get(id)
           : new Simulation(this.manifest, raw, this.profile);
-      if (this.cheats) sim.cheats = this.cheats.flags;
+      if (this.cheats) {
+        sim.cheats = this.cheats.flags;
+      }
       if (carry) {
         sim.player.weapon = carry.weapon;
         sim.player.ammo = carry.ammo;
         sim.player.armor = carry.armor;
-        const entry =
-          carry.from && sim.exits.find((e) => connectsTo(e, carry.from));
+        const entry = carry.from && sim.exits.find((e) => connectsTo(e, carry.from));
         if (entry) {
           const pos = sim.safeSpawn(entry);
           sim.player.x = pos.x;
           sim.player.y = pos.y;
         }
       }
-      if (id === 'eeTraining') sim.tutorial = new Tutorial(sim);
+      if (id === 'eeTraining') {
+        sim.tutorial = new Tutorial(sim);
+      }
       sim.status = 'playing';
       sim.player.alive = true;
       sim.grace = 0.6;
-      if (!reuse || !this.checkpoints.has(id))
+      if (!reuse || !this.checkpoints.has(id)) {
         this.checkpoints.set(id, {
           weapon: sim.player.weapon,
           ammo: sim.player.ammo,
           armor: sim.player.armor,
         });
+      }
       this.floorStates.set(id, sim);
       this.configureExit(sim);
       await this.view.setWorld(sim);
       this.sim = sim;
       this.mode = 'playing';
       this.overlay(null);
-      $('loading').classList.add('hidden');
+      elementById('loading').classList.add('hidden');
       this.audio.start();
       this.updateHUD();
-      if (!sim.tutorial)
-        this.toast(
-          sim.total ? `ПЕРИМЕТР: ${sim.total} ПРОТИВНИКОВ` : 'НАЙДИ ВЫХОД',
-        );
+      if (!sim.tutorial) {
+        this.toast(sim.total ? `ПЕРИМЕТР: ${sim.total} ПРОТИВНИКОВ` : 'НАЙДИ ВЫХОД');
+      }
     } catch (error) {
       this.fail(error);
     }
@@ -155,18 +160,22 @@ const app = {
     this.chapter = CHAPTERS[index];
     this.mode = 'briefing';
     this.overlay('briefing');
-    $('brief-number').textContent =
+    elementById('brief-number').textContent =
       'ГЛАВА ' + this.chapter.number + ' / ПОБЕГ ИЗ ГОРОДА';
-    $('brief-title').textContent = this.chapter.title;
-    $('brief-text').textContent = this.chapter.brief;
-    $('profile').disabled = index === 0;
-    if (index === 0) $('profile').value = PROFILES[0].id;
-    $('deploy').textContent = index === 0 ? 'НАЧАТЬ ОБУЧЕНИЕ' : 'НАЧАТЬ ГЛАВУ';
+    elementById('brief-title').textContent = this.chapter.title;
+    elementById('brief-text').textContent = this.chapter.brief;
+    elementById('profile').disabled = index === 0;
+    if (index === 0) {
+      elementById('profile').value = PROFILES[0].id;
+    }
+    elementById('deploy').textContent = index === 0 ? 'НАЧАТЬ ОБУЧЕНИЕ' : 'НАЧАТЬ ГЛАВУ';
   },
   start() {
     this.profile =
-      PROFILES.find((p) => p.id === $('profile').value) ?? PROFILES[0];
-    if (this.chapter.index === 0) this.profile = PROFILES[0];
+      PROFILES.find((p) => p.id === elementById('profile').value) ?? PROFILES[0];
+    if (this.chapter.index === 0) {
+      this.profile = PROFILES[0];
+    }
     this.resetRun();
     this.deaths = 0;
     this.progress.last = this.chapter.index;
@@ -181,7 +190,9 @@ const app = {
     this.checkpoints.clear();
   },
   restart() {
-    if (!this.sim) return;
+    if (!this.sim) {
+      return;
+    }
     this.deaths++;
     this.load(this.sim.room.id, this.checkpoints.get(this.sim.room.id));
   },
@@ -197,14 +208,16 @@ const app = {
     }
   },
   showEnding() {
-    if (!endingUnlocked(this.progress) || this.ending) return false;
+    if (!endingUnlocked(this.progress) || this.ending) {
+      return false;
+    }
     this.mode = 'ending';
     this.overlay(null);
-    $('combo').classList.add('hidden');
+    elementById('combo').classList.add('hidden');
     clearTimeout(this.toastTimer);
-    $('toast').style.opacity = '0';
+    elementById('toast').style.opacity = '0';
     this.ending = new EndingPlayer(
-      $('ending'),
+      elementById('ending'),
       endingSprites(this.view.images, this.skins, this.manifest),
       this.audio,
       this.settings,
@@ -218,15 +231,17 @@ const app = {
   menu() {
     this.mode = 'menu';
     this.overlay('menu');
-    $('ending-button').hidden = !endingUnlocked(this.progress);
-    $('continue').textContent = this.progress.unlocked
+    elementById('ending-button').hidden = !endingUnlocked(this.progress);
+    elementById('continue').textContent = this.progress.unlocked
       ? 'ПРОДОЛЖИТЬ ПОБЕГ'
       : 'НАЧАТЬ ПОБЕГ';
-    $('combo').classList.add('hidden');
+    elementById('combo').classList.add('hidden');
     clearTimeout(this.toastTimer);
-    $('toast').style.opacity = '0';
-    $('toast').textContent = '';
-    if (this.view) this.view.preview = true;
+    elementById('toast').style.opacity = '0';
+    elementById('toast').textContent = '';
+    if (this.view) {
+      this.view.preview = true;
+    }
     this.audio.active = true;
     this.renderChapters();
   },
@@ -235,11 +250,14 @@ const app = {
       this.mode = 'dead';
       this.overlay('death');
       this.audio.active = false;
-      $('combo').classList.add('hidden');
+      elementById('combo').classList.add('hidden');
     }
-    if (event.type === 'clear' && !this.sim.tutorial)
+    if (event.type === 'clear' && !this.sim.tutorial) {
       this.toast('ПЕРИМЕТР ЧИСТ · К ВЫХОДУ');
-    if (event.type === 'complete') this.complete();
+    }
+    if (event.type === 'complete') {
+      this.complete();
+    }
   },
   configureExit(sim) {
     const next = this.chapter.rooms[this.floorIndex + 1];
@@ -264,57 +282,49 @@ const app = {
       this.load(this.chapter.rooms[this.floorIndex], carry, true);
       return;
     }
-    this.runScore = [...this.floorStates.values()].reduce(
-      (n, s) => n + s.score,
-      0,
-    );
-    this.runTime = [...this.floorStates.values()].reduce(
-      (n, s) => n + s.elapsed,
-      0,
-    );
+    this.runScore = [...this.floorStates.values()].reduce((n, s) => n + s.score, 0);
+    this.runTime = [...this.floorStates.values()].reduce((n, s) => n + s.elapsed, 0);
     this.mode = 'result';
     this.overlay('result');
-    $('combo').classList.add('hidden');
+    elementById('combo').classList.add('hidden');
     const base = [...this.floorStates.values()].reduce(
-      (total, floor) => total + floor.total * 400, 0,
+      (total, floor) => total + floor.total * 400,
+      0,
     );
     const grade = gradeFor(this.runScore, base);
-    $('result-score').textContent = this.runScore.toLocaleString('ru-RU');
-    $('result-time').textContent = this.runTime.toFixed(1) + 's';
-    $('result-grade').textContent = grade;
-    $('result-title').textContent =
+    elementById('result-score').textContent = this.runScore.toLocaleString('ru-RU');
+    elementById('result-time').textContent = this.runTime.toFixed(1) + 's';
+    elementById('result-grade').textContent = grade;
+    elementById('result-title').textContent =
       this.chapter.index === 15 ? 'ГОРОД ПОЗАДИ.' : 'ЧИСТО.';
     this.progress.unlocked = Math.max(
       this.progress.unlocked,
       Math.min(CHAPTERS.length - 1, this.chapter.index + 1),
     );
     const best = this.progress.best[this.chapter.index];
-    if (!best || best.score < this.runScore)
+    if (!best || best.score < this.runScore) {
       this.progress.best[this.chapter.index] = {
         score: this.runScore,
         grade,
         time: this.runTime,
       };
+    }
     this.progress.last = Math.min(CHAPTERS.length - 1, this.chapter.index + 1);
     save('emergency-exit-progress', this.progress);
-    $('next').textContent =
-      this.chapter.index === CHAPTERS.length - 1
-        ? 'ЗАВЕРШИТЬ ПОБЕГ'
-        : 'СЛЕДУЮЩАЯ ГЛАВА';
-    if (
-      this.chapter.index === CHAPTERS.length - 1 &&
-      endingUnlocked(this.progress)
-    )
+    elementById('next').textContent =
+      this.chapter.index === CHAPTERS.length - 1 ? 'ЗАВЕРШИТЬ ПОБЕГ' : 'СЛЕДУЮЩАЯ ГЛАВА';
+    if (this.chapter.index === CHAPTERS.length - 1 && endingUnlocked(this.progress)) {
       this.showEnding();
+    }
   },
   updateHUD() {
     updateHUD(this);
   },
   toast(text) {
-    $('toast').textContent = text;
-    $('toast').style.opacity = '1';
+    elementById('toast').textContent = text;
+    elementById('toast').style.opacity = '1';
     clearTimeout(this.toastTimer);
-    this.toastTimer = setTimeout(() => ($('toast').style.opacity = '0'), 2800);
+    this.toastTimer = setTimeout(() => (elementById('toast').style.opacity = '0'), 2800);
   },
   renderChapters() {
     renderChapters(this);
@@ -332,14 +342,18 @@ const app = {
     save('emergency-exit-settings', this.settings);
   },
 };
-
 function gradeFor(score, base) {
-  if (score > base * 2.5) return 'A+';
-  if (score > base * 1.6) return 'A';
-  if (score > base) return 'B';
+  if (score > base * 2.5) {
+    return 'A+';
+  }
+  if (score > base * 1.6) {
+    return 'A';
+  }
+  if (score > base) {
+    return 'B';
+  }
   return 'C';
 }
-
 async function boot() {
   try {
     [app.manifest, app.skins] = await Promise.all([
@@ -349,13 +363,13 @@ async function boot() {
     app.audio = new AudioEngine(app.manifest, app.settings);
     app.applySettings();
     for (const profile of PROFILES) {
-      const o = document.createElement('option');
-      o.value = profile.id;
-      o.textContent = profile.name + ' — ' + profile.tag;
-      $('profile').append(o);
+      const option = document.createElement('option');
+      option.value = profile.id;
+      option.textContent = profile.name + ' — ' + profile.tag;
+      elementById('profile').append(option);
     }
     app.renderChapters();
-    $('load-progress').style.width = '35%';
+    elementById('load-progress').style.width = '35%';
     const scene = new GameView();
     scene.app = app;
     app.game = new Phaser.Game({
@@ -371,13 +385,23 @@ async function boot() {
         height: window.innerHeight,
       },
       scene: [scene],
-      audio: { noAudio: true },
-      input: { activePointers: 3 },
-      fps: { target: 60, forceSetTimeOut: false },
+      audio: {
+        noAudio: true,
+      },
+      input: {
+        activePointers: 3,
+      },
+      fps: {
+        target: 60,
+        forceSetTimeOut: false,
+      },
     });
     bindUI(app, () => save('emergency-exit-progress', app.progress));
     window.__GAME__ = {
-      getState: () => app.sim?.snapshot() ?? { status: app.mode },
+      getState: () =>
+        app.sim?.snapshot() ?? {
+          status: app.mode,
+        },
       get mode() {
         return app.mode;
       },

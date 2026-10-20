@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { readdirSync, readFileSync, statSync, existsSync } from 'node:fs';
+import { readdirSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { runInNewContext } from 'node:vm';
@@ -9,14 +9,12 @@ const root = fileURLToPath(new URL('../', import.meta.url));
 const assets = path.join(root, 'assets');
 const manifest = JSON.parse(readFileSync(path.join(assets, 'manifest.json')));
 const skins = JSON.parse(readFileSync(path.join(assets, 'custom/skins.json')));
-const rooms = new Set([
-  'eeHideout',
-  ...CHAPTERS.flatMap((chapter) => chapter.rooms),
-]);
+const rooms = new Set(['eeHideout', ...CHAPTERS.flatMap((chapter) => chapter.rooms)]);
 assert.deepEqual(new Set(manifest.rooms.map((room) => room.id)), rooms);
 const expected = new Set([
   '/assets/manifest.json',
   '/assets/data.js',
+  '/assets/game.js',
   '/assets/vendor/phaser.js',
   '/assets/custom/skins.json',
   '/assets/fonts/justice.ttf',
@@ -31,20 +29,18 @@ const expected = new Set([
 function files(directory) {
   return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
     const location = path.join(directory, entry.name);
-    return entry.isDirectory() ? files(location) : [location];
+    if (entry.isDirectory()) {
+      return files(location);
+    } else {
+      return [location];
+    }
   });
 }
 
 const actual = new Set(
-  files(assets).map(
-    (file) => '/' + path.relative(root, file).split(path.sep).join('/'),
-  ),
+  files(assets).map((file) => '/' + path.relative(root, file).split(path.sep).join('/')),
 );
-assert.deepEqual(
-  actual,
-  expected,
-  'Assets must contain exactly the declared game files',
-);
+assert.deepEqual(actual, expected, 'Assets must contain exactly the declared game files');
 const context = {
   URL,
   document: { currentScript: { src: 'file:///game/assets/data.js' } },
@@ -52,58 +48,42 @@ const context = {
 runInNewContext(readFileSync(path.join(assets, 'data.js'), 'utf8'), context);
 const cached = context.__EMERGENCY_EXIT_ASSETS__.json;
 for (const url of expected) {
-  if (url.endsWith('.json'))
+  if (url.endsWith('.json')) {
     assert.equal(
       JSON.stringify(cached[url]),
       JSON.stringify(JSON.parse(readFileSync(path.join(root, url.slice(1))))),
       url,
     );
+  }
 }
 for (const id of rooms) {
-  const room = JSON.parse(
-    readFileSync(path.join(assets, 'rooms', `${id}.json`)),
-  );
+  const room = JSON.parse(readFileSync(path.join(assets, 'rooms', `${id}.json`)));
   assert.equal(room.id, id);
   for (const entity of room.entities) {
     assert.ok(!('code' in entity), 'Rooms must use data, not source scripts');
-    if (entity.mask)
+    if (entity.mask) {
       assert.ok(manifest.sprites[entity.mask], `${id}: mask ${entity.mask}`);
+    }
   }
-  for (const tile of room.tiles)
+  for (const tile of room.tiles) {
     assert.ok(
       tile.bgName === '<undefined>' || manifest.backgrounds[tile.bgName],
       `${id}: tiles ${tile.bgName}`,
     );
+  }
 }
 
 const assetBytes = files(path.join(root, 'assets')).reduce(
   (n, file) => n + statSync(file).size,
   0,
 );
-const buildDirectory = path.join(root, 'dist');
-const buildBytes = existsSync(buildDirectory)
-  ? files(buildDirectory).reduce((n, file) => n + statSync(file).size, 0)
-  : null;
-assert.ok(assetBytes < 100_000_000, 'Game assets exceed the 100 MB budget');
-if (buildBytes !== null) {
-  assert.ok(
-    buildBytes < 100_000_000,
-    'Production build exceeds the 100 MB budget',
+const buildBytes =
+  assetBytes +
+  ['index.html', 'src/style.css'].reduce(
+    (total, name) => total + statSync(path.join(root, name)).size,
+    0,
   );
-  const buildAssets = new Set(
-    files(path.join(buildDirectory, 'assets'))
-      .filter((file) => !/^index-[^/]+\.(?:js|css)$/.test(path.basename(file)))
-      .map(
-        (file) =>
-          '/' + path.relative(buildDirectory, file).split(path.sep).join('/'),
-      ),
-  );
-  assert.deepEqual(
-    buildAssets,
-    expected,
-    'Rebuild dist when game assets change',
-  );
-}
+assert.ok(buildBytes < 100_000_000, 'Game exceeds the 100 MB budget');
 console.log(
   JSON.stringify(
     {

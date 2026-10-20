@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { Simulation } from '../src/simulation.js';
 import { CHAPTERS, PROFILES } from '../src/campaign.js';
 import { completeCampaign, clearLocation } from '../src/cheats.js';
-import { endingUnlocked } from '../src/ending-sequence.js';
+import { endingUnlocked } from '../src/ending-data.js';
 
 const manifest = JSON.parse(
   readFileSync(new URL('../assets/manifest.json', import.meta.url)),
@@ -69,8 +69,8 @@ test('A shared god toggle carries across simulations without altering normal def
   normal.die();
   assert.equal(normal.player.alive, false);
   const flags = { god: true };
-  const first = fixture(),
-    second = fixture();
+  const first = fixture();
+  const second = fixture();
   first.cheats = second.cheats = flags;
   second.die();
   assert.equal(second.player.alive, true);

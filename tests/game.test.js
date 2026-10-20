@@ -5,16 +5,14 @@ import { createHash } from 'node:crypto';
 import { Simulation } from '../src/simulation.js';
 import { PROFILES } from '../src/campaign.js';
 import { rayRect, segmentCircle, Navigation } from '../src/physics.js';
-import { buildRoom } from '../src/rooms.js';
+import { buildRoom } from '../src/levels.js';
 import { CHAPTERS } from '../src/campaign.js';
 
 const manifest = JSON.parse(
   readFileSync(new URL('../assets/manifest.json', import.meta.url)),
 );
 const raw = (id) =>
-  JSON.parse(
-    readFileSync(new URL('../assets/rooms/' + id + '.json', import.meta.url)),
-  );
+  JSON.parse(readFileSync(new URL('../assets/rooms/' + id + '.json', import.meta.url)));
 const prototypes = {
   objPlayerMouse: {
     kind: 'player',
@@ -56,9 +54,7 @@ function fixture(entities) {
 const empty = { moveX: 0, moveY: 0, attack: false };
 
 test('Loading rooms keeps mutable entity state separate from cached JSON', () => {
-  const data = fixture([
-    instance('objSpecificWeapon', 40, 40, { init: { ammo: 6 } }),
-  ]);
+  const data = fixture([instance('objSpecificWeapon', 40, 40, { init: { ammo: 6 } })]);
   const room = buildRoom(manifest, data);
   room.entities[0].broken = true;
   room.entities[0].init.ammo = 0;
@@ -137,7 +133,9 @@ test('Walls block enemy vision and projectiles', () => {
   );
   assert.equal(sim.lineBlocked(sim.player, sim.enemies[0]), true);
   sim.enemies[0].angle = Math.PI;
-  for (let i = 0; i < 100; i++) sim.update(1 / 60, empty);
+  for (let i = 0; i < 100; i++) {
+    sim.update(1 / 60, empty);
+  }
   assert.equal(sim.player.alive, true);
 });
 test('A door hit knocks down a nearby enemy', () => {
@@ -169,12 +167,7 @@ test('Disarm modifier steals a gun without duplicating it on the ground', () => 
   assert.equal(sim.items.filter((i) => !i.taken).length, 0);
 });
 test('Navigation finds a route around walls', () => {
-  const nav = new Navigation(
-    120,
-    120,
-    (x, y) => x > 45 && x < 75 && y < 80,
-    10,
-  );
+  const nav = new Navigation(120, 120, (x, y) => x > 45 && x < 75 && y < 80, 10);
   const path = nav.path({ x: 20, y: 20 }, { x: 100, y: 20 });
   assert.ok(path.some((p) => p.y >= 85));
 });
@@ -186,8 +179,9 @@ test('Every campaign room and declared asset exists', () => {
     assert.equal(data.id, r.id);
     assert.equal(data.entities.length, r.entities);
   }
-  for (const s of Object.values(manifest.sprites))
+  for (const s of Object.values(manifest.sprites)) {
     assert.ok(existsSync(new URL('..' + s.url, import.meta.url)), s.url);
+  }
 });
 test('All campaign combat maps construct a simulation with valid spawn and finite collision geometry', () => {
   for (const r of manifest.rooms.filter((r) => r.enemies > 0)) {
@@ -199,8 +193,9 @@ test('All campaign combat maps construct a simulation with valid spawn and finit
       r.id + ' spawn',
     );
     assert.ok(sim.total > 0, r.id);
-    for (const b of sim.staticBoxes)
+    for (const b of sim.staticBoxes) {
       assert.ok([b.x, b.y, b.w, b.h].every(Number.isFinite), r.id);
+    }
   }
 });
 test('Custom sheets preserve source canvas size, frame count, and origin', () => {
@@ -216,8 +211,8 @@ test('Custom sheets preserve source canvas size, frame count, and origin', () =>
     desk: 'sprAndersDesk',
   };
   for (const [key, sprite] of Object.entries(pairs)) {
-    const s = skins[key],
-      m = manifest.sprites[sprite];
+    const s = skins[key];
+    const m = manifest.sprites[sprite];
     const png = readFileSync(new URL('..' + s.url, import.meta.url));
     assert.equal(png.readUInt32BE(16), m.width * m.frames, key + ' width');
     assert.equal(png.readUInt32BE(20), m.height, key + ' height');
@@ -239,7 +234,9 @@ test('All retained textures, sounds and fonts remain byte-identical to the origi
     '/assets/audio/sndCarEngine.wav',
   ]);
   for (const [url, expected] of Object.entries(baseline.assets)) {
-    if (removed.has(url)) continue;
+    if (removed.has(url)) {
+      continue;
+    }
     assert.equal(
       createHash('sha256')
         .update(readFileSync(new URL('..' + url, import.meta.url)))

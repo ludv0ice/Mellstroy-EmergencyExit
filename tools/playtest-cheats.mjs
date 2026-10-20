@@ -3,8 +3,7 @@ import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import assert from 'node:assert/strict';
 const root = fileURLToPath(new URL('../', import.meta.url)).replace(/\/$/, '');
-const output =
-  process.env.PLAYTEST_OUTPUT ?? root + '/../artifacts/cheats-playtest';
+const output = process.env.PLAYTEST_OUTPUT ?? root + '/../artifacts/cheats-playtest';
 fs.mkdirSync(output, { recursive: true });
 const server = await serveTestGame(root);
 const page = await fetch('http://127.0.0.1:9222/json/new?about:blank', {
@@ -13,9 +12,9 @@ const page = await fetch('http://127.0.0.1:9222/json/new?about:blank', {
 const ws = new WebSocket(page.webSocketDebuggerUrl);
 await new Promise((r) => ws.addEventListener('open', r, { once: true }));
 let id = 0;
-const pending = new Map(),
-  errors = [],
-  requests = [];
+const pending = new Map();
+const errors = [];
+const requests = [];
 const send = (method, params = {}) =>
   new Promise((resolve, reject) => {
     pending.set(++id, { resolve, reject });
@@ -27,14 +26,15 @@ ws.onmessage = (e) => {
     const p = pending.get(m.id);
     pending.delete(m.id);
     m.error ? p.reject(m.error) : p.resolve(m.result);
-  } else if (m.method === 'Runtime.exceptionThrown')
+  } else if (m.method === 'Runtime.exceptionThrown') {
     errors.push(m.params.exceptionDetails);
-  else if (
+  } else if (
     m.method === 'Network.requestWillBeSent' &&
     /^https?:/.test(m.params.request.url) &&
     !m.params.request.url.startsWith(server.url + '/')
-  )
+  ) {
     requests.push(m.params.request.url);
+  }
 };
 const evaluate = async (expression) => {
   const r = await send('Runtime.evaluate', {
@@ -42,12 +42,16 @@ const evaluate = async (expression) => {
     awaitPromise: true,
     returnByValue: true,
   });
-  if (r.exceptionDetails) throw Error(JSON.stringify(r.exceptionDetails));
+  if (r.exceptionDetails) {
+    throw Error(JSON.stringify(r.exceptionDetails));
+  }
   return r.result.value;
 };
 const until = async (expression) => {
   for (let i = 0; i < 120; i++) {
-    if (await evaluate(expression)) return;
+    if (await evaluate(expression)) {
+      return;
+    }
     await new Promise((r) => setTimeout(r, 100));
   }
   throw Error('Timeout ' + expression);
@@ -144,9 +148,7 @@ try {
     windowsVirtualKeyCode: 192,
   });
   assert.equal(await evaluate('window.__GAME__.mode'), 'menu');
-  await evaluate(
-    'window.__QA_APP__.briefing(1);window.__QA_APP__.start();true',
-  );
+  await evaluate('window.__QA_APP__.briefing(1);window.__QA_APP__.start();true');
   await until("window.__GAME__.mode==='playing'");
   assert.equal(await evaluate('window.__QA_APP__.sim.cheats.god'), true);
   const immune = await evaluate(
@@ -186,15 +188,10 @@ try {
   await press('F2');
   await command('clear');
   assert.equal(await evaluate('window.__QA_APP__.sim.cleared'), true);
-  assert.equal(
-    await evaluate('window.__QA_APP__.sim.enemies.some(e=>e.alive)'),
-    false,
-  );
+  assert.equal(await evaluate('window.__QA_APP__.sim.enemies.some(e=>e.alive)'), false);
   await screenshot('cleared-location');
   await press('Escape');
-  await evaluate(
-    'window.__QA_APP__.briefing(0);window.__QA_APP__.start();true',
-  );
+  await evaluate('window.__QA_APP__.briefing(0);window.__QA_APP__.start();true');
   await until(
     "window.__GAME__.mode==='playing' && window.__QA_APP__.sim.room.id==='eeTraining'",
   );
@@ -210,14 +207,8 @@ try {
   const original = await evaluate('window.__QA_APP__.progress.best[0]');
   await press('F2');
   await command('winall');
-  assert.equal(
-    await evaluate('Object.keys(window.__QA_APP__.progress.best).length'),
-    22,
-  );
-  assert.deepEqual(
-    await evaluate('window.__QA_APP__.progress.best[0]'),
-    original,
-  );
+  assert.equal(await evaluate('Object.keys(window.__QA_APP__.progress.best).length'), 22);
+  assert.deepEqual(await evaluate('window.__QA_APP__.progress.best[0]'), original);
   await command('finale');
   assert.equal(await evaluate('window.__GAME__.mode'), 'ending');
   assert.equal(
@@ -230,17 +221,11 @@ try {
   assert.equal(await evaluate('window.__GAME__.mode'), 'ending');
   await press('Escape');
   assert.equal(await evaluate('window.__GAME__.mode'), 'menu');
-  assert.equal(
-    await evaluate("document.getElementById('ending-button').hidden"),
-    false,
-  );
+  assert.equal(await evaluate("document.getElementById('ending-button').hidden"), false);
   await send('Page.navigate', { url: server.url });
   await until("window.__GAME__?.mode==='menu'");
   await evaluate('window.__QA_APP__.game.loop.stop();document.fonts.ready');
-  assert.equal(
-    await evaluate("document.getElementById('ending-button').hidden"),
-    false,
-  );
+  assert.equal(await evaluate("document.getElementById('ending-button').hidden"), false);
   assert.equal(await evaluate('window.__QA_APP__.cheats.flags.god'), false);
   await press('F2');
   await command('help');

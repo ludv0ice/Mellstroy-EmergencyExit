@@ -49,8 +49,7 @@ function create() {
   sim.tutorial = new Tutorial(sim);
   return sim;
 }
-const step = (sim, input = {}) =>
-  sim.update(1 / 60, { moveX: 0, moveY: 0, ...input });
+const step = (sim, input = {}) => sim.update(1 / 60, { moveX: 0, moveY: 0, ...input });
 function act(sim, input = {}) {
   sim.player.vx = sim.player.vy = 0;
   sim.player.fireTimer = 0;
@@ -82,7 +81,9 @@ test('Tutorial blocks out-of-order actions and requires all four movement direct
     attack: true,
   });
   assert.equal(sim.player.weapon.id, -1);
-  for (let i = 0; i < 5; i++) step(sim, { moveX: 1 });
+  for (let i = 0; i < 5; i++) {
+    step(sim, { moveX: 1 });
+  }
   assert.equal(sim.tutorial.step, 'move');
   assert.deepEqual([...sim.tutorial.directions], ['D']);
   movement(sim);
@@ -115,7 +116,9 @@ test('Every lesson completes through gameplay results, and all 13 steps can be f
   assert.equal(sim.tutorial.step, 'throw');
   stand(sim, 200, 100);
   act(sim, { throw: true, aim: { x: 220, y: 100 } });
-  for (let i = 0; i < 5; i++) step(sim);
+  for (let i = 0; i < 5; i++) {
+    step(sim);
+  }
   assert.equal(sim.tutorial.step, 'recover');
   assert.equal(sim.enemies[1].alive, true);
   act(sim, { pickup: true });
@@ -128,7 +131,9 @@ test('Every lesson completes through gameplay results, and all 13 steps can be f
   assert.equal(sim.player.ammo, 6);
   stand(sim, 270, 100);
   act(sim, { attack: true, aim: { x: 300, y: 100 } });
-  for (let i = 0; i < 5; i++) step(sim);
+  for (let i = 0; i < 5; i++) {
+    step(sim);
+  }
   assert.equal(sim.tutorial.step, 'exit');
   assert.equal(sim.kills, 3);
   stand(sim, sim.exit.x, sim.exit.y);
@@ -142,17 +147,19 @@ test('A missed training throw can be recovered and retried without restarting', 
   sim.tutorial.index = 7;
   sim.player.weapon = WEAPONS[4];
   act(sim, { throw: true, aim: { x: 100, y: 300 } });
-  for (let i = 0; i < 60; i++) step(sim);
+  for (let i = 0; i < 60; i++) {
+    step(sim);
+  }
   assert.equal(sim.tutorial.step, 'throw');
-  const item = sim.items.find(
-    (i) => !i.taken && i.weapon.id === 4 && i.ammoBonusApplied,
-  );
+  const item = sim.items.find((i) => !i.taken && i.weapon.id === 4 && i.ammoBonusApplied);
   stand(sim, item.x, item.y);
   act(sim, { pickup: true });
   assert.equal(sim.player.weapon.id, 4);
   stand(sim, 200, 100);
   act(sim, { throw: true, aim: { x: 220, y: 100 } });
-  for (let i = 0; i < 5; i++) step(sim);
+  for (let i = 0; i < 5; i++) {
+    step(sim);
+  }
   assert.equal(sim.tutorial.step, 'recover');
 });
 

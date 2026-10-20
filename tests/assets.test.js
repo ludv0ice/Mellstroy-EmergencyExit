@@ -46,8 +46,9 @@ test('The launch page contains only markup and external file references', () => 
     (match) => match[1],
   );
   assert.ok(files.length >= 4);
-  for (const file of files)
+  for (const file of files) {
     assert.ok(existsSync(new URL('../' + file, import.meta.url)), file);
+  }
 });
 
 test('Sound effects play local WAV files and follow the volume setting', async (t) => {
@@ -65,8 +66,11 @@ test('Sound effects play local WAV files and follow the volume setting', async (
     }
   };
   t.after(() => {
-    if (original) globalThis.Audio = original;
-    else delete globalThis.Audio;
+    if (original) {
+      globalThis.Audio = original;
+    } else {
+      delete globalThis.Audio;
+    }
   });
   const audio = new AudioEngine(
     { audio: { sndHit: '/assets/audio/sndHit.wav' } },

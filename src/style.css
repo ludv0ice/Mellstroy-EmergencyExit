@@ -37,9 +37,6 @@ input,
 select {
   font: inherit;
 }
-button {
-  cursor: pointer;
-}
 button:focus-visible,
 input:focus-visible,
 select:focus-visible {
@@ -47,6 +44,7 @@ select:focus-visible {
   outline-offset: 5px;
 }
 button {
+  cursor: pointer;
   border: 0;
   background: none;
   color: inherit;

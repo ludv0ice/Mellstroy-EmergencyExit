@@ -48,10 +48,13 @@ def extract(source_path, minimum_columns):
 
 def head_anchor(image):
 
-
-    brown = {(x, y) for y in range(image.height) for x in range(image.width)
-             if (lambda r, g, b, a: a > 100 and 20 <= r < 120 and g < 100
-                 and b < 70 and r > g * 1.15 and r > b * 1.3)(*image.getpixel((x, y)))}
+    brown = set()
+    for y in range(image.height):
+        for x in range(image.width):
+            red, green, blue, alpha = image.getpixel((x, y))
+            if (alpha > 100 and 20 <= red < 120 and green < 100
+                    and blue < 70 and red > green * 1.15 and red > blue * 1.3):
+                brown.add((x, y))
     largest = []
     while brown:
         queue = deque([brown.pop()])
@@ -74,7 +77,6 @@ def head_anchor(image):
 def main():
     cells = extract(SOURCE, 15)
 
-
     walks = [row[:8] for row in cells]
     attacks = [row[:7] for row in extract(ATTACK_SOURCE, 7)]
     walk_scale = BODY_HEIGHT / max(image.getbbox()[3] - image.getbbox()[1]
@@ -90,7 +92,6 @@ def main():
             for frame_index, image in enumerate(row):
                 bounds = image.getbbox()
                 image = image.crop(bounds)
-
 
                 if name == 'mellstroy-directions':
                     head = image.getchannel('A').crop((0, 0, image.width, round(image.height * .28))).getbbox()

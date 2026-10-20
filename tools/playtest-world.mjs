@@ -3,8 +3,7 @@ import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import assert from 'node:assert/strict';
 const root = fileURLToPath(new URL('../', import.meta.url)).replace(/\/$/, '');
-const output =
-  process.env.PLAYTEST_OUTPUT ?? root + '/../artifacts/world-playtest';
+const output = process.env.PLAYTEST_OUTPUT ?? root + '/../artifacts/world-playtest';
 fs.mkdirSync(output, { recursive: true });
 const server = await serveTestGame(root);
 const page = await fetch('http://127.0.0.1:9222/json/new?about:blank', {
@@ -13,9 +12,9 @@ const page = await fetch('http://127.0.0.1:9222/json/new?about:blank', {
 const ws = new WebSocket(page.webSocketDebuggerUrl);
 await new Promise((r) => ws.addEventListener('open', r, { once: true }));
 let id = 0;
-const pending = new Map(),
-  errors = [],
-  requests = [];
+const pending = new Map();
+const errors = [];
+const requests = [];
 const send = (method, params = {}) =>
   new Promise((resolve, reject) => {
     pending.set(++id, { resolve, reject });
@@ -27,14 +26,15 @@ ws.onmessage = (e) => {
     const p = pending.get(m.id);
     pending.delete(m.id);
     m.error ? p.reject(m.error) : p.resolve(m.result);
-  } else if (m.method === 'Runtime.exceptionThrown')
+  } else if (m.method === 'Runtime.exceptionThrown') {
     errors.push(m.params.exceptionDetails);
-  else if (
+  } else if (
     m.method === 'Network.requestWillBeSent' &&
     /^https?:/.test(m.params.request.url) &&
     !m.params.request.url.startsWith(server.url + '/')
-  )
+  ) {
     requests.push(m.params.request.url);
+  }
 };
 const evaluate = async (expression) => {
   const r = await send('Runtime.evaluate', {
@@ -42,12 +42,16 @@ const evaluate = async (expression) => {
     awaitPromise: true,
     returnByValue: true,
   });
-  if (r.exceptionDetails) throw Error(JSON.stringify(r.exceptionDetails));
+  if (r.exceptionDetails) {
+    throw Error(JSON.stringify(r.exceptionDetails));
+  }
   return r.result.value;
 };
 const until = async (expression) => {
   for (let i = 0; i < 120; i++) {
-    if (await evaluate(expression)) return;
+    if (await evaluate(expression)) {
+      return;
+    }
     await new Promise((r) => setTimeout(r, 100));
   }
   throw Error('Timeout ' + expression);
@@ -97,9 +101,7 @@ try {
 
   await evaluate("document.fonts.load('100px Justice')");
   assert.match(
-    await evaluate(
-      "getComputedStyle(document.querySelector('#menu h1')).fontFamily",
-    ),
+    await evaluate("getComputedStyle(document.querySelector('#menu h1')).fontFamily"),
     /Justice/,
   );
   assert.equal(
@@ -109,8 +111,7 @@ try {
     'rgb(122, 199, 255)',
   );
   await screenshot('menu-outline-font');
-  const selected = () =>
-    evaluate("document.querySelector('.menu-selected')?.id");
+  const selected = () => evaluate("document.querySelector('.menu-selected')?.id");
   async function click(selector) {
     const p = await evaluate(
       `(()=>{const r=document.querySelector(${JSON.stringify(selector)}).getBoundingClientRect();return{x:r.x+r.width/2,y:r.y+r.height/2}})()`,
@@ -187,10 +188,7 @@ try {
     await until("window.__GAME__.mode==='playing'");
     const floors = await evaluate('window.__QA_APP__.chapter.rooms');
     for (let index = 0; index < floors.length; index++) {
-      assert.equal(
-        await evaluate('window.__QA_APP__.sim.room.id'),
-        floors[index],
-      );
+      assert.equal(await evaluate('window.__QA_APP__.sim.room.id'), floors[index]);
       assert.equal(
         await evaluate('window.__QA_APP__.sim.exit.transition'),
         index < floors.length - 1 ? 'stairs' : 'door',
@@ -211,7 +209,7 @@ try {
         s.player.weapon=s.items.find(item=>item.weapon.gun).weapon;s.player.ammo=17;s.player.armor=1;
         for(const enemy of s.enemies)s.kill(enemy,'shot');s.checkClear();s.player.x=s.exit.x;s.player.y=s.exit.y;
         a.view.cameraPoint={x:s.player.x,y:s.player.y};return true})()`);
-      if (chapter === 1 || chapter === 16 || chapter === 14)
+      if (chapter === 1 || chapter === 16 || chapter === 14) {
         await screenshot(
           'chapter-' +
             chapter +
@@ -220,6 +218,7 @@ try {
             '-' +
             (index < floors.length - 1 ? 'stairs' : 'door'),
         );
+      }
       await press('KeyE');
       transitions++;
       await until(
@@ -228,10 +227,7 @@ try {
           : "window.__GAME__.mode==='result'",
       );
     }
-    assert.equal(
-      await evaluate('window.__QA_APP__.floorStates.size'),
-      floors.length,
-    );
+    assert.equal(await evaluate('window.__QA_APP__.floorStates.size'), floors.length);
   }
   const rooms = await evaluate('window.__QA_APP__.manifest.rooms');
   for (const { id } of rooms) {

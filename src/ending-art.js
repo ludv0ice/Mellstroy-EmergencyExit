@@ -1,5 +1,4 @@
-import { CREDITS, ENDING, detonatorFrame } from './ending-sequence.js';
-import { endingDriveFrame } from './ending-drive.js';
+import { CREDITS, ENDING, detonatorFrame, endingDriveFrame } from './ending-data.js';
 
 const limit = (value) => Math.max(0, Math.min(1, value));
 const blend = (a, b, fraction) => a + (b - a) * limit(fraction);
@@ -20,9 +19,14 @@ function rectangle(ctx, color, x, y, w, h) {
 function polygon(ctx, color, points) {
   ctx.fillStyle = color;
   ctx.beginPath();
-  points.forEach(([x, y], index) =>
-    index ? ctx.lineTo(x, y) : ctx.moveTo(x, y),
-  );
+  for (let index = 0; index < points.length; index++) {
+    const [x, y] = points[index];
+    if (index === 0) {
+      ctx.moveTo(x, y);
+    } else {
+      ctx.lineTo(x, y);
+    }
+  }
   ctx.closePath();
   ctx.fill();
 }
@@ -58,8 +62,11 @@ function nightSky(ctx, time) {
     const height = 30 + random(i + 320) * 65;
     const x = i * 35 - 10;
     rectangle(ctx, '#142233', x, 223 - height, 29, height);
-    for (let yy = 223 - height + 7; yy < 218; yy += 11)
-      if (random(yy + i) > 0.5) rectangle(ctx, '#43616c', x + 7, yy, 3, 3);
+    for (let yy = 223 - height + 7; yy < 218; yy += 11) {
+      if (random(yy + i) > 0.5) {
+        rectangle(ctx, '#43616c', x + 7, yy, 3, 3);
+      }
+    }
   }
 }
 
@@ -85,8 +92,7 @@ function station(ctx, time) {
     for (let window = 0; window < 13; window++) {
       const x = 111 + window * 33 + shift;
       const lit = random(floor * 23 + window) > 0.35;
-      const destroyed =
-        time > ENDING.explosion + random(floor * 13 + window) * 1.4;
+      const destroyed = time > ENDING.explosion + random(floor * 13 + window) * 1.4;
       rectangle(ctx, '#172b38', x - 2, y + 4 + fall, 24, 18);
       rectangle(
         ctx,
@@ -133,11 +139,15 @@ function station(ctx, time) {
 
 function blast(ctx, time, effects) {
   const age = time - ENDING.explosion;
-  if (age < 0) return;
+  if (age < 0) {
+    return;
+  }
   const burst = limit(age / 0.9);
   for (let i = 0; i < 17; i++) {
     const delay = random(i + 25) * 0.7;
-    if (age < delay) continue;
+    if (age < delay) {
+      continue;
+    }
     const local = age - delay;
     const x = 113 + random(i + 12) * 413;
     const y = 109 + random(i + 19) * 115;
@@ -158,7 +168,9 @@ function blast(ctx, time, effects) {
   for (let i = 0; i < 100; i++) {
     const life = 1.2 + random(i + 80) * 2.4;
     const local = age - random(i + 70) * 1.2;
-    if (local < 0 || local > life) continue;
+    if (local < 0 || local > life) {
+      continue;
+    }
     const direction = random(i + 31) * Math.PI * 2;
     const speed = 25 + random(i + 59) * 80;
     const x = 320 + Math.cos(direction) * speed * local;
@@ -182,13 +194,7 @@ function blast(ctx, time, effects) {
     ctx.globalAlpha = Math.min(0.78, local * 0.3);
     ctx.fillStyle = i % 2 ? '#242936' : '#3a3541';
     ctx.beginPath();
-    ctx.arc(
-      x,
-      y,
-      (20 + random(i + 33) * 26) * Math.min(1, local),
-      0,
-      Math.PI * 2,
-    );
+    ctx.arc(x, y, (20 + random(i + 33) * 26) * Math.min(1, local), 0, Math.PI * 2);
     ctx.fill();
   }
   ctx.globalAlpha = 1;
@@ -225,17 +231,7 @@ function hero(ctx, assets, x, y, walking, direction, time, detonator) {
   if (detonator) {
     const pose = detonatorFrame(time);
     if (walking) {
-      ctx.drawImage(
-        assets.detonator.image,
-        pose * 60,
-        0,
-        60,
-        35,
-        -39,
-        -58,
-        78,
-        45.5,
-      );
+      ctx.drawImage(assets.detonator.image, pose * 60, 0, 60, 35, -39, -58, 78, 45.5);
       ctx.drawImage(
         assets.hero.image,
         frame * 60,
@@ -247,30 +243,12 @@ function hero(ctx, assets, x, y, walking, direction, time, detonator) {
         78,
         32.5,
       );
-    } else
-      ctx.drawImage(
-        assets.detonator.image,
-        pose * 60,
-        0,
-        60,
-        60,
-        -39,
-        -58,
-        78,
-        78,
-      );
-  } else
-    ctx.drawImage(
-      assets.hero.image,
-      frame * 60,
-      row * 60,
-      60,
-      60,
-      -39,
-      -58,
-      78,
-      78,
-    );
+    } else {
+      ctx.drawImage(assets.detonator.image, pose * 60, 0, 60, 60, -39, -58, 78, 78);
+    }
+  } else {
+    ctx.drawImage(assets.hero.image, frame * 60, row * 60, 60, 60, -39, -58, 78, 78);
+  }
   ctx.restore();
 }
 
@@ -279,17 +257,12 @@ function street(ctx, time, assets, effects) {
   rectangle(ctx, '#293747', 0, 251, 640, 23);
   rectangle(ctx, '#43505b', 0, 270, 640, 5);
   rectangle(ctx, '#172231', 0, 275, 640, 85);
-  for (let i = 0; i < 13; i++)
+  for (let i = 0; i < 13; i++) {
     rectangle(ctx, '#69716d', i * 60 - 8, 340, 28, 2);
-  for (let i = 0; i < 50; i++)
-    rectangle(
-      ctx,
-      '#293645',
-      random(i + 500) * 640,
-      280 + random(i + 600) * 80,
-      4,
-      1,
-    );
+  }
+  for (let i = 0; i < 50; i++) {
+    rectangle(ctx, '#293645', random(i + 500) * 640, 280 + random(i + 600) * 80, 4, 1);
+  }
   ctx.save();
   const shake = effects && time >= 9 && time < 12 ? (12 - time) * 1.5 : 0;
   ctx.translate(Math.sin(time * 59) * shake, Math.cos(time * 43) * shake);
@@ -302,8 +275,7 @@ function street(ctx, time, assets, effects) {
   if (time < 20.2) {
     const approach = smooth((time - ENDING.approach) / 4.4);
     const x = blend(320, 135, approach);
-    const y =
-      time < 6 ? blend(229, 276, (time - 2) / 4) : blend(276, 296, approach);
+    const y = time < 6 ? blend(229, 276, (time - 2) / 4) : blend(276, 296, approach);
     ctx.globalAlpha = time < 19.6 ? 1 : 1 - limit((time - 19.6) / 0.6);
     hero(
       ctx,
@@ -373,16 +345,10 @@ function highway(ctx, time, assets) {
     const y = ((random(i + 901) * 440 + drive * 480) % 440) - 40;
     rectangle(ctx, '#34414d', x, y, 1, 5 + random(i) * 17);
   }
-  for (const car of frame.traffic)
+  for (const car of frame.traffic) {
     highwayCar(ctx, assets.traffic[car.type], car.x, car.y, -Math.PI / 2, 0.7);
-  highwayCar(
-    ctx,
-    assets.car,
-    frame.player.x,
-    frame.player.y,
-    frame.player.angle,
-    1.08,
-  );
+  }
+  highwayCar(ctx, assets.car, frame.player.x, frame.player.y, frame.player.angle, 1.08);
   if (time >= ENDING.credits) {
     const shade = ctx.createLinearGradient(306, 0, 640, 0);
     shade.addColorStop(0, '#0a122000');
@@ -426,7 +392,9 @@ export function drawEnding(ctx, time, assets, effects = true) {
     ctx.translate(-320, -(180 + (closeup - 1) * 40));
     street(ctx, time, assets, effects);
     ctx.restore();
-  } else highway(ctx, time, assets);
+  } else {
+    highway(ctx, time, assets);
+  }
   const fadeIn = 1 - limit(time / 1.2);
   const fadeOut =
     time < ENDING.highway

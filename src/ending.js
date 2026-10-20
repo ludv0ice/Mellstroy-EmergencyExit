@@ -1,5 +1,5 @@
 import { drawEnding } from './ending-art.js';
-import { ENDING, endingCaption, endingPhase } from './ending-sequence.js';
+import { ENDING, endingCaption, endingPhase } from './ending-data.js';
 
 export function endingSprites(images, skins, manifest) {
   const custom = (name) => ({
@@ -45,14 +45,20 @@ export class EndingPlayer {
     document.addEventListener(
       'keydown',
       (event) => {
-        if (event.repeat || !['Escape', 'Space', 'Enter'].includes(event.code))
+        if (event.repeat || !['Escape', 'Space', 'Enter'].includes(event.code)) {
           return;
+        }
         event.preventDefault();
         event.stopImmediatePropagation();
-        if (event.code === 'Escape') this.finish();
-        else if (event.target === this.close) this.finish();
-        else if (this.time >= ENDING.credits) this.finish();
-        else this.skipToCredits();
+        if (event.code === 'Escape') {
+          this.finish();
+        } else if (event.target === this.close) {
+          this.finish();
+        } else if (this.time >= ENDING.credits) {
+          this.finish();
+        } else {
+          this.skipToCredits();
+        }
       },
       { capture: true, signal: this.listeners.signal },
     );
@@ -73,13 +79,17 @@ export class EndingPlayer {
     this.frame = requestAnimationFrame((now) => this.animate(now));
   }
   animate(now) {
-    if (this.disposed) return;
+    if (this.disposed) {
+      return;
+    }
     const dt =
       this.lastFrame === null || this.lastFrame === undefined
         ? 0
         : Math.min(0.1, (now - this.lastFrame) / 1000);
     this.lastFrame = now;
-    if (!document.hidden) this.advance(dt);
+    if (!document.hidden) {
+      this.advance(dt);
+    }
     this.render();
     this.frame = requestAnimationFrame((next) => this.animate(next));
   }
@@ -115,12 +125,15 @@ export class EndingPlayer {
       this.caption.textContent = endingCaption(this.time);
       const focused = document.activeElement === this.skip;
       this.skip.hidden = this.time >= ENDING.credits;
-      if (this.skip.hidden && focused)
+      if (this.skip.hidden && focused) {
         this.close.focus({ preventScroll: true });
+      }
     }
   }
   skipToCredits() {
-    if (this.time >= ENDING.credits) return;
+    if (this.time >= ENDING.credits) {
+      return;
+    }
     this.audio.stopCinematicSounds();
     this.time = ENDING.credits;
     this.lastFrame = null;
@@ -128,12 +141,16 @@ export class EndingPlayer {
     this.render();
   }
   finish() {
-    if (this.disposed) return;
+    if (this.disposed) {
+      return;
+    }
     this.dispose();
     this.onClose();
   }
   dispose() {
-    if (this.disposed) return;
+    if (this.disposed) {
+      return;
+    }
     this.disposed = true;
     cancelAnimationFrame(this.frame);
     this.listeners.abort();

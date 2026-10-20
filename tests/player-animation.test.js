@@ -62,15 +62,17 @@ test('Four movement directions select upright walking rows independently of the 
     ['right', 1, 0],
   ]) {
     const sim = create();
-    for (let i = 0; i < 12; i++)
+    for (let i = 0; i < 12; i++) {
       sim.update(1 / 60, { moveX: x, moveY: y, aim: { x: 450, y: 350 } });
+    }
     assert.equal(sim.player.facing, direction);
     assert.ok(sim.player.frame > 0);
     const pose = playerPose(sim.player);
     assert.equal(pose.row, PLAYER_DIRECTIONS.indexOf(direction));
     assert.equal(pose.angle, 0);
-    for (let i = 0; i < 20; i++)
+    for (let i = 0; i < 20; i++) {
       sim.update(1 / 60, { moveX: 0, moveY: 0, aim: { x: 100, y: 100 } });
+    }
     assert.equal(sim.player.facing, direction);
     assert.equal(sim.player.frame, 0);
   }
@@ -133,8 +135,8 @@ test('Zero motion keeps the last facing and directional atlases retain fixed anc
     readFileSync(new URL('../assets/custom/skins.json', import.meta.url)),
   );
   for (const key of ['heroDirectional', 'punchDirectional']) {
-    const skin = skins[key],
-      png = readFileSync(new URL('..' + skin.url, import.meta.url));
+    const skin = skins[key];
+    const png = readFileSync(new URL('..' + skin.url, import.meta.url));
     assert.equal(png.readUInt32BE(16), skin.width * skin.frames);
     assert.equal(png.readUInt32BE(20), skin.height * skin.rows);
     assert.deepEqual(skin.directions, PLAYER_DIRECTIONS);

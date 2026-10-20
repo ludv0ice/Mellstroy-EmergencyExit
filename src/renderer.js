@@ -1,15 +1,20 @@
-import Phaser from 'phaser';
 import { clamp } from './physics.js';
-import { drawLevel, drawTransition } from './level-art.js';
+import { drawLevel, drawTransition } from './levels.js';
 import { assetUrl } from './assets.js';
 import { playerPose, heldWeaponPose } from './player-animation.js';
-
+const Phaser = globalThis.Phaser;
 export class GameView extends Phaser.Scene {
   constructor() {
     super('world');
     this.images = new Map();
-    this.cameraPoint = { x: 320, y: 240 };
-    this.controls = { moveX: 0, moveY: 0 };
+    this.cameraPoint = {
+      x: 320,
+      y: 240,
+    };
+    this.controls = {
+      moveX: 0,
+      moveY: 0,
+    };
     this.shake = 0;
     this.preview = true;
     this.loading = false;
@@ -31,10 +36,16 @@ export class GameView extends Phaser.Scene {
     this.input.mouse.disableContextMenu();
     this.pending = {};
     this.input.on('pointerdown', (pointer) => {
-      if (this.app?.mode !== 'playing') return;
+      if (this.app?.mode !== 'playing') {
+        return;
+      }
       this.app.audio.start();
-      if (pointer.rightButtonDown()) this.pending.weaponAction = true;
-      if (pointer.middleButtonDown()) this.pending.throw = true;
+      if (pointer.rightButtonDown()) {
+        this.pending.weaponAction = true;
+      }
+      if (pointer.middleButtonDown()) {
+        this.pending.throw = true;
+      }
     });
     this.input.keyboard.on('keydown', (event) => {
       if (event.code === 'Escape') {
@@ -48,10 +59,18 @@ export class GameView extends Phaser.Scene {
         this.app?.restart();
       }
       if (this.app?.mode === 'playing' && !event.repeat) {
-        if (event.code === 'KeyE') this.pending.pickup = true;
-        if (event.code === 'KeyF') this.pending.throw = true;
-        if (event.code === 'KeyQ') this.pending.drop = true;
-        if (event.code === 'Space') this.pending.execute = true;
+        if (event.code === 'KeyE') {
+          this.pending.pickup = true;
+        }
+        if (event.code === 'KeyF') {
+          this.pending.throw = true;
+        }
+        if (event.code === 'KeyQ') {
+          this.pending.drop = true;
+        }
+        if (event.code === 'Space') {
+          this.pending.execute = true;
+        }
       }
     });
     this.input.keyboard.addCapture([
@@ -69,7 +88,9 @@ export class GameView extends Phaser.Scene {
     this.app.onReady(this);
   }
   async image(key, url) {
-    if (this.images.has(key)) return this.images.get(key);
+    if (this.images.has(key)) {
+      return this.images.get(key);
+    }
     const image = new Image();
     image.src = assetUrl(url);
     await new Promise((resolve, reject) => {
@@ -81,13 +102,15 @@ export class GameView extends Phaser.Scene {
   }
   async setWorld(sim, preview = false) {
     this.loading = true;
-    const m = sim.manifest,
-      keys = new Set(
-        sim.room.entities.map((e) => e.sprite).filter((k) => m.sprites[k]),
-      );
-    for (const e of sim.room.entities.filter((e) => e.glass)) {
-      const key = e.sprite.replace(/([HV])$/, '$1Broken');
-      if (m.sprites[key]) keys.add(key);
+    const metadata = sim.manifest;
+    const keys = new Set(
+      sim.room.entities.map((entity) => entity.sprite).filter((k) => metadata.sprites[k]),
+    );
+    for (const entity of sim.room.entities.filter((e) => e.glass)) {
+      const key = entity.sprite.replace(/([HV])$/, '$1Broken');
+      if (metadata.sprites[key]) {
+        keys.add(key);
+      }
     }
     for (const key of [
       'sprWeapons',
@@ -108,31 +131,37 @@ export class GameView extends Phaser.Scene {
       'sprDogAttack',
       'sprPBackMachinegun',
       'sprPCrawl',
-    ])
-      if (m.sprites[key]) keys.add(key);
+    ]) {
+      if (metadata.sprites[key]) {
+        keys.add(key);
+      }
+    }
     const backgrounds = new Set(
-      sim.room.tiles.map((t) => t.bgName).filter((k) => m.backgrounds[k]),
+      sim.room.tiles.map((t) => t.bgName).filter((k) => metadata.backgrounds[k]),
     );
-    await Promise.all(
-      [...keys]
-        .map((k) => this.image(k, m.sprites[k].url))
-        .concat(
-          [...backgrounds].map((k) =>
-            this.image(
-              k,
-              k === 'tlFloorTiles'
-                ? this.app.skins.floor.url
-                : m.backgrounds[k],
-            ),
-          ),
-          Object.entries(this.app.skins)
-            .filter(([k]) => k !== 'floor')
-            .map(([k, v]) => this.image('custom-' + k, v.url)),
-        ),
-    );
+    const loading = [];
+    for (const key of keys) {
+      loading.push(this.image(key, metadata.sprites[key].url));
+    }
+    for (const key of backgrounds) {
+      let url = metadata.backgrounds[key];
+      if (key === 'tlFloorTiles') {
+        url = this.app.skins.floor.url;
+      }
+      loading.push(this.image(key, url));
+    }
+    for (const [key, skin] of Object.entries(this.app.skins)) {
+      if (key !== 'floor') {
+        loading.push(this.image('custom-' + key, skin.url));
+      }
+    }
+    await Promise.all(loading);
     this.sim = sim;
     this.preview = preview;
-    this.cameraPoint = { x: sim.player.x, y: sim.player.y };
+    this.cameraPoint = {
+      x: sim.player.x,
+      y: sim.player.y,
+    };
     this.shake = 0;
     this.floor = document.createElement('canvas');
     this.floor.width = sim.room.width;
@@ -146,46 +175,47 @@ export class GameView extends Phaser.Scene {
     ctx.fillRect(0, 0, this.floor.width, this.floor.height);
     drawLevel(ctx, sim.room);
     const entries = [
-      ...sim.room.tiles.map((tile) => ({ tile, depth: tile.depth })),
+      ...sim.room.tiles.map((tile) => ({
+        tile,
+        depth: tile.depth,
+      })),
       ...sim.room.entities
         .filter(
-          (e) =>
-            e.kind === 'decor' &&
-            e.meta &&
-            e.visible &&
-            !e.glass &&
-            !this.hiddenObject(e),
+          (entity) =>
+            entity.kind === 'decor' &&
+            entity.meta &&
+            entity.visible &&
+            !entity.glass &&
+            !this.hiddenObject(entity),
         )
-        .map((entity) => ({ entity, depth: entity.depth })),
+        .map((entity) => ({
+          entity,
+          depth: entity.depth,
+        })),
     ].sort((a, b) => b.depth - a.depth);
     for (const entry of entries) {
       const target = entry.depth < -3 ? this.front.getContext('2d') : ctx;
       target.imageSmoothingEnabled = false;
       if (entry.tile) {
-        const t = entry.tile,
-          img = this.images.get(t.bgName);
-        if (!img) continue;
-        const w = Math.min(t.w, img.width - t.xo),
-          h = Math.min(t.h, img.height - t.yo);
-        if (w > 0 && h > 0)
-          target.drawImage(
-            img,
-            t.xo,
-            t.yo,
-            w,
-            h,
-            t.x,
-            t.y,
-            w * t.scaleX,
-            h * t.scaleY,
-          );
-      } else this.drawEntity(target, entry.entity);
+        const t = entry.tile;
+        const image = this.images.get(t.bgName);
+        if (!image) {
+          continue;
+        }
+        const w = Math.min(t.w, image.width - t.xo);
+        const h = Math.min(t.h, image.height - t.yo);
+        if (w > 0 && h > 0) {
+          target.drawImage(image, t.xo, t.yo, w, h, t.x, t.y, w * t.scaleX, h * t.scaleY);
+        }
+      } else {
+        this.drawEntity(target, entry.entity);
+      }
     }
     this.loading = false;
   }
-  hiddenObject(e) {
+  hiddenObject(entity) {
     return /MaskMenu|Tutorial|Teacher|Score|Arrow|Cursor|Effector|Surfacer|WeaponUnlock|Teleporter|BackgroundColor|Shadow|Transitioner|LevelClearer|RoomStart|LevelStart|CorpseCount|Dialogue|Conversation|SwatSpawn|Boss\dSpawn|Light/.test(
-      e.name,
+      entity.name,
     );
   }
   drawSprite(
@@ -200,70 +230,76 @@ export class GameView extends Phaser.Scene {
     alpha = 1,
     origin = null,
   ) {
-    const m = this.sim.manifest.sprites[key],
-      img = this.images.get(key);
-    if (!m || !img) return;
-    frame = ((Math.floor(frame) % m.frames) + m.frames) % m.frames;
+    const metadata = this.sim.manifest.sprites[key];
+    const image = this.images.get(key);
+    if (!metadata || !image) {
+      return;
+    }
+    frame = ((Math.floor(frame) % metadata.frames) + metadata.frames) % metadata.frames;
     ctx.save();
     ctx.translate(Math.round(x), Math.round(y));
     ctx.rotate(angle);
     ctx.scale(sx, sy);
     ctx.globalAlpha = alpha;
     ctx.drawImage(
-      img,
-      frame * m.width,
+      image,
+      frame * metadata.width,
       0,
-      m.width,
-      m.height,
-      -(origin?.[0] ?? m.originX),
-      -(origin?.[1] ?? m.originY),
-      m.width,
-      m.height,
+      metadata.width,
+      metadata.height,
+      -(origin?.[0] ?? metadata.originX),
+      -(origin?.[1] ?? metadata.originY),
+      metadata.width,
+      metadata.height,
     );
     ctx.restore();
   }
   drawCustom(ctx, key, frame, x, y, angle = 0, alpha = 1, row = 0) {
-    const m = this.app.skins[key],
-      img = this.images.get('custom-' + key);
-    if (!img) return;
+    const metadata = this.app.skins[key];
+    const image = this.images.get('custom-' + key);
+    if (!image) {
+      return;
+    }
     ctx.save();
     ctx.translate(Math.round(x), Math.round(y));
     ctx.rotate(angle);
     ctx.globalAlpha = alpha;
     ctx.drawImage(
-      img,
-      (Math.floor(frame) % m.frames) * m.width,
-      clamp(row, 0, (m.rows ?? 1) - 1) * m.height,
-      m.width,
-      m.height,
-      -(m.originX ?? m.width / 2),
-      -(m.originY ?? m.height / 2),
-      m.width,
-      m.height,
+      image,
+      (Math.floor(frame) % metadata.frames) * metadata.width,
+      clamp(row, 0, (metadata.rows ?? 1) - 1) * metadata.height,
+      metadata.width,
+      metadata.height,
+      -(metadata.originX ?? metadata.width / 2),
+      -(metadata.originY ?? metadata.height / 2),
+      metadata.width,
+      metadata.height,
     );
     ctx.restore();
   }
-  drawEntity(ctx, e) {
-    if (e.broken) return;
-    if (e.sprite === 'sprAndersDesk') {
-      const img = this.images.get('custom-desk'),
-        m = e.meta,
-        custom = this.app.skins.desk;
-      if (img) {
+  drawEntity(ctx, entity) {
+    if (entity.broken) {
+      return;
+    }
+    if (entity.sprite === 'sprAndersDesk') {
+      const image = this.images.get('custom-desk');
+      const metadata = entity.meta;
+      const custom = this.app.skins.desk;
+      if (image) {
         ctx.save();
-        ctx.translate(e.x, e.y);
-        ctx.rotate(e.angle);
-        ctx.scale(e.scaleX, e.scaleY);
+        ctx.translate(entity.x, entity.y);
+        ctx.rotate(entity.angle);
+        ctx.scale(entity.scaleX, entity.scaleY);
         ctx.drawImage(
-          img,
-          (Math.floor(e.frame) % 6) * custom.width,
+          image,
+          (Math.floor(entity.frame) % 6) * custom.width,
           0,
           custom.width,
           custom.height,
-          -m.originX,
-          -m.originY,
-          m.width,
-          m.height,
+          -metadata.originX,
+          -metadata.originY,
+          metadata.width,
+          metadata.height,
         );
         ctx.restore();
         return;
@@ -271,31 +307,27 @@ export class GameView extends Phaser.Scene {
     }
     this.drawSprite(
       ctx,
-      e.sprite,
-      e.frame,
-      e.x,
-      e.y,
-      e.angle,
-      e.scaleX,
-      e.scaleY,
+      entity.sprite,
+      entity.frame,
+      entity.x,
+      entity.y,
+      entity.angle,
+      entity.scaleX,
+      entity.scaleY,
     );
   }
   inputState() {
-    const keys = this.keys,
-      pointer = this.input.activePointer;
+    const keys = this.keys;
+    const pointer = this.input.activePointer;
     const down = (name) => keys[name]?.isDown;
     const input = {
-      moveX:
-        (down('D') || down('RIGHT') ? 1 : 0) -
-        (down('A') || down('LEFT') ? 1 : 0),
-      moveY:
-        (down('S') || down('DOWN') ? 1 : 0) - (down('W') || down('UP') ? 1 : 0),
+      moveX: (down('D') || down('RIGHT') ? 1 : 0) - (down('A') || down('LEFT') ? 1 : 0),
+      moveY: (down('S') || down('DOWN') ? 1 : 0) - (down('W') || down('UP') ? 1 : 0),
       attack: pointer.isDown && pointer.leftButtonDown(),
       weaponAction: !!this.pending.weaponAction,
       drop: Phaser.Input.Keyboard.JustDown(keys.Q) || this.pending.drop,
       pickup: Phaser.Input.Keyboard.JustDown(keys.E) || this.pending.pickup,
-      execute:
-        Phaser.Input.Keyboard.JustDown(keys.SPACE) || this.pending.execute,
+      execute: Phaser.Input.Keyboard.JustDown(keys.SPACE) || this.pending.execute,
       throw: Phaser.Input.Keyboard.JustDown(keys.F) || this.pending.throw,
       aim: this.toWorld(pointer.x, pointer.y),
       look: down('SHIFT'),
@@ -305,8 +337,12 @@ export class GameView extends Phaser.Scene {
       input.moveX = this.controls.moveX;
       input.moveY = this.controls.moveY;
     }
-    if (this.controls.aim) input.aim = this.controls.aim;
-    if (this.controls.attack) input.attack = true;
+    if (this.controls.aim) {
+      input.aim = this.controls.aim;
+    }
+    if (this.controls.attack) {
+      input.attack = true;
+    }
     this.pending = {};
     return input;
   }
@@ -318,50 +354,133 @@ export class GameView extends Phaser.Scene {
     };
   }
   update(time, delta) {
-    if (!this.sim || this.loading || this.app.mode === 'ending') return;
-    const dt = Math.min(delta / 1000, 0.05),
-      input = this.inputState();
+    if (!this.sim || this.loading || this.app.mode === 'ending') {
+      return;
+    }
+    const dt = Math.min(delta / 1000, 0.05);
+    const input = this.inputState();
     if (this.app.mode === 'playing') {
       this.sim.update(dt, input);
       for (const event of this.sim.events) {
-        if (event.type === 'sound') this.app.audio.play(event.key);
-        if (event.type === 'shake' && this.app.settings.effects)
+        if (event.type === 'sound') {
+          this.app.audio.play(event.key);
+        }
+        if (event.type === 'shake' && this.app.settings.effects) {
           this.shake = event.amount;
+        }
         this.app.onEvent(event);
       }
       this.app.updateHUD();
     }
-    const p = this.sim.player,
-      look =
-        input.look && this.app.mode === 'playing'
-          ? (this.sim.profile.lookDistance ?? 96)
-          : 0;
+    const player = this.sim.player;
+    const look =
+      input.look && this.app.mode === 'playing'
+        ? (this.sim.profile.lookDistance ?? 96)
+        : 0;
     const target = {
-      x: p.x + Math.cos(p.angle) * look,
-      y: p.y + Math.sin(p.angle) * look,
+      x: player.x + Math.cos(player.angle) * look,
+      y: player.y + Math.sin(player.angle) * look,
     };
     this.cameraPoint.x += (target.x - this.cameraPoint.x) * Math.min(1, dt * 8);
     this.cameraPoint.y += (target.y - this.cameraPoint.y) * Math.min(1, dt * 8);
     if (this.preview) {
-      this.cameraPoint.x =
-        this.sim.room.width / 2 + Math.sin(time * 0.00013) * 35;
-      this.cameraPoint.y =
-        this.sim.room.height / 2 + Math.cos(time * 0.00012) * 20;
+      this.cameraPoint.x = this.sim.room.width / 2 + Math.sin(time * 0.00013) * 35;
+      this.cameraPoint.y = this.sim.room.height / 2 + Math.cos(time * 0.00012) * 20;
     }
     this.render(time, dt);
   }
+  drawEnemy(ctx, enemy) {
+    if (enemy.alive) {
+      if (enemy.dog) {
+        this.drawSprite(ctx, enemy.sprite, enemy.frame, enemy.x, enemy.y, enemy.angle);
+      } else if (enemy.stun > 0) {
+        this.drawCustom(ctx, 'policeUnarmed', 0, enemy.x, enemy.y, enemy.angle);
+        ctx.fillStyle = '#fbd567';
+        ctx.font = '8px monospace';
+        ctx.fillText('· · ·', enemy.x - 9, enemy.y - 13);
+      } else {
+        this.drawCustom(
+          ctx,
+          enemy.weapon.gun ? 'police' : 'policeUnarmed',
+          enemy.frame,
+          enemy.x,
+          enemy.y,
+          enemy.angle,
+        );
+        if (!enemy.weapon.gun && enemy.weapon.id >= 0) {
+          this.drawSprite(
+            ctx,
+            'sprWeapons',
+            enemy.weapon.id,
+            enemy.x + Math.cos(enemy.angle) * 9,
+            enemy.y + Math.sin(enemy.angle) * 9,
+            enemy.angle,
+            0.6,
+          );
+        }
+        if (enemy.fat || enemy.swat || enemy.boss) {
+          ctx.strokeStyle = enemy.boss ? '#f54387' : '#7ee2d2';
+          ctx.lineWidth = 1;
+          ctx.strokeRect(enemy.x - 5, enemy.y - 3, 10, 6);
+        }
+      }
+    }
+  }
+  drawPlayer(ctx, player) {
+    const pose = playerPose(player);
+    if (player.alive && player.visible !== false) {
+      this.drawCustom(
+        ctx,
+        pose.key,
+        pose.frame,
+        player.x,
+        player.y,
+        pose.angle,
+        1,
+        pose.row,
+      );
+      const held = heldWeaponPose(player);
+      if (held) {
+        this.drawSprite(
+          ctx,
+          'sprWeapons',
+          player.weapon.id,
+          player.x + held.x,
+          player.y + held.y,
+          held.angle,
+          held.scale,
+          held.scale,
+          1,
+          held.origin,
+        );
+      }
+    } else if (!player.alive) {
+      this.drawCustom(
+        ctx,
+        pose.key,
+        pose.frame,
+        player.x,
+        player.y,
+        pose.angle,
+        0.75,
+        pose.row,
+      );
+    }
+  }
   render(time, dt) {
-    const ctx = this.ctx,
-      sim = this.sim,
-      w = this.scale.width,
-      h = this.scale.height;
+    const ctx = this.ctx;
+    const sim = this.sim;
+    const w = this.scale.width;
+    const h = this.scale.height;
     ctx.imageSmoothingEnabled = false;
     ctx.fillStyle = '#130d21';
     ctx.fillRect(0, 0, w, h);
     this.zoom = clamp(Math.round(Math.min(w / 480, h / 270)), 1, 5);
-    if (this.preview) this.zoom = Math.max(2, this.zoom);
-    const sx = this.shake ? (Math.random() - 0.5) * this.shake : 0,
-      sy = this.shake ? (Math.random() - 0.5) * this.shake : 0;
+    if (this.preview) {
+      this.zoom = Math.max(2, this.zoom);
+    }
+    const sx = this.shake ? (Math.random() - 0.5) * this.shake : 0;
+    const sy = this.shake ? (Math.random() - 0.5) * this.shake : 0;
     this.shake = Math.max(0, this.shake - dt * 18);
     ctx.save();
     ctx.translate(w / 2, h / 2);
@@ -371,24 +490,18 @@ export class GameView extends Phaser.Scene {
       -Math.round(this.cameraPoint.y) + sy,
     );
     ctx.drawImage(this.floor, 0, 0);
-    for (const e of sim.exits)
-      if (e.visible && e.meta && !this.hiddenObject(e)) this.drawEntity(ctx, e);
-    for (const b of sim.blood)
-      this.drawSprite(
-        ctx,
-        'sprBloodSplat',
-        3,
-        b.x,
-        b.y,
-        b.angle,
-        b.scale,
-        b.scale,
-        0.9,
-      );
+    for (const entity of sim.exits) {
+      if (entity.visible && entity.meta && !this.hiddenObject(entity)) {
+        this.drawEntity(ctx, entity);
+      }
+    }
+    for (const b of sim.blood) {
+      this.drawSprite(ctx, 'sprBloodSplat', 3, b.x, b.y, b.angle, b.scale, b.scale, 0.9);
+    }
     for (const body of sim.bodies) {
-      if (body.dog)
+      if (body.dog) {
         this.drawSprite(ctx, 'sprDogDeadBlunt', 4, body.x, body.y, body.angle);
-      else
+      } else {
         this.drawCustom(
           ctx,
           'corpse',
@@ -397,27 +510,24 @@ export class GameView extends Phaser.Scene {
           body.y,
           body.angle,
         );
+      }
     }
-    for (const exit of sim.exits)
-      if (exit.transition)
+    for (const exit of sim.exits) {
+      if (exit.transition) {
         drawTransition(
           ctx,
           exit,
           exit === sim.exit,
           sim.cleared && (!sim.tutorial || sim.tutorial.canExit),
         );
-    for (const item of sim.items)
+      }
+    }
+    for (const item of sim.items) {
       if (!item.taken) {
         ctx.strokeStyle = '#5decce55';
         ctx.lineWidth = 0.5;
         ctx.beginPath();
-        ctx.arc(
-          item.x,
-          item.y,
-          8 + Math.sin(time * 0.005) * 1.5,
-          0,
-          Math.PI * 2,
-        );
+        ctx.arc(item.x, item.y, 8 + Math.sin(time * 0.005) * 1.5, 0, Math.PI * 2);
         ctx.stroke();
         this.drawSprite(
           ctx,
@@ -428,8 +538,9 @@ export class GameView extends Phaser.Scene {
           item.angle ?? 0,
         );
       }
+    }
     for (const door of sim.doors) {
-      if (!door.broken)
+      if (!door.broken) {
         this.drawSprite(
           ctx,
           door.sprite,
@@ -440,94 +551,13 @@ export class GameView extends Phaser.Scene {
           door.scaleX,
           door.scaleY,
         );
-    }
-    for (const enemy of sim.enemies)
-      if (enemy.alive) {
-        if (enemy.dog) {
-          this.drawSprite(
-            ctx,
-            enemy.sprite,
-            enemy.frame,
-            enemy.x,
-            enemy.y,
-            enemy.angle,
-          );
-        } else if (enemy.stun > 0) {
-          this.drawCustom(
-            ctx,
-            'policeUnarmed',
-            0,
-            enemy.x,
-            enemy.y,
-            enemy.angle,
-          );
-          ctx.fillStyle = '#fbd567';
-          ctx.font = '8px monospace';
-          ctx.fillText('· · ·', enemy.x - 9, enemy.y - 13);
-        } else {
-          this.drawCustom(
-            ctx,
-            enemy.weapon.gun ? 'police' : 'policeUnarmed',
-            enemy.frame,
-            enemy.x,
-            enemy.y,
-            enemy.angle,
-          );
-          if (!enemy.weapon.gun && enemy.weapon.id >= 0)
-            this.drawSprite(
-              ctx,
-              'sprWeapons',
-              enemy.weapon.id,
-              enemy.x + Math.cos(enemy.angle) * 9,
-              enemy.y + Math.sin(enemy.angle) * 9,
-              enemy.angle,
-              0.6,
-            );
-          if (enemy.fat || enemy.swat || enemy.boss) {
-            ctx.strokeStyle = enemy.boss ? '#f54387' : '#7ee2d2';
-            ctx.lineWidth = 1;
-            ctx.strokeRect(enemy.x - 5, enemy.y - 3, 10, 6);
-          }
-        }
       }
-    const p = sim.player;
-    const pose = playerPose(p);
-    if (p.alive && p.visible !== false) {
-      this.drawCustom(
-        ctx,
-        pose.key,
-        pose.frame,
-        p.x,
-        p.y,
-        pose.angle,
-        1,
-        pose.row,
-      );
-      const held = heldWeaponPose(p);
-      if (held)
-        this.drawSprite(
-          ctx,
-          'sprWeapons',
-          p.weapon.id,
-          p.x + held.x,
-          p.y + held.y,
-          held.angle,
-          held.scale,
-          held.scale,
-          1,
-          held.origin,
-        );
-    } else if (!p.alive)
-      this.drawCustom(
-        ctx,
-        pose.key,
-        pose.frame,
-        p.x,
-        p.y,
-        pose.angle,
-        0.75,
-        pose.row,
-      );
+    }
+    for (const enemy of sim.enemies) {
+      this.drawEnemy(ctx, enemy);
+    }
+    const player = sim.player;
+    this.drawPlayer(ctx, player);
     const target = sim.tutorial?.target;
     if (target && this.app.mode === 'playing') {
       ctx.fillStyle = '#79caff';
@@ -538,14 +568,25 @@ export class GameView extends Phaser.Scene {
       ctx.fill();
     }
     ctx.drawImage(this.front, 0, 0);
-    for (const e of sim.room.entities.filter((e) => e.glass && e.visible)) {
-      const broken = e.sprite.replace(/([HV])$/, '$1Broken');
-      if (e.broken && this.images.has(broken))
-        this.drawSprite(ctx, broken, 0, e.x, e.y, e.angle, e.scaleX, e.scaleY);
-      else if (!e.broken) this.drawEntity(ctx, e);
+    for (const entity of sim.room.entities.filter((e) => e.glass && e.visible)) {
+      const broken = entity.sprite.replace(/([HV])$/, '$1Broken');
+      if (entity.broken && this.images.has(broken)) {
+        this.drawSprite(
+          ctx,
+          broken,
+          0,
+          entity.x,
+          entity.y,
+          entity.angle,
+          entity.scaleX,
+          entity.scaleY,
+        );
+      } else if (!entity.broken) {
+        this.drawEntity(ctx, entity);
+      }
     }
     for (const bullet of sim.bullets) {
-      if (bullet.thrown)
+      if (bullet.thrown) {
         this.drawSprite(
           ctx,
           'sprWeapons',
@@ -554,7 +595,7 @@ export class GameView extends Phaser.Scene {
           bullet.y,
           time * 0.02,
         );
-      else {
+      } else {
         ctx.strokeStyle = bullet.team === 'player' ? '#ffebb2' : '#ff5c79';
         ctx.lineWidth = 1;
         ctx.beginPath();
@@ -564,27 +605,23 @@ export class GameView extends Phaser.Scene {
       }
     }
     for (const particle of sim.particles) {
-      ctx.fillStyle = particle.blood
-        ? '#da2857'
-        : particle.glass
-          ? '#77dfed'
-          : '#ffcb84';
+      ctx.fillStyle = particle.blood ? '#da2857' : particle.glass ? '#77dfed' : '#ffcb84';
       ctx.fillRect(particle.x, particle.y, 1, 1);
     }
-    for (const f of sim.floating) {
+    for (const label of sim.floating) {
       ctx.fillStyle = '#fcf2c7';
       ctx.font = 'bold 8px monospace';
-      ctx.globalAlpha = Math.min(1, f.life * 2);
-      ctx.fillText(f.text, f.x, f.y);
+      ctx.globalAlpha = Math.min(1, label.life * 2);
+      ctx.fillText(label.text, label.x, label.y);
       ctx.globalAlpha = 1;
     }
     if (sim.cleared && !this.preview) {
-      const e = sim.exit;
-      const d = Math.hypot(e.x - p.x, e.y - p.y);
+      const entity = sim.exit;
+      const d = Math.hypot(entity.x - player.x, entity.y - player.y);
       if (d > 100) {
-        const angle = Math.atan2(e.y - p.y, e.x - p.x);
+        const angle = Math.atan2(entity.y - player.y, entity.x - player.x);
         ctx.save();
-        ctx.translate(p.x + Math.cos(angle) * 54, p.y + Math.sin(angle) * 54);
+        ctx.translate(player.x + Math.cos(angle) * 54, player.y + Math.sin(angle) * 54);
         ctx.rotate(angle);
         ctx.fillStyle = '#66f7df';
         ctx.beginPath();
@@ -597,8 +634,8 @@ export class GameView extends Phaser.Scene {
       }
     }
     if (this.app.mode === 'playing') {
-      const pointer = this.input.activePointer,
-        a = this.toWorld(pointer.x, pointer.y);
+      const pointer = this.input.activePointer;
+      const a = this.toWorld(pointer.x, pointer.y);
       ctx.strokeStyle = '#fff3ec';
       ctx.lineWidth = 0.5;
       ctx.beginPath();
@@ -615,8 +652,8 @@ export class GameView extends Phaser.Scene {
     }
     ctx.restore();
     if (sim.profile.darkness && !this.preview) {
-      const px = w / 2 + (p.x - this.cameraPoint.x) * this.zoom,
-        py = h / 2 + (p.y - this.cameraPoint.y) * this.zoom;
+      const px = w / 2 + (player.x - this.cameraPoint.x) * this.zoom;
+      const py = h / 2 + (player.y - this.cameraPoint.y) * this.zoom;
       const gradient = ctx.createRadialGradient(
         px,
         py,

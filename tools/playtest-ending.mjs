@@ -3,8 +3,7 @@ import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import assert from 'node:assert/strict';
 const root = fileURLToPath(new URL('../', import.meta.url)).replace(/\/$/, '');
-const output =
-  process.env.PLAYTEST_OUTPUT ?? root + '/../artifacts/ending-playtest';
+const output = process.env.PLAYTEST_OUTPUT ?? root + '/../artifacts/ending-playtest';
 fs.mkdirSync(output, { recursive: true });
 const server = await serveTestGame(root);
 const page = await fetch('http://127.0.0.1:9222/json/new?about:blank', {
@@ -13,9 +12,9 @@ const page = await fetch('http://127.0.0.1:9222/json/new?about:blank', {
 const ws = new WebSocket(page.webSocketDebuggerUrl);
 await new Promise((r) => ws.addEventListener('open', r, { once: true }));
 let id = 0;
-const pending = new Map(),
-  errors = [],
-  requests = [];
+const pending = new Map();
+const errors = [];
+const requests = [];
 const send = (method, params = {}) =>
   new Promise((resolve, reject) => {
     pending.set(++id, { resolve, reject });
@@ -27,14 +26,15 @@ ws.onmessage = (e) => {
     const p = pending.get(m.id);
     pending.delete(m.id);
     m.error ? p.reject(m.error) : p.resolve(m.result);
-  } else if (m.method === 'Runtime.exceptionThrown')
+  } else if (m.method === 'Runtime.exceptionThrown') {
     errors.push(m.params.exceptionDetails);
-  else if (
+  } else if (
     m.method === 'Network.requestWillBeSent' &&
     /^https?:/.test(m.params.request.url) &&
     !m.params.request.url.startsWith(server.url + '/')
-  )
+  ) {
     requests.push(m.params.request.url);
+  }
 };
 const evaluate = async (expression) => {
   const r = await send('Runtime.evaluate', {
@@ -42,12 +42,16 @@ const evaluate = async (expression) => {
     awaitPromise: true,
     returnByValue: true,
   });
-  if (r.exceptionDetails) throw Error(JSON.stringify(r.exceptionDetails));
+  if (r.exceptionDetails) {
+    throw Error(JSON.stringify(r.exceptionDetails));
+  }
   return r.result.value;
 };
 const until = async (expression) => {
   for (let i = 0; i < 120; i++) {
-    if (await evaluate(expression)) return;
+    if (await evaluate(expression)) {
+      return;
+    }
     await new Promise((r) => setTimeout(r, 100));
   }
   throw Error('Timeout ' + expression);
@@ -94,10 +98,7 @@ try {
   await send('Page.bringToFront');
   await until("window.__GAME__?.mode==='menu'");
   await evaluate('window.__QA_APP__.game.loop.stop();document.fonts.ready');
-  assert.equal(
-    await evaluate("document.getElementById('ending-button').hidden"),
-    true,
-  );
+  assert.equal(await evaluate("document.getElementById('ending-button').hidden"), true);
   assert.equal(await evaluate('window.__QA_APP__.showEnding()'), false);
   await evaluate(
     '(()=>{const a=window.__QA_APP__;a.progress={unlocked:21,best:{},last:21};a.briefing(21);a.start();return true})()',
@@ -112,9 +113,7 @@ try {
   await exitFloor();
   assert.equal(await evaluate('window.__GAME__.mode'), 'result');
   assert.equal(
-    await evaluate(
-      "document.getElementById('ending').classList.contains('hidden')",
-    ),
+    await evaluate("document.getElementById('ending').classList.contains('hidden')"),
     true,
   );
   await evaluate(
@@ -129,28 +128,17 @@ try {
   await until('window.__QA_APP__.ending.time>2.3');
   await evaluate('cancelAnimationFrame(window.__QA_APP__.ending.frame);true');
   assert.equal(
-    await evaluate(
-      "document.getElementById('hud').classList.contains('hidden')",
-    ),
+    await evaluate("document.getElementById('hud').classList.contains('hidden')"),
     true,
   );
-  assert.equal(
-    await evaluate("document.body.classList.contains('ending-active')"),
-    true,
-  );
+  assert.equal(await evaluate("document.body.classList.contains('ending-active')"), true);
   assert.ok(
     await evaluate(
       "window.__QA_APP__.ending.sprites.car.image.currentSrc.endsWith('/assets/custom/escape-car.png')",
     ),
   );
-  assert.equal(
-    await evaluate('window.__QA_APP__.ending.sprites.car.frames'),
-    13,
-  );
-  assert.equal(
-    await evaluate('window.__QA_APP__.ending.sprites.detonator.frames'),
-    4,
-  );
+  assert.equal(await evaluate('window.__QA_APP__.ending.sprites.car.frames'), 13);
+  assert.equal(await evaluate('window.__QA_APP__.ending.sprites.detonator.frames'), 4);
   const drivingFrames = [];
   const frames = [
     [3.5, 'walk-out'],
@@ -231,18 +219,12 @@ try {
   assert.equal(await evaluate('window.__GAME__.mode'), 'menu');
   assert.equal(await evaluate('window.__QA_APP__.ending'), null);
   assert.equal(await evaluate('window.__QA_APP__.audio.endingMusic'), false);
-  assert.equal(
-    await evaluate("document.getElementById('ending-button').hidden"),
-    false,
-  );
+  assert.equal(await evaluate("document.getElementById('ending-button').hidden"), false);
   await screenshot('unlocked-menu');
   await send('Page.navigate', { url: server.url });
   await until("window.__GAME__?.mode==='menu'");
   await evaluate('window.__QA_APP__.game.loop.stop();document.fonts.ready');
-  assert.equal(
-    await evaluate("document.getElementById('ending-button').hidden"),
-    false,
-  );
+  assert.equal(await evaluate("document.getElementById('ending-button').hidden"), false);
   await press('KeyS');
   await press('KeyS');
   await press('Enter');

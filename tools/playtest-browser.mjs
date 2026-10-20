@@ -3,8 +3,7 @@ import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import assert from 'node:assert/strict';
 const root = fileURLToPath(new URL('../', import.meta.url)).replace(/\/$/, '');
-const output =
-  process.env.PLAYTEST_OUTPUT ?? root + '/../artifacts/weapons-playtest';
+const output = process.env.PLAYTEST_OUTPUT ?? root + '/../artifacts/weapons-playtest';
 fs.mkdirSync(output, { recursive: true });
 const server = await serveTestGame(root);
 const page = await fetch('http://127.0.0.1:9222/json/new?about:blank', {
@@ -13,9 +12,9 @@ const page = await fetch('http://127.0.0.1:9222/json/new?about:blank', {
 const ws = new WebSocket(page.webSocketDebuggerUrl);
 await new Promise((r) => ws.addEventListener('open', r, { once: true }));
 let id = 0;
-const pending = new Map(),
-  errors = [],
-  requests = [];
+const pending = new Map();
+const errors = [];
+const requests = [];
 const send = (method, params = {}) =>
   new Promise((resolve, reject) => {
     pending.set(++id, { resolve, reject });
@@ -27,14 +26,15 @@ ws.onmessage = (e) => {
     const p = pending.get(m.id);
     pending.delete(m.id);
     m.error ? p.reject(m.error) : p.resolve(m.result);
-  } else if (m.method === 'Runtime.exceptionThrown')
+  } else if (m.method === 'Runtime.exceptionThrown') {
     errors.push(m.params.exceptionDetails);
-  else if (
+  } else if (
     m.method === 'Network.requestWillBeSent' &&
     /^https?:/.test(m.params.request.url) &&
     !m.params.request.url.startsWith(server.url + '/')
-  )
+  ) {
     requests.push(m.params.request.url);
+  }
 };
 const evaluate = async (expression) => {
   const r = await send('Runtime.evaluate', {
@@ -42,12 +42,16 @@ const evaluate = async (expression) => {
     awaitPromise: true,
     returnByValue: true,
   });
-  if (r.exceptionDetails) throw Error(JSON.stringify(r.exceptionDetails));
+  if (r.exceptionDetails) {
+    throw Error(JSON.stringify(r.exceptionDetails));
+  }
   return r.result.value;
 };
 const until = async (expression) => {
   for (let i = 0; i < 120; i++) {
-    if (await evaluate(expression)) return;
+    if (await evaluate(expression)) {
+      return;
+    }
     await new Promise((r) => setTimeout(r, 100));
   }
   throw Error('Timeout ' + expression);
@@ -133,13 +137,8 @@ try {
   await evaluate('window.__QA_APP__.sim.player.fireTimer=10;true');
   await mouse('right', point);
   await tick(3);
-  assert.equal(
-    (await evaluate('window.__GAME__.getState()')).player.weapon,
-    -1,
-  );
-  assert.ok(
-    (await evaluate('window.__GAME__.getState()')).actors[0].stun > 2.5,
-  );
+  assert.equal((await evaluate('window.__GAME__.getState()')).player.weapon, -1);
+  assert.ok((await evaluate('window.__GAME__.getState()')).actors[0].stun > 2.5);
   await mouse('right', point);
   assert.equal((await evaluate('window.__GAME__.getState()')).player.weapon, 5);
   await press('KeyQ');
@@ -157,9 +156,7 @@ try {
   await until(
     "window.__QA_APP__.audio.voices.get('sndPickupWeapon')?.some(v => v.readyState >= 2 && !v.error)",
   );
-  const meleeIds = [
-    2, 3, 4, 5, 8, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 26,
-  ];
+  const meleeIds = [2, 3, 4, 5, 8, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 26];
   for (const id of meleeIds) {
     point = await arena(id, 320);
     await evaluate("window.__QA_APP__.sim.player.facing='right';true");
@@ -199,10 +196,7 @@ try {
     windowsVirtualKeyCode: 81,
   });
   await tick();
-  assert.equal(
-    (await evaluate('window.__GAME__.getState()')).player.weapon,
-    -1,
-  );
+  assert.equal((await evaluate('window.__GAME__.getState()')).player.weapon, -1);
   await press('KeyE');
   assert.equal((await evaluate('window.__GAME__.getState()')).player.weapon, 2);
   await evaluate(
@@ -286,10 +280,7 @@ try {
   await tick();
   await send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
   await tick();
-  assert.equal(
-    (await evaluate('window.__GAME__.getState()')).player.weapon,
-    -1,
-  );
+  assert.equal((await evaluate('window.__GAME__.getState()')).player.weapon, -1);
   assert.deepEqual(errors, []);
   assert.deepEqual(requests, []);
   const report = {

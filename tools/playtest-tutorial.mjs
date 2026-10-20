@@ -3,8 +3,7 @@ import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import assert from 'node:assert/strict';
 const root = fileURLToPath(new URL('../', import.meta.url)).replace(/\/$/, '');
-const output =
-  process.env.PLAYTEST_OUTPUT ?? root + '/../artifacts/tutorial-playtest';
+const output = process.env.PLAYTEST_OUTPUT ?? root + '/../artifacts/tutorial-playtest';
 fs.mkdirSync(output, { recursive: true });
 const server = await serveTestGame(root);
 const page = await fetch('http://127.0.0.1:9222/json/new?about:blank', {
@@ -13,9 +12,9 @@ const page = await fetch('http://127.0.0.1:9222/json/new?about:blank', {
 const ws = new WebSocket(page.webSocketDebuggerUrl);
 await new Promise((r) => ws.addEventListener('open', r, { once: true }));
 let id = 0;
-const pending = new Map(),
-  errors = [],
-  requests = [];
+const pending = new Map();
+const errors = [];
+const requests = [];
 const send = (method, params = {}) =>
   new Promise((resolve, reject) => {
     pending.set(++id, { resolve, reject });
@@ -27,14 +26,15 @@ ws.onmessage = (e) => {
     const p = pending.get(m.id);
     pending.delete(m.id);
     m.error ? p.reject(m.error) : p.resolve(m.result);
-  } else if (m.method === 'Runtime.exceptionThrown')
+  } else if (m.method === 'Runtime.exceptionThrown') {
     errors.push(m.params.exceptionDetails);
-  else if (
+  } else if (
     m.method === 'Network.requestWillBeSent' &&
     /^https?:/.test(m.params.request.url) &&
     !m.params.request.url.startsWith(server.url + '/')
-  )
+  ) {
     requests.push(m.params.request.url);
+  }
 };
 const evaluate = async (expression) => {
   const r = await send('Runtime.evaluate', {
@@ -42,12 +42,16 @@ const evaluate = async (expression) => {
     awaitPromise: true,
     returnByValue: true,
   });
-  if (r.exceptionDetails) throw Error(JSON.stringify(r.exceptionDetails));
+  if (r.exceptionDetails) {
+    throw Error(JSON.stringify(r.exceptionDetails));
+  }
   return r.result.value;
 };
 const until = async (expression) => {
   for (let i = 0; i < 120; i++) {
-    if (await evaluate(expression)) return;
+    if (await evaluate(expression)) {
+      return;
+    }
     await new Promise((r) => setTimeout(r, 100));
   }
   throw Error('Timeout ' + expression);
@@ -95,9 +99,7 @@ try {
   await evaluate('window.__QA_APP__.game.loop.stop(); document.fonts.ready');
   await screenshot('menu-desktop');
   assert.equal(
-    await evaluate(
-      "document.getElementById('menu').textContent.includes('OFFLINE')",
-    ),
+    await evaluate("document.getElementById('menu').textContent.includes('OFFLINE')"),
     false,
   );
   await send('Emulation.setDeviceMetricsOverride', {
@@ -123,16 +125,18 @@ try {
   const stage = () => evaluate('window.__QA_APP__.sim.tutorial.step');
   const held = new Set();
   async function movement(codes) {
-    for (const k of [...held])
+    for (const k of [...held]) {
       if (!codes.includes(k)) {
         await key(k, 'keyUp');
         held.delete(k);
       }
-    for (const k of codes)
+    }
+    for (const k of codes) {
       if (!held.has(k)) {
         await key(k, 'keyDown');
         held.add(k);
       }
+    }
   }
   async function goTo(x, y, reach = 12) {
     for (let i = 0; i < 240; i++) {
@@ -208,7 +212,9 @@ try {
   await expectStage('aim');
   const hero = await evaluate('window.__GAME__.getState().player');
   await aim(hero.x + 100, hero.y);
-  if ((await stage()) === 'aim') await aim(hero.x - 100, hero.y);
+  if ((await stage()) === 'aim') {
+    await aim(hero.x - 100, hero.y);
+  }
   await expectStage('punch');
   const enemies = await evaluate(
     'window.__QA_APP__.sim.enemies.map(e => ({x:e.x,y:e.y}))',
@@ -222,10 +228,7 @@ try {
   await press('Space');
   await tick(50);
   await expectStage('pickup');
-  await goTo(
-    weapons.find((w) => w.id === 4).x,
-    weapons.find((w) => w.id === 4).y,
-  );
+  await goTo(weapons.find((w) => w.id === 4).x, weapons.find((w) => w.id === 4).y);
   await press('KeyE');
   await expectStage('drop');
   await press('KeyQ');
@@ -246,10 +249,7 @@ try {
   await goTo(enemies[1].x, enemies[1].y, 35);
   await attack(enemies[1].x, enemies[1].y);
   await expectStage('gun');
-  await goTo(
-    weapons.find((w) => w.id === 1).x,
-    weapons.find((w) => w.id === 1).y,
-  );
+  await goTo(weapons.find((w) => w.id === 1).x, weapons.find((w) => w.id === 1).y);
   await press('KeyE');
   await expectStage('shoot');
   await goTo(enemies[2].x, enemies[2].y, 42);

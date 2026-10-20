@@ -1,3 +1,76 @@
+const defaults = {
+  kind: 'decor',
+  scaleX: 1,
+  scaleY: 1,
+  angle: 0,
+  frame: 0,
+  depth: 0,
+  visible: true,
+  solid: false,
+  isWall: false,
+  furniture: false,
+  glass: false,
+  broken: false,
+};
+export function buildRoom(manifest, raw) {
+  const entities = raw.entities.map((entity, id) => ({
+    ...defaults,
+    id,
+    ...entity,
+    solid: entity.solid || /^objWallSoft[HV]$/.test(entity.name),
+    isWall: entity.isWall || /^objWallSoft[HV]$/.test(entity.name),
+    init: {
+      ...entity.init,
+    },
+    meta: manifest.sprites[entity.sprite],
+    mask: manifest.sprites[entity.mask],
+  }));
+  return {
+    ...raw,
+    entities,
+  };
+}
+export function connectsTo(exit, room) {
+  return exit.init.nextroom === room || !!exit.targets?.includes(room);
+}
+export function rectFor(entity) {
+  if (entity.bounds) {
+    return {
+      ...entity.bounds,
+      entity,
+    };
+  }
+  const metadata = entity.mask ?? entity.meta;
+  if (!metadata) {
+    return null;
+  }
+  const bounds = metadata.bbox;
+  const originX = metadata.originX;
+  const originY = metadata.originY;
+  const corners = [
+    [bounds[0] - originX, bounds[1] - originY],
+    [bounds[2] - originX + 1, bounds[1] - originY],
+    [bounds[2] - originX + 1, bounds[3] - originY + 1],
+    [bounds[0] - originX, bounds[3] - originY + 1],
+  ];
+  const cosine = Math.cos(entity.angle);
+  const sine = Math.sin(entity.angle);
+  const points = corners.map(([x, y]) => [
+    entity.x + x * entity.scaleX * cosine - y * entity.scaleY * sine,
+    entity.y + x * entity.scaleX * sine + y * entity.scaleY * cosine,
+  ]);
+  const left = Math.min(...points.map((point) => point[0]));
+  const top = Math.min(...points.map((point) => point[1]));
+  const right = Math.max(...points.map((point) => point[0]));
+  const bottom = Math.max(...points.map((point) => point[1]));
+  return {
+    x: left,
+    y: top,
+    w: right - left,
+    h: bottom - top,
+    entity,
+  };
+}
 const FLOORS = {
   tile: ['#567377', '#6f9090'],
   wood: ['#846247', '#a7835c'],
@@ -12,7 +85,6 @@ const FLOORS = {
   garden: ['#335b4c', '#49705a'],
   platform: ['#636e76', '#7e8990'],
 };
-
 function floorTile(ctx, x, y, cell, style, index) {
   const [base, light] = FLOORS[style] ?? FLOORS.tile;
   ctx.fillStyle = base;
@@ -24,21 +96,27 @@ function floorTile(ctx, x, y, cell, style, index) {
       ctx.fillRect(x + ((y / cell + offset) % 3) * 10, y + offset, 1, 8);
     }
   } else if (style === 'checker' || style === 'dance') {
-    for (let yy = 0; yy < 2; yy++)
-      for (let xx = 0; xx < 2; xx++)
-        if ((x / 16 + y / 16 + xx + yy) % 2)
+    for (let yy = 0; yy < 2; yy++) {
+      for (let xx = 0; xx < 2; xx++) {
+        if ((x / 16 + y / 16 + xx + yy) % 2) {
           ctx.fillRect(x + xx * 16 + 1, y + yy * 16 + 1, 14, 14);
+        }
+      }
+    }
     if (style === 'dance' && (x / cell + y / cell) % 4 === 0) {
       ctx.fillStyle = ['#a75e86', '#5a9298', '#918152'][index % 3];
       ctx.fillRect(x + 4, y + 4, 8, 8);
     }
   } else if (style === 'carpet') {
     ctx.globalAlpha = 0.5;
-    for (let i = 3; i < cell; i += 8) ctx.fillRect(x + i, y + i, 2, 2);
+    for (let i = 3; i < cell; i += 8) {
+      ctx.fillRect(x + i, y + i, 2, 2);
+    }
     ctx.globalAlpha = 1;
   } else if (style === 'garden') {
-    for (let i = 0; i < 4; i++)
+    for (let i = 0; i < 4; i++) {
       ctx.fillRect(x + ((i * 11 + y) % 29), y + ((i * 7 + x) % 29), 2, 3);
+    }
   } else {
     ctx.fillRect(x, y, cell, 1);
     ctx.fillRect(x, y, 1, cell);
@@ -58,30 +136,29 @@ function floorTile(ctx, x, y, cell, style, index) {
     }
   }
 }
-
 export function drawLevel(ctx, room) {
-  if (!room.floor) return;
+  if (!room.floor) {
+    return;
+  }
   const { cell, grid, palette } = room.floor;
   const accent = palette[2];
   ctx.fillStyle = '#111a25';
   ctx.fillRect(0, 0, room.width, room.height);
   ctx.fillStyle = '#1a2630';
-  for (let y = 0; y < room.height; y += 16)
-    for (let x = (y % 32) / 2; x < room.width; x += 32)
+  for (let y = 0; y < room.height; y += 16) {
+    for (let x = (y % 32) / 2; x < room.width; x += 32) {
       ctx.fillRect(x, y, 1, 1);
-  for (let y = 0; y < grid.length; y++)
-    for (let x = 0; x < grid[y].length; x++) {
-      if (grid[y][x] === ' ') continue;
-      const index = parseInt(grid[y][x], 36);
-      floorTile(
-        ctx,
-        x * cell,
-        y * cell,
-        cell,
-        room.zones[index]?.style ?? 'tile',
-        index,
-      );
     }
+  }
+  for (let y = 0; y < grid.length; y++) {
+    for (let x = 0; x < grid[y].length; x++) {
+      if (grid[y][x] === ' ') {
+        continue;
+      }
+      const index = parseInt(grid[y][x], 36);
+      floorTile(ctx, x * cell, y * cell, cell, room.zones[index]?.style ?? 'tile', index);
+    }
+  }
   for (const [index, zone] of room.zones.entries()) {
     if (['carpet', 'wood', 'marble'].includes(zone.style)) {
       ctx.fillStyle = zone.style === 'wood' ? '#6c4653' : '#3b5863';
@@ -107,26 +184,32 @@ export function drawLevel(ctx, room) {
     ctx.textAlign = 'left';
     ctx.fillText(zone.name, zone.x + 13, zone.y + 16, zone.w - 26);
     ctx.fillStyle = accent + '70';
-    if (index % 2 === 0)
+    if (index % 2 === 0) {
       ctx.fillRect(zone.x + 9, zone.y + zone.h - 4, zone.w - 18, 2);
+    }
   }
   for (const entity of room.entities.filter((e) => e.isWall && e.bounds)) {
-    const r = entity.bounds;
+    const bounds = entity.bounds;
     ctx.fillStyle = '#0008';
-    ctx.fillRect(r.x + 3, r.y + 5, r.w + 2, r.h + 2);
+    ctx.fillRect(bounds.x + 3, bounds.y + 5, bounds.w + 2, bounds.h + 2);
     ctx.fillStyle = '#243340';
-    ctx.fillRect(r.x, r.y, r.w, r.h);
+    ctx.fillRect(bounds.x, bounds.y, bounds.w, bounds.h);
     ctx.fillStyle = '#afad9b';
-    if (r.w > r.h) ctx.fillRect(r.x, r.y, r.w, 2);
-    else ctx.fillRect(r.x, r.y, 2, r.h);
+    if (bounds.w > bounds.h) {
+      ctx.fillRect(bounds.x, bounds.y, bounds.w, 2);
+    } else {
+      ctx.fillRect(bounds.x, bounds.y, 2, bounds.h);
+    }
     ctx.fillStyle = accent;
-    if ((r.x + r.y) % 128 === 0) {
-      if (r.w > r.h) ctx.fillRect(r.x + 5, r.y + 2, Math.min(22, r.w - 5), 2);
-      else ctx.fillRect(r.x + 2, r.y + 5, 2, Math.min(22, r.h - 5));
+    if ((bounds.x + bounds.y) % 128 === 0) {
+      if (bounds.w > bounds.h) {
+        ctx.fillRect(bounds.x + 5, bounds.y + 2, Math.min(22, bounds.w - 5), 2);
+      } else {
+        ctx.fillRect(bounds.x + 2, bounds.y + 5, 2, Math.min(22, bounds.h - 5));
+      }
     }
   }
 }
-
 export function drawTransition(ctx, exit, active, unlocked) {
   ctx.save();
   ctx.translate(Math.round(exit.x), Math.round(exit.y));

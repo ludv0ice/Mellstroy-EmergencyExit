@@ -14,21 +14,19 @@ export async function serveTestGame(root) {
   };
   const server = createServer((request, response) => {
     try {
-      let name = decodeURIComponent(
-        new URL(request.url, 'http://localhost').pathname,
-      );
-      if (name === '/') name = '/index.html';
+      let name = decodeURIComponent(new URL(request.url, 'http://localhost').pathname);
+      if (name === '/') {
+        name = '/index.html';
+      }
       const file = path.resolve(root, '.' + name);
       if (!file.startsWith(root + path.sep)) {
         response.writeHead(403).end();
         return;
       }
       let body = readFileSync(file);
-      if (name === '/src/game.js') {
+      if (name === '/assets/game.js') {
         let code = body.toString();
-        const alias = code.match(
-          /get mode\(\)\s*\{\s*return ([\w$]+)\.mode/,
-        )[1];
+        const alias = code.match(/get mode\(\)\s*\{\s*return ([\w$]+)\.mode/)[1];
         code = code.replace(
           /window\.__GAME__\s*=/,
           `window.__QA_APP__ = ${alias};window.__GAME__ =`,

@@ -1,11 +1,13 @@
 import { CHAPTERS } from './campaign.js';
-import { endingUnlocked } from './ending-sequence.js';
+import { endingUnlocked } from './ending-data.js';
 
 export function completeCampaign(progress) {
   const best = { ...progress.best };
-  for (const chapter of CHAPTERS)
-    if (!Number.isFinite(best[chapter.index]?.score))
+  for (const chapter of CHAPTERS) {
+    if (!Number.isFinite(best[chapter.index]?.score)) {
       best[chapter.index] = { score: 0, grade: 'C', time: 0 };
+    }
+  }
   return {
     ...progress,
     best,
@@ -16,7 +18,9 @@ export function completeCampaign(progress) {
 
 export function clearLocation(sim) {
   sim.tutorial = null;
-  for (const enemy of sim.enemies) sim.kill(enemy, 'cheat');
+  for (const enemy of sim.enemies) {
+    sim.kill(enemy, 'cheat');
+  }
   sim.bullets = sim.bullets.filter((bullet) => bullet.team === 'player');
   sim.checkClear();
 }
@@ -42,20 +46,28 @@ export class CheatConsole {
     document.addEventListener(
       'keyup',
       (event) => {
-        if (this.opened) event.stopImmediatePropagation();
+        if (this.opened) {
+          event.stopImmediatePropagation();
+        }
       },
       true,
     );
   }
   keydown(event) {
     if (['F2', 'Backquote'].includes(event.code)) {
-      if (!this.opened && ['loading', 'ending'].includes(this.app.mode)) return;
+      if (!this.opened && ['loading', 'ending'].includes(this.app.mode)) {
+        return;
+      }
       event.preventDefault();
       event.stopImmediatePropagation();
-      if (!event.repeat) this.opened ? this.close() : this.open();
+      if (!event.repeat) {
+        this.opened ? this.close() : this.open();
+      }
       return;
     }
-    if (!this.opened) return;
+    if (!this.opened) {
+      return;
+    }
     event.stopImmediatePropagation();
     if (event.code === 'Tab') {
       event.preventDefault();
@@ -69,7 +81,9 @@ export class CheatConsole {
       this.close();
     } else if (event.code === 'Enter' && event.target === this.input) {
       event.preventDefault();
-      if (!event.repeat) this.submit();
+      if (!event.repeat) {
+        this.submit();
+      }
     } else if (
       ['ArrowUp', 'ArrowDown'].includes(event.code) &&
       event.target === this.input
@@ -86,10 +100,11 @@ export class CheatConsole {
     }
   }
   open() {
-    if (this.opened || !this.app.view) return;
+    if (this.opened || !this.app.view) {
+      return;
+    }
     this.previousMode = this.app.mode;
-    this.previousPanel =
-      document.querySelector('.overlay:not(.hidden)')?.id ?? null;
+    this.previousPanel = document.querySelector('.overlay:not(.hidden)')?.id ?? null;
     this.app.mode = 'console';
     this.app.menuNavigation.show(null);
     this.app.view.input.keyboard.enabled = false;
@@ -107,7 +122,9 @@ export class CheatConsole {
     this.input.focus({ preventScroll: true });
   }
   close() {
-    if (!this.opened) return;
+    if (!this.opened) {
+      return;
+    }
     this.opened = false;
     this.root.classList.add('hidden');
     this.input.blur();
@@ -128,29 +145,36 @@ export class CheatConsole {
   submit() {
     const line = this.input.value.trim();
     this.input.value = '';
-    if (!line) return;
+    if (!line) {
+      return;
+    }
     this.history.push(line);
     this.history = this.history.slice(-30);
     this.historyIndex = this.history.length;
     this.log('> ' + line);
     this.log(this.execute(line));
-    if (this.opened) this.input.focus({ preventScroll: true });
+    if (this.opened) {
+      this.input.focus({ preventScroll: true });
+    }
   }
   execute(line) {
-    const [command, argument, ...extra] = line
-      .toLowerCase()
-      .trim()
-      .split(/\s+/);
-    if (command === 'help' && !argument)
+    const [command, argument, ...extra] = line.toLowerCase().trim().split(/\s+/);
+    if (command === 'help' && !argument) {
       return 'god [on/off] — неуязвимость\nclear — зачистить текущую локацию\nwin — пройти текущую локацию и перейти дальше\nwinall — пройти всю кампанию и открыть финал\nfinale — посмотреть открытый финал';
+    }
     if (command === 'god') {
-      if (extra.length || (argument && !['on', 'off'].includes(argument)))
+      if (extra.length || (argument && !['on', 'off'].includes(argument))) {
         return 'Формат: god, god on или god off';
+      }
       this.flags.god = argument ? argument === 'on' : !this.flags.god;
-      if (this.app.sim) this.app.sim.cheats = this.flags;
+      if (this.app.sim) {
+        this.app.sim.cheats = this.flags;
+      }
       return 'Неуязвимость: ' + (this.flags.god ? 'ВКЛ' : 'ВЫКЛ');
     }
-    if (argument) return 'Лишние аргументы. help — список команд.';
+    if (argument) {
+      return 'Лишние аргументы. help — список команд.';
+    }
     if (command === 'winall') {
       this.app.progress = completeCampaign(this.app.progress);
       this.persist();
@@ -158,19 +182,18 @@ export class CheatConsole {
       return 'Все 22 уровня пройдены. Прогресс сохранён. Закрой консоль — финал доступен в меню.';
     }
     if (command === 'finale') {
-      if (!endingUnlocked(this.app.progress))
+      if (!endingUnlocked(this.app.progress)) {
         return 'Финал ещё закрыт. Сначала пройди все уровни или введи winall.';
+      }
       this.close();
       this.app.showEnding();
       return 'Финальная катсцена.';
     }
     if (['clear', 'win'].includes(command)) {
       const sim = this.app.sim;
-      if (
-        !['playing', 'paused'].includes(this.previousMode) ||
-        !sim?.player.alive
-      )
+      if (!['playing', 'paused'].includes(this.previousMode) || !sim?.player.alive) {
         return 'Сначала запусти уровень.';
+      }
       clearLocation(sim);
       if (command === 'win') {
         this.returnToMenu = false;

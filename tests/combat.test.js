@@ -63,15 +63,17 @@ test('Every enemy melee weapon has less reach than the same weapon held by the h
       [weapon.enemyRange + 6, true],
       [weapon.enemyRange + 8, false],
     ]) {
-      const sim = duel(distance),
-        enemy = sim.enemies[0];
+      const sim = duel(distance);
+      const enemy = sim.enemies[0];
       enemy.weapon = weapon;
       enemy.angle = Math.PI;
       enemy.reaction = 0;
       enemy.fireTimer = 0;
       sim.grace = 0;
       sim.moveEnemy = () => {};
-      for (let frame = 0; frame < 14; frame++) sim.updateEnemy(enemy, 1 / 60);
+      for (let frame = 0; frame < 14; frame++) {
+        sim.updateEnemy(enemy, 1 / 60);
+      }
       assert.equal(sim.player.alive, !killed, weapon.name + ' ' + distance);
     }
   }
@@ -110,9 +112,11 @@ test('An enemy boxed in by obstacles waits instead of spinning', () => {
     wall(136, 136, -Math.PI / 2),
     wall(136, 156, -Math.PI / 2),
   ]);
-  const enemy = sim.enemies[0],
-    angle = enemy.angle;
-  for (let i = 0; i < 180; i++) sim.updateEnemy(enemy, 1 / 60);
+  const enemy = sim.enemies[0];
+  const angle = enemy.angle;
+  for (let i = 0; i < 180; i++) {
+    sim.updateEnemy(enemy, 1 / 60);
+  }
   assert.equal(enemy.angle, angle);
   assert.equal(enemy.x, 150);
   assert.equal(enemy.y, 150);
@@ -125,7 +129,9 @@ test('A patrolling enemy selects an open direction and moves away from a wall', 
     wall(170, 130, 0, 1, 2),
   ]);
   const enemy = sim.enemies[0];
-  for (let i = 0; i < 30; i++) sim.updateEnemy(enemy, 1 / 60);
+  for (let i = 0; i < 30; i++) {
+    sim.updateEnemy(enemy, 1 / 60);
+  }
   assert.ok(enemy.y > 175);
   assert.ok(Math.abs(enemy.angle - Math.PI / 2) < 0.001);
 });
@@ -308,20 +314,24 @@ test('Enemy cannot steal a ground weapon through a wall', () => {
 });
 
 test('Melee wind-up gives 220 ms to counterattack and resets when the hero escapes', () => {
-  const sim = duel(20),
-    enemy = sim.enemies[0];
+  const sim = duel(20);
+  const enemy = sim.enemies[0];
   sim.grace = 0;
   enemy.reaction = 0;
   enemy.fireTimer = 0;
   enemy.angle = Math.PI;
   sim.moveEnemy = () => {};
-  for (let i = 0; i < 10; i++) sim.updateEnemy(enemy, 1 / 60);
+  for (let i = 0; i < 10; i++) {
+    sim.updateEnemy(enemy, 1 / 60);
+  }
   assert.equal(sim.player.alive, true);
   sim.player.x = 200;
   sim.updateEnemy(enemy, 1 / 60);
   assert.equal(enemy.meleeWindup, null);
   sim.player.x = 40;
-  for (let i = 0; i < 10; i++) sim.updateEnemy(enemy, 1 / 60);
+  for (let i = 0; i < 10; i++) {
+    sim.updateEnemy(enemy, 1 / 60);
+  }
   assert.equal(sim.player.alive, true);
   sim.player.weapon = WEAPONS[4];
   sim.player.angle = 0;
@@ -329,24 +339,30 @@ test('Melee wind-up gives 220 ms to counterattack and resets when the hero escap
   assert.equal(enemy.alive, false);
 });
 test('A newly alerted gunman waits before his first shot', () => {
-  const sim = duel(120),
-    enemy = sim.enemies[0];
+  const sim = duel(120);
+  const enemy = sim.enemies[0];
   sim.grace = 0;
   enemy.weapon = WEAPONS[0];
   enemy.ammo = 10;
   enemy.angle = Math.PI;
   enemy.fireTimer = 0;
-  for (let i = 0; i < 20; i++) sim.updateEnemy(enemy, 1 / 60);
+  for (let i = 0; i < 20; i++) {
+    sim.updateEnemy(enemy, 1 / 60);
+  }
   assert.equal(sim.bullets.length, 0);
-  for (let i = 0; i < 8; i++) sim.updateEnemy(enemy, 1 / 60);
+  for (let i = 0; i < 8; i++) {
+    sim.updateEnemy(enemy, 1 / 60);
+  }
   assert.ok(sim.bullets.length > 0);
 });
 
 test('The player cannot walk through a living or stunned enemy, even with a large movement step', () => {
   for (const stunned of [false, true]) {
-    const sim = duel(40),
-      enemy = sim.enemies[0];
-    if (stunned) sim.stun(enemy, STUN_DURATION);
+    const sim = duel(40);
+    const enemy = sim.enemies[0];
+    if (stunned) {
+      sim.stun(enemy, STUN_DURATION);
+    }
     sim.move(sim.player, 160, 0, 1);
     assert.ok(sim.player.x <= enemy.x - 14);
     assert.ok(Math.hypot(sim.player.x - enemy.x, sim.player.y - enemy.y) >= 14);
@@ -370,8 +386,8 @@ test('Enemy movement also respects the player and other enemies', () => {
 });
 
 test('Corpses do not block movement and pre-existing overlaps allow actors to separate', () => {
-  const sim = duel(40),
-    enemy = sim.enemies[0];
+  const sim = duel(40);
+  const enemy = sim.enemies[0];
   sim.kill(enemy, 'blunt');
   sim.move(sim.player, 100, 0, 1);
   assert.equal(sim.player.x, 140);
@@ -381,8 +397,8 @@ test('Corpses do not block movement and pre-existing overlaps allow actors to se
 });
 
 test('A hero touching an enemy can slide around him and still attack at melee distance', () => {
-  const sim = duel(14),
-    enemy = sim.enemies[0];
+  const sim = duel(14);
+  const enemy = sim.enemies[0];
   sim.move(sim.player, 0, 30, 1);
   assert.equal(sim.player.y, 70);
   sim.move(sim.player, 30, 0, 1);
@@ -411,8 +427,9 @@ test('Path checks account for actor width when a sight ray narrowly clears a wal
   const route = sim.navigation.path(sim.player, target);
   assert.ok(route.length > 0);
   assert.ok(route.some((point) => point.y <= 52));
-  for (const point of route)
+  for (const point of route) {
     assert.equal(sim.blocked(point.x, point.y, 7, false), false);
+  }
 });
 
 test('Using an unlocked exit keeps the held weapon even when another weapon lies under the door', () => {
