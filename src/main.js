@@ -1,3 +1,4 @@
+import { Saves } from './saves.js';
 import { GameView } from './renderer.js';
 import { Simulation } from './simulation.js';
 import { Tutorial } from './tutorial.js';
@@ -18,6 +19,7 @@ const overlays = [
   'death',
   'result',
   'settings',
+  'saves',
 ];
 function stored(key, fallback) {
   try {
@@ -31,6 +33,9 @@ function save(key, value) {
     localStorage.setItem(key, JSON.stringify(value));
   } catch {}
 }
+let storage;
+try { storage = localStorage; } catch {}
+const saves = new Saves(storage);
 const app = {
   mode: 'loading',
   manifest: null,
@@ -42,11 +47,7 @@ const app = {
   runScore: 0,
   runTime: 0,
   deaths: 0,
-  progress: stored('emergency-exit-progress', {
-    unlocked: 0,
-    best: {},
-    last: 0,
-  }),
+  progress: saves.current.progress,
   settings: stored('emergency-exit-settings', {
     sound: 65,
     music: 35,
@@ -56,6 +57,79 @@ const app = {
   cache: new Map(),
   floorStates: new Map(),
   checkpoints: new Map(),
+  persist() {
+    saves.current.progress = this.progress;
+    if (!saves.write()) this.toast('Не удалось сохранить: проверь доступ браузера к хранилищу');
+  },
+  saveFloor() {
+    saves.current.checkpoint = {
+      chapter: this.chapter.index, floor: this.floorIndex, profile: this.profile.id,
+      carry: this.checkpoints.get(this.sim.room.id), deaths: this.deaths,
+      floors: [...this.floorStates].filter(([id]) => id !== this.sim.room.id)
+        .map(([id, floor]) => [id, { score: floor.score, elapsed: floor.elapsed, total: floor.total }]),
+    };
+    this.persist();
+  },
+  continueGame() {
+    this.audio.start();
+    const checkpoint = saves.current.checkpoint;
+    if (!checkpoint) return this.briefing(this.progress.last ?? 0);
+    this.resetRun();
+    this.chapter = CHAPTERS[checkpoint.chapter];
+    this.floorIndex = checkpoint.floor;
+    this.profile = PROFILES.find(profile => profile.id === checkpoint.profile) ?? PROFILES[0];
+    this.deaths = checkpoint.deaths;
+    this.floorStates = new Map(checkpoint.floors);
+    this.runScore = [...this.floorStates.values()].reduce((sum, floor) => sum + floor.score, 0);
+    this.load(this.chapter.rooms[this.floorIndex], checkpoint.carry);
+  },
+  showSaves() {
+    this.mode = 'saves';
+    this.audio.active = false;
+    this.overlay('saves');
+    const list = elementById('save-list');
+    list.replaceChildren();
+    saves.data.slots.forEach((slot, index) => {
+      const card = document.createElement('div');
+      card.className = 'save-card';
+      const title = document.createElement('p');
+      title.textContent = `СЛОТ ${index + 1}` + (index === saves.data.active ? ' · ТЕКУЩИЙ' : '') +
+        (slot ? ` · Пройдено глав: ${Object.keys(slot.progress.best).length} / 22` : ' · ПУСТО');
+      card.append(title);
+      const choose = (reset) => {
+        saves.select(index, reset);
+        this.progress = saves.current.progress;
+        this.resetRun();
+        if (reset) this.briefing(0);
+        else this.continueGame();
+      };
+      if (slot) {
+        const resume = document.createElement('button');
+        resume.textContent = 'ПРОДОЛЖИТЬ';
+        resume.onclick = () => choose(false);
+        card.append(resume);
+      }
+      const fresh = document.createElement('button');
+      fresh.textContent = 'НОВАЯ ИГРА';
+      fresh.onclick = () => {
+        if (!slot) return choose(true);
+        card.replaceChildren();
+        const warning = document.createElement('p');
+        warning.textContent = `Удалить прогресс слота ${index + 1} и начать с обучения? Другие слоты сохранятся.`;
+        const confirm = document.createElement('button');
+        confirm.textContent = 'НАЧАТЬ ЗАНОВО';
+        confirm.onclick = () => choose(true);
+        const cancel = document.createElement('button');
+        cancel.textContent = 'ОТМЕНА';
+        cancel.onclick = () => this.showSaves();
+        card.append(warning, confirm, cancel);
+        confirm.focus();
+      };
+      card.append(fresh);
+      list.append(card);
+    });
+    this.menuNavigation?.show('saves');
+  },
   async room(id) {
     if (!this.cache.has(id)) {
       this.cache.set(id, await readJson('/assets/rooms/' + id + '.json'));
@@ -138,6 +212,7 @@ const app = {
           weapon: sim.player.weapon,
           ammo: sim.player.ammo,
           armor: sim.player.armor,
+          from: carry?.from,
         });
       }
       this.floorStates.set(id, sim);
@@ -149,6 +224,7 @@ const app = {
       elementById('loading').classList.add('hidden');
       this.audio.start();
       this.updateHUD();
+      this.saveFloor();
       if (!sim.tutorial) {
         this.toast(sim.total ? `ПЕРИМЕТР: ${sim.total} ПРОТИВНИКОВ` : 'НАЙДИ ВЫХОД');
       }
@@ -179,7 +255,7 @@ const app = {
     this.resetRun();
     this.deaths = 0;
     this.progress.last = this.chapter.index;
-    save('emergency-exit-progress', this.progress);
+    this.persist();
     this.load(this.chapter.rooms[0]);
   },
   resetRun() {
@@ -232,7 +308,7 @@ const app = {
     this.mode = 'menu';
     this.overlay('menu');
     elementById('ending-button').hidden = !endingUnlocked(this.progress);
-    elementById('continue').textContent = this.progress.unlocked
+    elementById('continue').textContent = saves.current.checkpoint || this.progress.unlocked
       ? 'ПРОДОЛЖИТЬ ПОБЕГ'
       : 'НАЧАТЬ ПОБЕГ';
     elementById('combo').classList.add('hidden');
@@ -310,7 +386,8 @@ const app = {
       };
     }
     this.progress.last = Math.min(CHAPTERS.length - 1, this.chapter.index + 1);
-    save('emergency-exit-progress', this.progress);
+    saves.current.checkpoint = null;
+    this.persist();
     elementById('next').textContent =
       this.chapter.index === CHAPTERS.length - 1 ? 'ЗАВЕРШИТЬ ПОБЕГ' : 'СЛЕДУЮЩАЯ ГЛАВА';
     if (this.chapter.index === CHAPTERS.length - 1 && endingUnlocked(this.progress)) {
@@ -396,7 +473,7 @@ async function boot() {
         forceSetTimeOut: false,
       },
     });
-    bindUI(app, () => save('emergency-exit-progress', app.progress));
+    bindUI(app, () => { saves.current.checkpoint = null; app.persist(); });
     window.__GAME__ = {
       getState: () =>
         app.sim?.snapshot() ?? {

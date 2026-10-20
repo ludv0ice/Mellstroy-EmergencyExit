@@ -25,7 +25,8 @@
           <h1>MELLSTROY<span>EMERGENCY EXIT</span></h1>
           <nav>
             <button id="continue" class="primary">НАЧАТЬ ПОБЕГ</button
-            ><button id="chapters-button">ВЫБРАТЬ ГЛАВУ</button
+            ><button id="saves-button">СОХРАНЕНИЯ / НОВАЯ ИГРА</button>
+          <button id="chapters-button">ВЫБРАТЬ ГЛАВУ</button
             ><button id="ending-button" hidden>СМОТРЕТЬ ФИНАЛ</button
             ><button id="settings-button">НАСТРОЙКИ / УПРАВЛЕНИЕ</button>
           </nav>
@@ -138,7 +139,8 @@
           <p class="menu-controls">W / S — выбор · Enter — подтвердить</p>
           <button id="resume" class="primary">ПРОДОЛЖИТЬ</button
           ><button id="restart">НАЧАТЬ КОМНАТУ ЗАНОВО</button
-          ><button id="pause-settings">НАСТРОЙКИ</button
+          ><button id="pause-saves">СОХРАНЕНИЯ / НОВАЯ ИГРА</button>
+        <button id="pause-settings">НАСТРОЙКИ</button
           ><button id="to-menu">В ГЛАВНОЕ МЕНЮ</button>
         </div>
       </section>
@@ -163,7 +165,15 @@
           ><button id="result-menu">В МЕНЮ</button>
         </div>
       </section>
-      <section id="settings" class="overlay dialog-overlay hidden">
+      <section id="saves" class="overlay dialog-overlay hidden">
+      <div class="dialog saves-dialog">
+        <h2>СОХРАНЕНИЯ</h2>
+        <p>Автосохранение в начале каждого этажа. Продолжение — с начала этажа. Прогресс хранится в этом браузере.</p>
+        <div id="save-list"></div>
+        <button class="back">НАЗАД В МЕНЮ</button>
+      </div>
+    </section>
+    <section id="settings" class="overlay dialog-overlay hidden">
         <div class="dialog settings">
           <h2>НАСТРОЙКИ</h2>
           <label

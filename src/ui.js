@@ -85,8 +85,9 @@ export function bindUI(app, saveProgress) {
     : 'НАЧАТЬ ПОБЕГ';
   elementById('continue').onclick = () => {
     app.audio.start();
-    app.briefing(app.progress.last ?? 0);
+    app.continueGame();
   };
+  onClick(['saves-button', 'pause-saves'], () => app.showSaves());
   elementById('deploy').onclick = () => app.start();
   elementById('ending-button').onclick = () => app.showEnding();
   elementById('chapters-button').onclick = () => {
@@ -204,7 +205,7 @@ function touchInput(app) {
     button.onpointercancel = () => (app.view.controls.attack = false);
   }
 }
-const panels = ['menu', 'pause', 'briefing', 'chapter-panel'];
+const panels = ['menu', 'pause', 'briefing', 'chapter-panel', 'saves'];
 export class MenuNavigation {
   constructor() {
     this.panel = null;

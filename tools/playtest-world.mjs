@@ -136,6 +136,8 @@ try {
   }
   assert.equal(await selected(), 'continue');
   await press('KeyS');
+  assert.equal(await selected(), 'saves-button');
+  await press('KeyS');
   assert.equal(await selected(), 'chapters-button');
   await press('Enter');
   assert.equal(await evaluate('window.__GAME__.mode'), 'chapters');
@@ -158,6 +160,8 @@ try {
   assert.equal(await selected(), 'resume');
   await press('KeyS');
   assert.equal(await selected(), 'restart');
+  await press('KeyS');
+  assert.equal(await selected(), 'pause-saves');
   await press('KeyS');
   assert.equal(await selected(), 'pause-settings');
   await press('Enter');

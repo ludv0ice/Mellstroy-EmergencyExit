@@ -227,6 +227,7 @@ try {
   assert.equal(await evaluate("document.getElementById('ending-button').hidden"), false);
   await press('KeyS');
   await press('KeyS');
+  await press('KeyS');
   await press('Enter');
   await evaluate('cancelAnimationFrame(window.__QA_APP__.ending.frame);true');
   assert.ok(await evaluate('window.__QA_APP__.ending.time<3'));

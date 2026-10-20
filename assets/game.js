@@ -1,4 +1,40 @@
 (() => {
+  var freshProgress = () => ({ unlocked: 0, best: {}, last: 0 });
+  var Saves = class {
+    constructor(storage2) {
+      var _a;
+      this.storage = storage2;
+      this.data = { active: 0, slots: [null, null, null] };
+      try {
+        const data = JSON.parse(storage2.getItem("emergency-exit-saves"));
+        if (data && Number.isInteger(data.active) && data.active >= 0 && data.active < 3 && ((_a = data.slots) == null ? void 0 : _a.length) === 3) {
+          this.data = data;
+        } else {
+          const legacy = JSON.parse(storage2.getItem("emergency-exit-progress"));
+          if (legacy == null ? void 0 : legacy.best) this.data.slots[0] = { progress: legacy, checkpoint: null };
+        }
+      } catch {
+      }
+      if (!this.current) this.data.slots[this.data.active] = { progress: freshProgress(), checkpoint: null };
+    }
+    get current() {
+      return this.data.slots[this.data.active];
+    }
+    write() {
+      try {
+        this.storage.setItem("emergency-exit-saves", JSON.stringify(this.data));
+        this.storage.setItem("emergency-exit-progress", JSON.stringify(this.current.progress));
+        return true;
+      } catch {
+        return false;
+      }
+    }
+    select(index, reset = false) {
+      this.data.active = index;
+      if (reset || !this.current) this.data.slots[index] = { progress: freshProgress(), checkpoint: null };
+      return this.write();
+    }
+  };
   var distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
   var clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   var angleDelta = (a, b) => Math.atan2(Math.sin(a - b), Math.cos(a - b));
@@ -4120,8 +4156,9 @@
     elementById("continue").textContent = app2.progress.unlocked ? "\u041F\u0420\u041E\u0414\u041E\u041B\u0416\u0418\u0422\u042C \u041F\u041E\u0411\u0415\u0413" : "\u041D\u0410\u0427\u0410\u0422\u042C \u041F\u041E\u0411\u0415\u0413";
     elementById("continue").onclick = () => {
       app2.audio.start();
-      app2.briefing(app2.progress.last ?? 0);
+      app2.continueGame();
     };
+    onClick(["saves-button", "pause-saves"], () => app2.showSaves());
     elementById("deploy").onclick = () => app2.start();
     elementById("ending-button").onclick = () => app2.showEnding();
     elementById("chapters-button").onclick = () => {
@@ -4240,7 +4277,7 @@
       button.onpointercancel = () => app2.view.controls.attack = false;
     }
   }
-  var panels = ["menu", "pause", "briefing", "chapter-panel"];
+  var panels = ["menu", "pause", "briefing", "chapter-panel", "saves"];
   var MenuNavigation = class {
     constructor() {
       this.panel = null;
@@ -4336,7 +4373,8 @@
     "pause",
     "death",
     "result",
-    "settings"
+    "settings",
+    "saves"
   ];
   function stored(key, fallback) {
     try {
@@ -4351,6 +4389,12 @@
     } catch {
     }
   }
+  var storage;
+  try {
+    storage = localStorage;
+  } catch {
+  }
+  var saves = new Saves(storage);
   var app = {
     mode: "loading",
     manifest: null,
@@ -4362,11 +4406,7 @@
     runScore: 0,
     runTime: 0,
     deaths: 0,
-    progress: stored("emergency-exit-progress", {
-      unlocked: 0,
-      best: {},
-      last: 0
-    }),
+    progress: saves.current.progress,
     settings: stored("emergency-exit-settings", {
       sound: 65,
       music: 35,
@@ -4376,6 +4416,81 @@
     cache:  new Map(),
     floorStates:  new Map(),
     checkpoints:  new Map(),
+    persist() {
+      saves.current.progress = this.progress;
+      if (!saves.write()) this.toast("\u041D\u0435 \u0443\u0434\u0430\u043B\u043E\u0441\u044C \u0441\u043E\u0445\u0440\u0430\u043D\u0438\u0442\u044C: \u043F\u0440\u043E\u0432\u0435\u0440\u044C \u0434\u043E\u0441\u0442\u0443\u043F \u0431\u0440\u0430\u0443\u0437\u0435\u0440\u0430 \u043A \u0445\u0440\u0430\u043D\u0438\u043B\u0438\u0449\u0443");
+    },
+    saveFloor() {
+      saves.current.checkpoint = {
+        chapter: this.chapter.index,
+        floor: this.floorIndex,
+        profile: this.profile.id,
+        carry: this.checkpoints.get(this.sim.room.id),
+        deaths: this.deaths,
+        floors: [...this.floorStates].filter(([id]) => id !== this.sim.room.id).map(([id, floor]) => [id, { score: floor.score, elapsed: floor.elapsed, total: floor.total }])
+      };
+      this.persist();
+    },
+    continueGame() {
+      this.audio.start();
+      const checkpoint = saves.current.checkpoint;
+      if (!checkpoint) return this.briefing(this.progress.last ?? 0);
+      this.resetRun();
+      this.chapter = CHAPTERS[checkpoint.chapter];
+      this.floorIndex = checkpoint.floor;
+      this.profile = PROFILES.find((profile) => profile.id === checkpoint.profile) ?? PROFILES[0];
+      this.deaths = checkpoint.deaths;
+      this.floorStates = new Map(checkpoint.floors);
+      this.runScore = [...this.floorStates.values()].reduce((sum, floor) => sum + floor.score, 0);
+      this.load(this.chapter.rooms[this.floorIndex], checkpoint.carry);
+    },
+    showSaves() {
+      var _a;
+      this.mode = "saves";
+      this.audio.active = false;
+      this.overlay("saves");
+      const list = elementById2("save-list");
+      list.replaceChildren();
+      saves.data.slots.forEach((slot, index) => {
+        const card = document.createElement("div");
+        card.className = "save-card";
+        const title = document.createElement("p");
+        title.textContent = `\u0421\u041B\u041E\u0422 ${index + 1}` + (index === saves.data.active ? " \xB7 \u0422\u0415\u041A\u0423\u0429\u0418\u0419" : "") + (slot ? ` \xB7 \u041F\u0440\u043E\u0439\u0434\u0435\u043D\u043E \u0433\u043B\u0430\u0432: ${Object.keys(slot.progress.best).length} / 22` : " \xB7 \u041F\u0423\u0421\u0422\u041E");
+        card.append(title);
+        const choose = (reset) => {
+          saves.select(index, reset);
+          this.progress = saves.current.progress;
+          this.resetRun();
+          if (reset) this.briefing(0);
+          else this.continueGame();
+        };
+        if (slot) {
+          const resume = document.createElement("button");
+          resume.textContent = "\u041F\u0420\u041E\u0414\u041E\u041B\u0416\u0418\u0422\u042C";
+          resume.onclick = () => choose(false);
+          card.append(resume);
+        }
+        const fresh = document.createElement("button");
+        fresh.textContent = "\u041D\u041E\u0412\u0410\u042F \u0418\u0413\u0420\u0410";
+        fresh.onclick = () => {
+          if (!slot) return choose(true);
+          card.replaceChildren();
+          const warning = document.createElement("p");
+          warning.textContent = `\u0423\u0434\u0430\u043B\u0438\u0442\u044C \u043F\u0440\u043E\u0433\u0440\u0435\u0441\u0441 \u0441\u043B\u043E\u0442\u0430 ${index + 1} \u0438 \u043D\u0430\u0447\u0430\u0442\u044C \u0441 \u043E\u0431\u0443\u0447\u0435\u043D\u0438\u044F? \u0414\u0440\u0443\u0433\u0438\u0435 \u0441\u043B\u043E\u0442\u044B \u0441\u043E\u0445\u0440\u0430\u043D\u044F\u0442\u0441\u044F.`;
+          const confirm = document.createElement("button");
+          confirm.textContent = "\u041D\u0410\u0427\u0410\u0422\u042C \u0417\u0410\u041D\u041E\u0412\u041E";
+          confirm.onclick = () => choose(true);
+          const cancel = document.createElement("button");
+          cancel.textContent = "\u041E\u0422\u041C\u0415\u041D\u0410";
+          cancel.onclick = () => this.showSaves();
+          card.append(warning, confirm, cancel);
+          confirm.focus();
+        };
+        card.append(fresh);
+        list.append(card);
+      });
+      (_a = this.menuNavigation) == null ? void 0 : _a.show("saves");
+    },
     async room(id) {
       if (!this.cache.has(id)) {
         this.cache.set(id, await readJson("/assets/rooms/" + id + ".json"));
@@ -4455,7 +4570,8 @@
           this.checkpoints.set(id, {
             weapon: sim.player.weapon,
             ammo: sim.player.ammo,
-            armor: sim.player.armor
+            armor: sim.player.armor,
+            from: carry == null ? void 0 : carry.from
           });
         }
         this.floorStates.set(id, sim);
@@ -4467,6 +4583,7 @@
         elementById2("loading").classList.add("hidden");
         this.audio.start();
         this.updateHUD();
+        this.saveFloor();
         if (!sim.tutorial) {
           this.toast(sim.total ? `\u041F\u0415\u0420\u0418\u041C\u0415\u0422\u0420: ${sim.total} \u041F\u0420\u041E\u0422\u0418\u0412\u041D\u0418\u041A\u041E\u0412` : "\u041D\u0410\u0419\u0414\u0418 \u0412\u042B\u0425\u041E\u0414");
         }
@@ -4495,7 +4612,7 @@
       this.resetRun();
       this.deaths = 0;
       this.progress.last = this.chapter.index;
-      save("emergency-exit-progress", this.progress);
+      this.persist();
       this.load(this.chapter.rooms[0]);
     },
     resetRun() {
@@ -4548,7 +4665,7 @@
       this.mode = "menu";
       this.overlay("menu");
       elementById2("ending-button").hidden = !endingUnlocked(this.progress);
-      elementById2("continue").textContent = this.progress.unlocked ? "\u041F\u0420\u041E\u0414\u041E\u041B\u0416\u0418\u0422\u042C \u041F\u041E\u0411\u0415\u0413" : "\u041D\u0410\u0427\u0410\u0422\u042C \u041F\u041E\u0411\u0415\u0413";
+      elementById2("continue").textContent = saves.current.checkpoint || this.progress.unlocked ? "\u041F\u0420\u041E\u0414\u041E\u041B\u0416\u0418\u0422\u042C \u041F\u041E\u0411\u0415\u0413" : "\u041D\u0410\u0427\u0410\u0422\u042C \u041F\u041E\u0411\u0415\u0413";
       elementById2("combo").classList.add("hidden");
       clearTimeout(this.toastTimer);
       elementById2("toast").style.opacity = "0";
@@ -4620,7 +4737,8 @@
         };
       }
       this.progress.last = Math.min(CHAPTERS.length - 1, this.chapter.index + 1);
-      save("emergency-exit-progress", this.progress);
+      saves.current.checkpoint = null;
+      this.persist();
       elementById2("next").textContent = this.chapter.index === CHAPTERS.length - 1 ? "\u0417\u0410\u0412\u0415\u0420\u0428\u0418\u0422\u042C \u041F\u041E\u0411\u0415\u0413" : "\u0421\u041B\u0415\u0414\u0423\u042E\u0429\u0410\u042F \u0413\u041B\u0410\u0412\u0410";
       if (this.chapter.index === CHAPTERS.length - 1 && endingUnlocked(this.progress)) {
         this.showEnding();
@@ -4706,7 +4824,10 @@
           forceSetTimeOut: false
         }
       });
-      bindUI(app, () => save("emergency-exit-progress", app.progress));
+      bindUI(app, () => {
+        saves.current.checkpoint = null;
+        app.persist();
+      });
       window.__GAME__ = {
         getState: () => {
           var _a;

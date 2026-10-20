@@ -75,7 +75,7 @@ def head_anchor(image):
 
 
 def main():
-    cells = extract(SOURCE, 15)
+    cells = extract(SOURCE, 8)
 
     walks = [row[:8] for row in cells]
     attacks = [row[:7] for row in extract(ATTACK_SOURCE, 7)]
