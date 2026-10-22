@@ -3559,31 +3559,18 @@
     ctx.restore();
   }
   function hero(ctx, assets, x, y, walking, direction, time, detonator) {
+    const frame = walking ? Math.floor(time * 8) % 8 : 0;
+    let image = assets.hero.image;
+    let column = frame;
+    let row = direction === "left" ? 2 : 0;
+    if (detonator) {
+      image = walking ? assets.detonatorWalk.image : assets.detonator.image;
+      column = walking ? frame : detonatorFrame(time);
+      row = 0;
+    }
     ctx.save();
     ctx.translate(Math.round(x), Math.round(y));
-    const frame = walking ? Math.floor(time * 8) % 8 : 0;
-    const row = direction === "left" ? 2 : 0;
-    if (detonator) {
-      const pose = detonatorFrame(time);
-      if (walking) {
-        ctx.drawImage(assets.detonator.image, pose * 60, 0, 60, 35, -39, -58, 78, 45.5);
-        ctx.drawImage(
-          assets.hero.image,
-          frame * 60,
-          row * 60 + 35,
-          60,
-          25,
-          -39,
-          -12.5,
-          78,
-          32.5
-        );
-      } else {
-        ctx.drawImage(assets.detonator.image, pose * 60, 0, 60, 60, -39, -58, 78, 78);
-      }
-    } else {
-      ctx.drawImage(assets.hero.image, frame * 60, row * 60, 60, 60, -39, -58, 78, 78);
-    }
+    ctx.drawImage(image, column * 60, row * 60, 60, 60, -39, -58, 78, 78);
     ctx.restore();
   }
   function street(ctx, time, assets, effects) {
@@ -3743,6 +3730,7 @@
     return {
       hero: custom("heroDirectional"),
       detonator: custom("heroDetonator"),
+      detonatorWalk: custom("heroDetonatorWalk"),
       car: custom("endingCar"),
       traffic: ["sprBossCar1", "sprBossCar2", "sprCopCar"].map(original)
     };

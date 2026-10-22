@@ -2,14 +2,6 @@ globalThis.__EMERGENCY_EXIT_ROOT__ = new URL("../", document.currentScript.src).
 globalThis.__EMERGENCY_EXIT_ASSETS__ = {
   "json": {
     "/assets/custom/skins.json": {
-      "hero": {
-        "url": "/assets/custom/mellstroy-walk.png",
-        "width": 60,
-        "height": 60,
-        "frames": 8,
-        "originX": 30,
-        "originY": 30
-      },
       "police": {
         "url": "/assets/custom/police-walk.png",
         "width": 32,
@@ -24,14 +16,6 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
         "height": 32,
         "frames": 8,
         "originX": 16,
-        "originY": 16
-      },
-      "punch": {
-        "url": "/assets/custom/mellstroy-punch.png",
-        "width": 44,
-        "height": 32,
-        "frames": 7,
-        "originX": 13,
         "originY": 16
       },
       "corpse": {
@@ -98,6 +82,14 @@ globalThis.__EMERGENCY_EXIT_ASSETS__ = {
         "width": 60,
         "height": 60,
         "frames": 4,
+        "originX": 30,
+        "originY": 30
+      },
+      "heroDetonatorWalk": {
+        "url": "/assets/custom/mellstroy-detonator-walk.png",
+        "width": 60,
+        "height": 60,
+        "frames": 8,
         "originX": 30,
         "originY": 30
       }
