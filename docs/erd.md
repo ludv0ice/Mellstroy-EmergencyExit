@@ -138,4 +138,4 @@ erDiagram
     registrations ||--o{ sponsorships : "registration_id"
 ```
 
-Каждый блок соответствует таблице миграции. Подпись связи — столбец внешнего ключа. Полный SQL: schema.sql. Ограничения и типы: data_dictionary.md.
+Каждый блок соответствует таблице миграции. Подпись связи — столбец внешнего ключа. SQL можно получить командой `alembic upgrade head --sql`. Ограничения и типы: data_dictionary.md.
