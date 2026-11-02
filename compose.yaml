@@ -1,0 +1,18 @@
+services:
+  db:
+    image: postgres:16.8
+    environment:
+      POSTGRES_DB: marathon
+      POSTGRES_USER: marathon
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-marathon_local}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - marathon_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U marathon -d marathon"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+volumes:
+  marathon_data:

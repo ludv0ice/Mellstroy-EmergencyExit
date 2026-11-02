@@ -1,0 +1,135 @@
+erDiagram
+    distances {
+        INTEGER id PK
+        VARCHAR name
+        NUMERIC kilometers
+    }
+    marathons {
+        INTEGER id PK
+        VARCHAR name
+        INTEGER year
+        VARCHAR city
+        VARCHAR country_code
+        DATE event_date
+    }
+    roles {
+        INTEGER id PK
+        VARCHAR code
+        VARCHAR name
+    }
+    sponsors {
+        INTEGER id PK
+        VARCHAR name
+        VARCHAR email
+        VARCHAR phone
+        TEXT description
+    }
+    users {
+        INTEGER id PK
+        VARCHAR email
+        VARCHAR password_hash
+        BOOLEAN is_active
+        DATETIME created_at
+    }
+    volunteers {
+        INTEGER id PK
+        VARCHAR first_name
+        VARCHAR last_name
+        VARCHAR email
+        VARCHAR phone
+    }
+    news {
+        INTEGER id PK
+        INTEGER marathon_id FK
+        INTEGER author_id FK
+        VARCHAR language_code
+        VARCHAR title
+        TEXT body
+        DATETIME published_at
+    }
+    users ||--o{ news : "author_id"
+    marathons ||--o{ news : "marathon_id"
+    races {
+        INTEGER id PK
+        INTEGER marathon_id FK
+        INTEGER distance_id FK
+        DATETIME starts_at
+        INTEGER capacity
+    }
+    distances ||--o{ races : "distance_id"
+    marathons ||--o{ races : "marathon_id"
+    runners {
+        INTEGER id PK
+        INTEGER user_id FK
+        VARCHAR first_name
+        VARCHAR last_name
+        DATE birth_date
+        VARCHAR country_code
+    }
+    users ||--o| runners : "user_id"
+    user_roles {
+        INTEGER id PK
+        INTEGER user_id FK
+        INTEGER role_id FK
+    }
+    roles ||--o{ user_roles : "role_id"
+    users ||--o{ user_roles : "user_id"
+    volunteer_assignments {
+        INTEGER id PK
+        INTEGER volunteer_id FK
+        INTEGER marathon_id FK
+        VARCHAR duty
+        DATETIME starts_at
+        DATETIME ends_at
+    }
+    volunteers ||--o{ volunteer_assignments : "volunteer_id"
+    marathons ||--o{ volunteer_assignments : "marathon_id"
+    achievements {
+        INTEGER id PK
+        INTEGER runner_id FK
+        VARCHAR title
+        TEXT description
+        DATE achieved_on
+    }
+    runners ||--o{ achievements : "runner_id"
+    registrations {
+        INTEGER id PK
+        INTEGER runner_id FK
+        INTEGER race_id FK
+        INTEGER bib_number
+        VARCHAR status
+        DATETIME registered_at
+    }
+    races ||--o{ registrations : "race_id"
+    runners ||--o{ registrations : "runner_id"
+    certificates {
+        INTEGER id PK
+        INTEGER registration_id FK
+        VARCHAR number
+        VARCHAR kind
+        DATETIME issued_at
+        VARCHAR file_path
+    }
+    registrations ||--o| certificates : "registration_id"
+    results {
+        INTEGER id PK
+        INTEGER registration_id FK
+        VARCHAR status
+        INTEGER elapsed_seconds
+    }
+    registrations ||--o| results : "registration_id"
+    sponsorships {
+        INTEGER id PK
+        INTEGER sponsor_id FK
+        INTEGER registration_id FK
+        NUMERIC amount
+        VARCHAR currency
+        TEXT terms
+        VARCHAR document_path
+        VARCHAR status
+        INTEGER confirmed_by_id FK
+        DATETIME confirmed_at
+    }
+    users ||--o{ sponsorships : "confirmed_by_id"
+    sponsors ||--o{ sponsorships : "sponsor_id"
+    registrations ||--o{ sponsorships : "registration_id"
