@@ -4,7 +4,7 @@
 
 ## Запуск
 
-Нужны Python 3.10+ и PostgreSQL 16 (либо Docker Compose).
+Нужны Python 3.10+ и PostgreSQL 16 (либо Docker Compose). Перед запуском заполните `DATABASE_URL` в `.env` в корне проекта. Для Docker также заполните `POSTGRES_PASSWORD`. В опубликованном файле значения пустые.
 
 ```bash
 python -m venv .venv
@@ -20,16 +20,20 @@ python -m scripts.seed
 uvicorn app.main:app --reload
 ```
 
-Если PostgreSQL уже установлен, вместо Docker создайте пустую БД и задайте подключение. По умолчанию используется `postgresql+psycopg://marathon:marathon_local@localhost:5432/marathon`.
+Подключение задается в файле `.env` в корне проекта:
 
-```bash
-# Linux/macOS:
-export DATABASE_URL='postgresql+psycopg://user:password@localhost:5432/marathon'
-# PowerShell:
-# $env:DATABASE_URL='postgresql+psycopg://user:password@localhost:5432/marathon'
+```dotenv
+DATABASE_URL=postgresql+psycopg://marathon:marathon_local@localhost:5432/marathon
+POSTGRES_PASSWORD=marathon_local
 ```
 
-Пароль `marathon_local` в Compose предназначен только для локальной учебной БД. При его изменении задайте соответствующий DATABASE_URL. Swagger: http://127.0.0.1:8000/docs (предметных маршрутов пока нет).
+Если PostgreSQL уже установлен, создайте пустую БД и замените в `DATABASE_URL` пользователя, пароль, адрес, порт и имя БД на свои. После изменения `.env` перезапустите приложение или повторно выполните команду миграции.
+
+`.env` автоматически читается приложением, Alembic и скриптом заполнения через общий пакет `app`, независимо от текущего рабочего каталога. Существующие переменные окружения имеют приоритет: если ранее задавали `DATABASE_URL` в терминале, удалите ее (`Remove-Item Env:DATABASE_URL` в PowerShell или `unset DATABASE_URL` в Linux/macOS), чтобы использовался файл.
+
+Docker Compose также читает `.env`: `POSTGRES_PASSWORD` задает пароль при первоначальном создании БД. При изменении пароля обновите и `DATABASE_URL`. Для существующего тома смена переменной сама по себе пароль в PostgreSQL не меняет.
+
+Пример выше содержит только учебные локальные настройки. Не отправляйте реальные пароли в GitHub. Swagger: http://127.0.0.1:8000/docs (предметных маршрутов пока нет).
 
 ### Ошибка установки psycopg-binary
 
@@ -44,7 +48,7 @@ export DATABASE_URL='postgresql+psycopg://user:password@localhost:5432/marathon'
 - `tests/`, `pytest.ini` — интеграционные проверки PostgreSQL.
 - `compose.yaml` — локальная PostgreSQL.
 - `docs/erd.md`, `docs/data_dictionary.md` — ER-диаграмма и словарь данных.
-- `requirements.txt` — 5 прямых зависимостей приложения; `requirements-dev.txt` добавляет только pytest.
+- `.env` — подключение к БД; `requirements.txt` — зависимости приложения; `requirements-dev.txt` добавляет только pytest.
 
 ## Тестовые данные и проверки
 

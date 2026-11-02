@@ -1,5 +1,3 @@
-"""Интеграционные тесты: TEST_DATABASE_URL должен указывать на ОТДЕЛЬНУЮ пустую БД."""
-
 import os
 from datetime import datetime, timezone
 from pathlib import Path
@@ -77,7 +75,9 @@ def test_schema_and_seed(database):
         assert reg.runner.user.email.endswith("@example.test")
         assert reg.race.marathon.city == "Екатеринбург"
         for registration in s.scalars(select(Registration)):
-            assert registration.runner.birth_date < registration.race.marathon.event_date
+            assert (
+                registration.runner.birth_date < registration.race.marathon.event_date
+            )
 
 
 @pytest.mark.parametrize(

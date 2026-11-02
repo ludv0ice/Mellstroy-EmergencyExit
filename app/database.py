@@ -15,12 +15,12 @@ class Base(DeclarativeBase):
     )
 
 
+def get_database_url():
+    url = os.getenv("DATABASE_URL")
+    if not url:
+        raise ValueError("Заполните DATABASE_URL в файле .env в корне проекта")
+    return url
+
+
 def make_engine(url=None):
-    return create_engine(
-        url
-        or os.getenv(
-            "DATABASE_URL",
-            "postgresql+psycopg://marathon:marathon_local@localhost:5432/marathon",
-        ),
-        pool_pre_ping=True,
-    )
+    return create_engine(url or get_database_url(), pool_pre_ping=True)

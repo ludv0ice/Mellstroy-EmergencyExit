@@ -1,5 +1,3 @@
-"""Детерминированные синтетические данные. Только отдельная учебная БД."""
-
 from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal
 from sqlalchemy import select, func
@@ -43,7 +41,7 @@ def seed(session):
     session.add_all(roles + distances)
     session.flush()
     for i in range(50):
-        # Нет рабочего пароля: все демонстрационные учетные записи отключены.
+
         user = User(
             email=f"runner{i+1}@example.test",
             password_hash="!disabled-demo-account",
