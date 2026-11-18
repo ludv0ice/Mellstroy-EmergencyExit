@@ -1,0 +1,5 @@
+pytest>=9.2.0
+coverage>=7.17.3
+pytest-cov>=7.1.0
+pluggy>=1.7.0
+Pygments>=2.21.0
